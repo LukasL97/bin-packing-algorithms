@@ -1,6 +1,6 @@
 package models.problem.rectangles
 
-import models.algorithm.{Solution, SolutionHandler}
+import models.algorithm.{LocalSearch, Solution, SolutionHandler}
 
 import scala.util.Random
 
@@ -11,17 +11,24 @@ trait RectanglesPlacement {
   val rectangleWidthRange: (Int, Int)
   val rectangleHeightRange: (Int, Int)
 
-  val boxes: Seq[Box] = (1 to numRectangles).map(index => Box(index, boxLength, boxLength))
+  val boxes: Set[Box] = (1 to numRectangles).map(index => Box(index, boxLength, boxLength)).toSet
 
   private val (rectangleWidthMin, rectangleWidthMax) = rectangleWidthRange
   private val (rectangleHeightMin, rectangleHeightMax) = rectangleHeightRange
 
-  val rectangles: Seq[Rectangle] = (1 to numRectangles).map(index => Rectangle(
+  val rectangles: Set[Rectangle] = (1 to numRectangles).map(index => Rectangle(
     index,
     rectangleWidthMin + Random.nextInt(rectangleWidthMax - rectangleWidthMin + 1),
     rectangleHeightMin + Random.nextInt(rectangleHeightMax - rectangleHeightMin + 1)
-  ))
+  )).toSet
 
+  val solutionHandler: RectanglesPlacementSolutionHandler
+  val localSearch: RectanglesPlacementLocalSearch
+
+}
+
+trait RectanglesPlacementLocalSearch extends LocalSearch[RectanglesPlacementSolution] {
+  override val solutionHandler: RectanglesPlacementSolutionHandler
 }
 
 case class RectanglesPlacementSolution (

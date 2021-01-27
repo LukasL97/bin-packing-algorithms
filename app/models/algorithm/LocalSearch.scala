@@ -10,7 +10,7 @@ trait LocalSearch[A <: Solution] {
 
   val solutionHandler: SolutionHandler[A]
 
-  def startSolution: A = solutionHandler.createArbitraryFeasibleSolution()
+  lazy val startSolution: A = solutionHandler.createArbitraryFeasibleSolution()
 
   def step(currentSolution: A): StepResult = {
     val currentSolutionResult = solutionHandler.evaluate(currentSolution)
