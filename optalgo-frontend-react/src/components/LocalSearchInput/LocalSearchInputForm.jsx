@@ -4,6 +4,14 @@ import LocalSearchInputFormRow from "./LocalSearchInputFormRow";
 class LocalSearchInputForm extends Component {
 
   render() {
+
+    const {start} = this.props
+
+    function startWithoutPageRefresh(event) {
+      event.preventDefault()
+      start()
+    }
+
     return (
       <div className="local-search-input-form">
         <form>
@@ -13,7 +21,7 @@ class LocalSearchInputForm extends Component {
           <LocalSearchInputFormRow label={"Max. Width"} name={"max-width"}/>
           <LocalSearchInputFormRow label={"Min. Height"} name={"min-height"}/>
           <LocalSearchInputFormRow label={"Max. Height"} name={"max-height"}/>
-          <button>Start</button>
+          <button onClick={startWithoutPageRefresh}>Start</button>
         </form>
       </div>
     )
