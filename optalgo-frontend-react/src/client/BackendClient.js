@@ -27,6 +27,23 @@ class BackendClient {
     }
   }
 
+  getRndInt(min, max) {
+    return Math.floor(Math.random() * (max - min) ) + min;
+  }
+
+  // TODO: integrate API when ready
+  fetchCurrentSolution() {
+    return {
+      placement: [
+        {
+          box: {id: 1, width: 100, height: 100},
+          coordinates: {x: this.getRndInt(0, 20), y: this.getRndInt(0, 20)},
+          rectangle: {id: 1, width: this.getRndInt(40, 80), height: this.getRndInt(40, 80)}
+        }
+      ]
+    }
+  }
+
 }
 
 export default BackendClient

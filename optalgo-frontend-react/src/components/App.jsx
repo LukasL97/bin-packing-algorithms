@@ -5,9 +5,12 @@ import BackendClient from "../client/BackendClient";
 
 class App extends Component {
 
+  fetchSolutionPeriod = 100
+
   backendClient = new BackendClient()
 
   state = {
+    running: false,
     placement: []
   }
 
@@ -32,10 +35,33 @@ class App extends Component {
     )(startSolution => {
       console.log(startSolution)
       this.setState({
+        running: true,
         placement: startSolution.data.placement
       })
-      console.log(this.state)
     })
+  }
+
+  fetchLatestSolution = () => {
+    this.setState({
+      running: this.state.running, // TODO: recognize finished run
+      placement: this.backendClient.fetchCurrentSolution().placement
+    })
+  }
+
+  componentDidMount() {
+    this.fetchSolutionInterval = setInterval(
+      () => {
+        if (this.state.running) {
+          this.fetchLatestSolution()
+          console.log(this.state)
+        }
+      },
+      this.fetchSolutionPeriod
+    )
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.fetchSolutionInterval)
   }
 
   render() {
