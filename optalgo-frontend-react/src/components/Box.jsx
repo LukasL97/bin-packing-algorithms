@@ -10,7 +10,7 @@ class Box extends Component {
   render() {
     const self = this
 
-    const {unitLength, pixelLength, getRectangles} = this.props
+    const {id, unitLength, pixelLength, getRectangles} = this.props
 
     function unitToPixel(unit) {
       return unit / unitLength * pixelLength
@@ -31,14 +31,16 @@ class Box extends Component {
     const rectangles = getRectangles().map((rectangle, index) => getRectShape(rectangle))
 
     return (
-      <Stage width={pixelLength} height={pixelLength}>
-        <Layer>
-          <Rect x={0} y={0} width={pixelLength} height={pixelLength} fill={this.boxFillColor} stroke={this.boxBorderColor}/>
-          <Group x={0} y={0}>
-            {rectangles}
-          </Group>
-        </Layer>
-      </Stage>
+      <div className="box" id={id}>
+        <Stage width={pixelLength} height={pixelLength}>
+          <Layer>
+            <Rect x={0} y={0} width={pixelLength} height={pixelLength} fill={this.boxFillColor} stroke={this.boxBorderColor}/>
+            <Group x={0} y={0}>
+              {rectangles}
+            </Group>
+          </Layer>
+        </Stage>
+      </div>
     )
   }
 }

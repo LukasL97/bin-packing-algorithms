@@ -11,35 +11,30 @@ class App extends Component {
     placement: []
   }
 
-  // TODO: get only for box id
-  getRectangles = () => {
-    console.log('STATE:')
-    console.log(this.state)
-    return this.state.placement.map(placing => {
-      return {
-        x: placing.coordinates.x,
-        y: placing.coordinates.y,
-        width: placing.rectangle.width,
-        height: placing.rectangle.height
-      }
-    })
-  }
+  getRectanglesPlacement = () => this.state.placement
 
-  // TODO: read from form
-  start = () => {
+  start = (
+    boxLength,
+    numRectangles,
+    minWidth,
+    maxWidth,
+    minHeight,
+    maxHeight
+  ) => {
     this.backendClient.startRectanglesPlacement(
       'geometryBased',
-      100,
-      2,
-      30,
-      80,
-      10,
-      90
+      boxLength,
+      numRectangles,
+      minWidth,
+      maxWidth,
+      minHeight,
+      maxHeight
     )(startSolution => {
       console.log(startSolution)
       this.setState({
         placement: startSolution.data.placement
       })
+      console.log(this.state)
     })
   }
 
@@ -47,7 +42,7 @@ class App extends Component {
     return (
       <div className="main">
         <Header/>
-        <Content getRectangles={this.getRectangles} start={this.start}/>
+        <Content getRectanglesPlacement={this.getRectanglesPlacement} start={this.start}/>
       </div>
     )
   }
