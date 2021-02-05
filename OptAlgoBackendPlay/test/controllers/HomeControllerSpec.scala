@@ -1,6 +1,6 @@
 package controllers
 
-import dao.RectanglesPlacementSolutionDAO
+import dao.RectanglesPlacementSolutionStepDAO
 import org.scalamock.scalatest.MockFactory
 import org.scalatestplus.play._
 import org.scalatestplus.play.guice._
@@ -15,7 +15,7 @@ import play.api.test.Helpers._
  */
 class HomeControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting with MockFactory {
 
-  private val dao = mock[RectanglesPlacementSolutionDAO]
+  private val dao = mock[RectanglesPlacementSolutionStepDAO]
 
   "HomeController GET" should {
 

@@ -2,6 +2,8 @@ package utils
 
 import org.joda.time.format.ISODateTimeFormat
 import org.joda.time.{DateTime, DateTimeZone}
+import org.json4s.native.Serialization.writePretty
+import org.json4s.native.parseJson
 import org.json4s.{DateFormat, DefaultFormats, Extraction, Formats, JValue, NoTypeHints, TypeHints}
 
 import java.util.{Date, TimeZone}
@@ -13,7 +15,13 @@ object SerializationUtil {
   def fromJson[T](json: JValue)(implicit m: Manifest[T], formats: Formats = formats): T =
     json.extract[T](formats, m)
 
+  def fromJsonString[T](json: String)(implicit m: Manifest[T], formats: Formats = formats): T =
+    fromJson[T](parseJson(json))
+
   def toJson(a: Any)(implicit formats: Formats = formats): JValue = Extraction.decompose(a)
+
+  def toJsonString(a: Any)(implicit formats: Formats = formats): String =
+    writePretty(toJson(a))
 
   def defaultFormats(hints: TypeHints) = new Formats {
     val dateFormat: DateFormat = new DateFormat {

@@ -1,6 +1,7 @@
 package controllers
 
-import dao.RectanglesPlacementSolutionDAO
+import actors.RectanglesPlacementSolutionStep
+import dao.RectanglesPlacementSolutionStepDAO
 import models.problem.rectangles.RectanglesPlacementSolution
 import play.api.mvc._
 
@@ -14,7 +15,7 @@ import scala.language.postfixOps
  * application's home page.
  */
 @Singleton
-class HomeController @Inject()(val controllerComponents: ControllerComponents, val dao: RectanglesPlacementSolutionDAO) extends BaseController {
+class HomeController @Inject()(val controllerComponents: ControllerComponents, val dao: RectanglesPlacementSolutionStepDAO) extends BaseController {
 
   /**
    * Create an Action to render an HTML page.
@@ -28,8 +29,8 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents, v
   }
 
   def mongoTest() = Action { implicit request: Request[AnyContent] =>
-    dao.dumpSolution("run", 42, RectanglesPlacementSolution(Map()))
-    val result = Await.result(dao.getSolutionsBetweenSteps("run", 42, 42), 1 second)
+    dao.dumpSolutionStep(RectanglesPlacementSolutionStep("run", 42, RectanglesPlacementSolution(Map())))
+    val result = Await.result(dao.getSolutionStepsInStepRange("run", 42, 42), 1 second)
     Ok(result.toString())
   }
 

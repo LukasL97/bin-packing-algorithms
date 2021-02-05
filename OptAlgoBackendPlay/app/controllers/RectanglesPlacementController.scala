@@ -2,14 +2,12 @@ package controllers
 
 import actors.RectanglesPlacementExecutor
 import akka.actor.ActorSystem
-import models.problem.rectangles.{GeometryBasedRectanglesPlacement, RectanglesPlacement, RectanglesPlacementSolution}
-import org.json4s
-import org.json4s.{Formats, ShortTypeHints}
-import org.json4s.JsonAST.{JArray, JObject, JValue}
+import models.problem.rectangles.{GeometryBasedRectanglesPlacement, RectanglesPlacement}
 import play.api.libs.json.JsValue
 import play.api.mvc._
 import utils.JsonConversions._
 import utils.SerializationUtil
+import utils.RectanglesPlacementSolutionSerializationUtil.formats
 
 import javax.inject.{Inject, Singleton}
 
@@ -23,29 +21,6 @@ class RectanglesPlacementController @Inject()(
   private val rectanglesPlacementExecutor = system.actorOf(
     RectanglesPlacementExecutor.props,
     "rectangles-placement-actor"
-  )
-
-  implicit val formats: Formats = SerializationUtil.defaultFormats(
-    new ShortTypeHints(List(classOf[RectanglesPlacementSolution])) {
-      override def serialize: PartialFunction[Any, json4s.JObject] = {
-        case solution: RectanglesPlacementSolution => solutionToJValue(solution)
-      }
-    }
-  )
-
-  private def solutionToJValue(solution: RectanglesPlacementSolution): JObject = JObject(
-    "placement" -> JArray(
-      solution.placement.toSeq.map {
-        case (rectangle, (box, (x, y))) => SerializationUtil.toJson(Map(
-          "rectangle" -> SerializationUtil.toJson(rectangle),
-          "box" -> SerializationUtil.toJson(box),
-          "coordinates" -> Map(
-            "x" -> x,
-            "y" -> y
-          )
-        ))
-      }.toList
-    )
   )
 
   def start(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
