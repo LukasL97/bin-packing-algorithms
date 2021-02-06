@@ -70,7 +70,7 @@ class RectanglesPlacementExecutorSpec extends WordSpec with MockFactory {
         (dao.dumpSolutionStep _)
           .expects(RectanglesPlacementSolutionStep(runId, 3, solution = RectanglesPlacementSolution(
             Map(rectanglesPlacement.rectangles.head -> (rectanglesPlacement.boxes.head, (2, 2)))
-          )))
+          ), finished = true))
           .returns(null)
 
         executor.execute(runId, rectanglesPlacement)

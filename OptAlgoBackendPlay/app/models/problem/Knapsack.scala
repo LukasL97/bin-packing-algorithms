@@ -74,6 +74,6 @@ object Knapsack {
   )
 
   def main(args: Array[String]): Unit = {
-    problem.KnapsackLocalSearch.run(100, (solution, step) => println(solution.toString + "\n\n"))
+    problem.KnapsackLocalSearch.run(100, (solution, step, finished) => println(solution.toString + "\n\n"))
   }
 }

@@ -37,12 +37,13 @@ class RectanglesPlacementExecutor(dao: RectanglesPlacementSolutionStepDAO) exten
     rectanglesPlacement.localSearch.run(maxIterations, dumpSolutionStep(runId))
   }
 
-  private def dumpSolutionStep(runId: String)(solution: RectanglesPlacementSolution, step: Int): Unit = {
+  private def dumpSolutionStep(runId: String)(solution: RectanglesPlacementSolution, step: Int, finished: Boolean): Unit = {
     dao.dumpSolutionStep(
       RectanglesPlacementSolutionStep(
         runId,
         step,
-        solution
+        solution,
+        finished
       )
     )
   }
