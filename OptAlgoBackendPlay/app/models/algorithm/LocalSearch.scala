@@ -21,17 +21,20 @@ trait LocalSearch[A <: Solution] {
     }
   }
 
-  def run(maxSteps: Int, beforeStep: A => Unit): A = {
-    def runRecursively(currentSolution: A, remainingSteps: Int): A = if (remainingSteps > 0) {
-      beforeStep(currentSolution)
+  def run(maxSteps: Int, afterStep: (A, Int) => Unit): A = {
+    def runRecursively(currentSolution: A, currentStep: Int): A = if (currentStep <= maxSteps) {
       step(currentSolution) match {
-        case Improvement(solution) => runRecursively(solution, remainingSteps - 1)
-        case Stagnation(solution) => solution
+        case Improvement(solution) =>
+          afterStep(solution, currentStep)
+          runRecursively(solution, currentStep + 1)
+        case Stagnation(solution) =>
+          afterStep(solution, currentStep)
+          solution
       }
     } else {
       currentSolution
     }
-    runRecursively(startSolution, maxSteps)
+    runRecursively(startSolution, 1)
   }
 
 }

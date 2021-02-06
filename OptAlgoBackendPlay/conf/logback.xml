@@ -31,8 +31,10 @@
     <appender-ref ref="STDOUT" />
   </appender>
 
-  <logger name="play" level="INFO" />
+  <logger name="play" level="TRACE" />
   <logger name="application" level="DEBUG" />
+
+  <logger name="actors" level="TRACE" />
 
   <root level="WARN">
     <appender-ref ref="ASYNCFILE" />

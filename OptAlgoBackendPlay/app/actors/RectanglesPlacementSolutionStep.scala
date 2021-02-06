@@ -7,3 +7,13 @@ case class RectanglesPlacementSolutionStep(
   step: Int,
   solution: RectanglesPlacementSolution
 )
+
+object RectanglesPlacementSolutionStep {
+  def getStartStep(runId: String, solution: RectanglesPlacementSolution): RectanglesPlacementSolutionStep = {
+    RectanglesPlacementSolutionStep(
+      runId,
+      0,
+      solution
+    )
+  }
+}

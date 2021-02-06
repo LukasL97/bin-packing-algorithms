@@ -11,12 +11,12 @@ trait RectanglesPlacement {
   val rectangleWidthRange: (Int, Int)
   val rectangleHeightRange: (Int, Int)
 
-  val boxes: Set[Box] = (1 to numRectangles).map(index => Box(index, boxLength, boxLength)).toSet
+  lazy val boxes: Set[Box] = (1 to numRectangles).map(index => Box(index, boxLength, boxLength)).toSet
 
-  private val (rectangleWidthMin, rectangleWidthMax) = rectangleWidthRange
-  private val (rectangleHeightMin, rectangleHeightMax) = rectangleHeightRange
+  private lazy val (rectangleWidthMin, rectangleWidthMax) = rectangleWidthRange
+  private lazy val (rectangleHeightMin, rectangleHeightMax) = rectangleHeightRange
 
-  val rectangles: Set[Rectangle] = (1 to numRectangles).map(index => Rectangle(
+  lazy val rectangles: Set[Rectangle] = (1 to numRectangles).map(index => Rectangle(
     index,
     rectangleWidthMin + Random.nextInt(rectangleWidthMax - rectangleWidthMin + 1),
     rectangleHeightMin + Random.nextInt(rectangleHeightMax - rectangleHeightMin + 1)

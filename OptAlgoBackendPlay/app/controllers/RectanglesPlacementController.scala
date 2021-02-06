@@ -1,10 +1,13 @@
 package controllers
 
+import actors.RectanglesPlacementActor
 import actors.RectanglesPlacementExecutor
 import actors.RectanglesPlacementSolutionStep
+import akka.actor.Actor
 import akka.actor.ActorRef
 import akka.actor.ActorRef.noSender
 import akka.actor.ActorSystem
+import akka.actor.Props
 import models.problem.rectangles.GeometryBasedRectanglesPlacement
 import models.problem.rectangles.RectanglesPlacement
 import play.api.libs.json.JsValue
@@ -21,11 +24,16 @@ import javax.inject.Singleton
 @Singleton
 class RectanglesPlacementController @Inject()(
   val controllerComponents: ControllerComponents,
-  val system: ActorSystem
+  val system: ActorSystem,
+  val rectanglesPlacementActorFactory: RectanglesPlacementActor.Factory
 ) extends BaseController {
 
+  def injectedChild2(create: => Actor, name: String): ActorRef = {
+    system.actorOf(Props(create), name)
+  }
+
   private def createExecutor(runId: String): ActorRef = system.actorOf(
-    RectanglesPlacementExecutor.props,
+    Props(rectanglesPlacementActorFactory.apply()),
     s"rectangles-placement-executor-$runId"
   )
 
@@ -43,11 +51,7 @@ class RectanglesPlacementController @Inject()(
     )
     val startSolution = rectanglesPlacement.localSearch.startSolution
     executor.tell((runId, rectanglesPlacement), noSender)
-    RectanglesPlacementSolutionStep(
-      runId,
-      0,
-      startSolution
-    )
+    RectanglesPlacementSolutionStep.getStartStep(runId, startSolution)
   }
 
   def start(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
