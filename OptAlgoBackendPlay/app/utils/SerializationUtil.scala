@@ -23,7 +23,7 @@ object SerializationUtil {
   def toJsonString(a: Any)(implicit formats: Formats = formats): String =
     writePretty(toJson(a))
 
-  def defaultFormats(hints: TypeHints) = new Formats {
+  def defaultFormats(hints: TypeHints): Formats = new Formats {
     val dateFormat: DateFormat = new DateFormat {
       override def parse(s: String): Option[Date] =
         try {

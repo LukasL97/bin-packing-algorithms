@@ -1,16 +1,15 @@
 package dao
 
 import actors.RectanglesPlacementSolutionStep
-import models.problem.rectangles.{Box, Rectangle, RectanglesPlacementSolution}
 import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.model.Filters._
-import org.mongodb.scala.{Completed, Document, MongoDatabase}
-import utils.SerializationUtil
+import org.mongodb.scala.Completed
+import org.mongodb.scala.MongoDatabase
 import utils.RectanglesPlacementSolutionSerializationUtil.formats
+import utils.SerializationUtil
 
 import javax.inject.Inject
 import scala.concurrent.Future
-import scala.jdk.CollectionConverters._
 
 class RectanglesPlacementSolutionStepDAO @Inject()(val db: MongoDatabase) {
 
