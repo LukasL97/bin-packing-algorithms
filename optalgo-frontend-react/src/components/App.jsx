@@ -6,7 +6,7 @@ import BackendClient from "../client/BackendClient";
 class App extends Component {
 
   fetchSolutionStepsPeriod = 100
-  removeFirstSolutionStepFromQueuePeriod = 100
+  removeFirstSolutionStepFromQueuePeriod = 1000
 
   backendClient = new BackendClient()
 
@@ -46,26 +46,31 @@ class App extends Component {
 
   fetchSolutionSteps = () => {
     const lastLoadedStep = last(this.state.solutionStepQueue).step
-    this.setState({
-      running: this.state.running, // TODO: recognize finished run
-      runId: this.state.runId,
-      solutionStepQueue: [
-        ...this.state.solutionStepQueue,
-        ...this.backendClient.fetchSolutionSteps(
-          this.state.runId,
-          lastLoadedStep + 1, // TODO: use proper step window
-          lastLoadedStep + 10
-        )
-      ]
+    this.backendClient.fetchSolutionSteps(
+      this.state.runId,
+      lastLoadedStep + 1, // TODO: use proper step window
+      lastLoadedStep + 10
+    )(solutionSteps => {
+      console.log(solutionSteps)
+      const finished = solutionSteps.data.length > 0 && last(solutionSteps.data).finished
+      this.setState({
+        running: !finished,
+        runId: this.state.runId,
+        solutionStepQueue: [
+          ...this.state.solutionStepQueue,
+          ...solutionSteps.data
+        ]
+      })
     })
   }
 
   removeFirstSolutionStepFromQueue = () => {
     if (this.state.solutionStepQueue.length > 1) {
+      const newSolutionStepQueue = this.state.solutionStepQueue.slice(1)
       this.setState({
-        running: this.state.running, // TODO: recognize finished run
+        running: this.state.running,
         runId: this.state.runId,
-        solutionStepQueue: this.state.solutionStepQueue.slice(1)
+        solutionStepQueue: newSolutionStepQueue
       })
     }
   }

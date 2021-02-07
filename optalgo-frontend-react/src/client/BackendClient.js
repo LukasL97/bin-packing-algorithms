@@ -8,8 +8,9 @@ class BackendClient {
 
   startRectanglesPlacement(strategy, boxLength, numRectangles, minWidth, maxWidth, minHeight, maxHeight) {
     return (callback) => {
-      console.trace("Starting algorithm")
-      axios.put('/rectanglesPlacement/start',
+      console.trace('Starting algorithm')
+      axios.put(
+        '/rectanglesPlacement/start',
         {
           strategy: strategy,
           boxLength: boxLength,
@@ -27,32 +28,20 @@ class BackendClient {
     }
   }
 
-  getRndInt(min, max) {
-    return Math.floor(Math.random() * (max - min)) + min;
-  }
-
-  createRandomSolution() {
-    return {
-      placement: [
-        {
-          box: {id: 1, width: 100, height: 100},
-          coordinates: {x: this.getRndInt(0, 20), y: this.getRndInt(0, 20)},
-          rectangle: {id: 1, width: this.getRndInt(40, 80), height: this.getRndInt(40, 80)}
-        }
-      ]
-    }
-  }
-
-  // TODO: integrate API when ready
   fetchSolutionSteps(runId, minStep, maxStep) {
-    return [...Array(maxStep - minStep + 1).keys()].map(i => {
-        return {
-          runId: runId,
-          step: minStep + i,
-          solution: this.createRandomSolution()
+    return (callback) => {
+      console.trace('Fetching steps ' + minStep  + ' - ' + maxStep + ' for runId ' + runId)
+      axios.get(
+        '/rectanglesPlacement/steps',
+        {
+          params: {
+            runId: runId,
+            minStep: minStep,
+            maxStep: maxStep
+          }
         }
-      }
-    )
+      ).then(solutionSteps => callback(solutionSteps))
+    }
   }
 
 }

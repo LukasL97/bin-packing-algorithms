@@ -5,7 +5,9 @@ class Box extends Component {
 
   boxFillColor = 'white'
   boxBorderColor = 'black'
-  rectangleColor = 'green'
+  rectangleFillColor = '#D6E9FE'
+  rectangleBorderColor = '#5995DA'
+
 
   render() {
     const self = this
@@ -23,7 +25,8 @@ class Box extends Component {
           y={unitToPixel(rectangle.y)}
           width={unitToPixel(rectangle.width)}
           height={unitToPixel(rectangle.height)}
-          fill={self.rectangleColor}
+          fill={self.rectangleFillColor}
+          stroke={self.rectangleBorderColor}
         />
       )
     }
@@ -34,7 +37,14 @@ class Box extends Component {
       <div className="box" id={id}>
         <Stage width={pixelLength} height={pixelLength}>
           <Layer>
-            <Rect x={0} y={0} width={pixelLength} height={pixelLength} fill={this.boxFillColor} stroke={this.boxBorderColor}/>
+            <Rect
+              x={0}
+              y={0}
+              width={pixelLength}
+              height={pixelLength}
+              fill={this.boxFillColor}
+              stroke={this.boxBorderColor}
+            />
             <Group x={0} y={0}>
               {rectangles}
             </Group>

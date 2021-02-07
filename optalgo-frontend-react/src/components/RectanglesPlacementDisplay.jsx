@@ -24,6 +24,10 @@ class RectanglesPlacementDisplay extends Component {
       })
   }
 
+  getUnique(boxes) {
+    return [...new Set(boxes.map(box => box.id))].map(id => boxes.find(box => box.id === id))
+  }
+
   render() {
 
     const newSolutionStep = this.getCurrentSolutionStep()
@@ -34,7 +38,8 @@ class RectanglesPlacementDisplay extends Component {
       })
     }
 
-    const boxes = [...new Set(this.state.placement.map(placing => placing.box))]
+    const boxes = this.getUnique(this.state.placement.map(placing => placing.box))
+      .sort((box1, box2) => box1.id - box2.id)
       .map(box => (
         <Box
           id={box.id}
