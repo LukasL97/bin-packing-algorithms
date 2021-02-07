@@ -5,16 +5,18 @@ import BackendClient from "../client/BackendClient";
 
 class App extends Component {
 
-  fetchSolutionPeriod = 100
+  fetchSolutionStepsPeriod = 100
+  removeFirstSolutionStepFromQueuePeriod = 100
 
   backendClient = new BackendClient()
 
   state = {
     running: false,
-    placement: []
+    runId: "",
+    solutionStepQueue: []
   }
 
-  getRectanglesPlacement = () => this.state.placement
+  getCurrentSolutionStep = () => this.state.solutionStepQueue[0]
 
   start = (
     boxLength,
@@ -32,46 +34,74 @@ class App extends Component {
       maxWidth,
       minHeight,
       maxHeight
-    )(startSolution => {
-      console.log(startSolution)
+    )(startSolutionStep => {
+      console.log(startSolutionStep)
       this.setState({
         running: true,
-        placement: startSolution.data.placement
+        runId: startSolutionStep.data.runId,
+        solutionStepQueue: [startSolutionStep.data]
       })
     })
   }
 
-  fetchLatestSolution = () => {
+  fetchSolutionSteps = () => {
+    const lastLoadedStep = last(this.state.solutionStepQueue).step
     this.setState({
       running: this.state.running, // TODO: recognize finished run
-      placement: this.backendClient.fetchCurrentSolution().placement
+      runId: this.state.runId,
+      solutionStepQueue: [
+        ...this.state.solutionStepQueue,
+        ...this.backendClient.fetchSolutionSteps(
+          this.state.runId,
+          lastLoadedStep + 1, // TODO: use proper step window
+          lastLoadedStep + 10
+        )
+      ]
     })
   }
 
+  removeFirstSolutionStepFromQueue = () => {
+    if (this.state.solutionStepQueue.length > 1) {
+      this.setState({
+        running: this.state.running, // TODO: recognize finished run
+        runId: this.state.runId,
+        solutionStepQueue: this.state.solutionStepQueue.slice(1)
+      })
+    }
+  }
+
   componentDidMount() {
-    this.fetchSolutionInterval = setInterval(
+    this.fetchSolutionStepsInterval = setInterval(
       () => {
         if (this.state.running) {
-          this.fetchLatestSolution()
-          console.log(this.state)
+          this.fetchSolutionSteps()
         }
       },
-      this.fetchSolutionPeriod
+      this.fetchSolutionStepsPeriod
+    )
+    this.removeFirstSolutionStepFromQueueInterval = setInterval(
+      this.removeFirstSolutionStepFromQueue,
+      this.removeFirstSolutionStepFromQueuePeriod
     )
   }
 
   componentWillUnmount() {
-    clearInterval(this.fetchSolutionInterval)
+    clearInterval(this.fetchSolutionStepsInterval)
+    clearInterval(this.removeFirstSolutionStepFromQueueInterval)
   }
 
   render() {
     return (
       <div className="main">
         <Header/>
-        <Content getRectanglesPlacement={this.getRectanglesPlacement} start={this.start}/>
+        <Content getCurrentSolutionStep={this.getCurrentSolutionStep} start={this.start}/>
       </div>
     )
   }
+}
+
+function last(array) {
+  return array[array.length - 1]
 }
 
 export default App

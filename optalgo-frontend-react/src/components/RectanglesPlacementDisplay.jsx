@@ -3,12 +3,16 @@ import Box from "./Box"
 
 class RectanglesPlacementDisplay extends Component {
 
+  state = {
+    placement: []
+  }
+
   boxPixelLength = 300
 
-  getRectanglesPlacement = this.props.getRectanglesPlacement
+  getCurrentSolutionStep = this.props.getCurrentSolutionStep
 
   getRectangles(boxId) {
-    return () => this.getRectanglesPlacement()
+    return () => this.state.placement
       .filter(placing => placing.box.id === boxId)
       .map(placing => {
         return {
@@ -22,7 +26,15 @@ class RectanglesPlacementDisplay extends Component {
 
   render() {
 
-    const boxes = [...new Set(this.getRectanglesPlacement().map(placing => placing.box))]
+    const newSolutionStep = this.getCurrentSolutionStep()
+
+    if (typeof newSolutionStep !== 'undefined' && newSolutionStep.solution.placement !== this.state.placement) {
+      this.setState({
+        placement: newSolutionStep.solution.placement
+      })
+    }
+
+    const boxes = [...new Set(this.state.placement.map(placing => placing.box))]
       .map(box => (
         <Box
           id={box.id}

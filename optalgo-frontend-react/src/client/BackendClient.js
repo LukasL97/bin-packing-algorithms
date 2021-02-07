@@ -23,16 +23,15 @@ class BackendClient {
             max: maxHeight
           }
         }
-      ).then(startSolution => callback(startSolution))
+      ).then(startSolutionStep => callback(startSolutionStep))
     }
   }
 
   getRndInt(min, max) {
-    return Math.floor(Math.random() * (max - min) ) + min;
+    return Math.floor(Math.random() * (max - min)) + min;
   }
 
-  // TODO: integrate API when ready
-  fetchCurrentSolution() {
+  createRandomSolution() {
     return {
       placement: [
         {
@@ -42,6 +41,18 @@ class BackendClient {
         }
       ]
     }
+  }
+
+  // TODO: integrate API when ready
+  fetchSolutionSteps(runId, minStep, maxStep) {
+    return [...Array(maxStep - minStep + 1).keys()].map(i => {
+        return {
+          runId: runId,
+          step: minStep + i,
+          solution: this.createRandomSolution()
+        }
+      }
+    )
   }
 
 }
