@@ -12,3 +12,4 @@ GET     /assets/*file               controllers.Assets.versioned(path="/public",
 GET     /mongoTest                  controllers.HomeController.mongoTest
 
 PUT     /rectanglesPlacement/start  controllers.RectanglesPlacementController.start
+GET     /rectanglesPlacement/steps  controllers.RectanglesPlacementController.getSteps(runId, minStep, maxStep)

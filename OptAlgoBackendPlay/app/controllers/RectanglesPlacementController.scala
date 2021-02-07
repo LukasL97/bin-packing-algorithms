@@ -1,13 +1,13 @@
 package controllers
 
 import actors.RectanglesPlacementActor
-import actors.RectanglesPlacementExecutor
 import actors.RectanglesPlacementSolutionStep
 import akka.actor.Actor
 import akka.actor.ActorRef
 import akka.actor.ActorRef.noSender
 import akka.actor.ActorSystem
 import akka.actor.Props
+import dao.RectanglesPlacementSolutionStepDAO
 import models.problem.rectangles.GeometryBasedRectanglesPlacement
 import models.problem.rectangles.RectanglesPlacement
 import play.api.libs.json.JsValue
@@ -16,17 +16,22 @@ import utils.JsonConversions._
 import utils.RectanglesPlacementSolutionSerializationUtil.formats
 import utils.SerializationUtil
 
+import java.lang.Integer.parseInt
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
 
 
 @Singleton
 class RectanglesPlacementController @Inject()(
   val controllerComponents: ControllerComponents,
   val system: ActorSystem,
-  val rectanglesPlacementActorFactory: RectanglesPlacementActor.Factory
+  val rectanglesPlacementActorFactory: RectanglesPlacementActor.Factory,
+  val dao: RectanglesPlacementSolutionStepDAO,
+  implicit val ec: ExecutionContext
 ) extends BaseController {
+
 
   def injectedChild2(create: => Actor, name: String): ActorRef = {
     system.actorOf(Props(create), name)
@@ -63,6 +68,12 @@ class RectanglesPlacementController @Inject()(
     }.getOrElse(
       BadRequest
     )
+  }
+
+  def getSteps(runId: String, minStep: String, maxStep: String): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+    dao.getSolutionStepsInStepRange(runId, parseInt(minStep), parseInt(maxStep))
+      .map(solutionSteps => SerializationUtil.toJson(solutionSteps))
+      .map(response => Ok(toPlayJson(response)))
   }
 
 }
