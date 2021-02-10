@@ -6,7 +6,8 @@ import BackendClient from "../client/BackendClient";
 class App extends Component {
 
   fetchSolutionStepsPeriod = 100
-  removeFirstSolutionStepFromQueuePeriod = 1000
+  fetchSolutionStepsCount = 100
+  removeFirstSolutionStepFromQueuePeriod = 100
 
   backendClient = new BackendClient()
 
@@ -48,8 +49,8 @@ class App extends Component {
     const lastLoadedStep = last(this.state.solutionStepQueue).step
     this.backendClient.fetchSolutionSteps(
       this.state.runId,
-      lastLoadedStep + 1, // TODO: use proper step window
-      lastLoadedStep + 10
+      lastLoadedStep + 1,
+      lastLoadedStep + this.fetchSolutionStepsCount
     )(solutionSteps => {
       console.log(solutionSteps)
       const finished = solutionSteps.data.length > 0 && last(solutionSteps.data).finished

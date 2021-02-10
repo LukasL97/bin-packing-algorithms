@@ -36,6 +36,7 @@ class RectanglesPlacementDisplay extends Component {
       this.setState({
         placement: newSolutionStep.solution.placement
       })
+      console.log("Visualize solution step " + newSolutionStep.step + " for run with id " + newSolutionStep.runId)
     }
 
     const boxes = this.getUnique(this.state.placement.map(placing => placing.box))
