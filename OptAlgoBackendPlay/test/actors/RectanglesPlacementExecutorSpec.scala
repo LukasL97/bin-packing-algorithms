@@ -41,7 +41,7 @@ class RectanglesPlacementExecutorSpec extends WordSpec with MockFactory {
               )).filter(solutionHandler.isFeasible)
             ).flatten
 
-            override def evaluate(solution: RectanglesPlacementSolution): Double = solution.placement.head match {
+            override def evaluate(solution: RectanglesPlacementSolution): BigDecimal = solution.placement.head match {
               case (rectangle, (box, (x, y))) => -(x + y)
             }
           }

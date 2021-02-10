@@ -27,7 +27,7 @@ class Knapsack(
       .filter(isFeasible)
       .toSet
 
-    override def evaluate(solution: KnapsackSolution): Double = {
+    override def evaluate(solution: KnapsackSolution): BigDecimal = {
       val overallValue = (solution.contains zip values)
         .collect { case (doesContain, value) if doesContain => value }
         .sum

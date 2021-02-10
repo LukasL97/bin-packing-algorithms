@@ -24,7 +24,7 @@ class RectanglesPlacementActor @Inject()(val dao: RectanglesPlacementSolutionSte
 class RectanglesPlacementExecutor(dao: RectanglesPlacementSolutionStepDAO) extends Logging {
 
   // TODO: proper configuration
-  val maxIterations = 10
+  val maxIterations = 1000
 
   def execute(runId: String, rectanglesPlacement: RectanglesPlacement): Unit = {
     logger.info(s"Starting ${getClass.getSimpleName} for runId $runId")
@@ -45,7 +45,7 @@ class RectanglesPlacementExecutor(dao: RectanglesPlacementSolutionStepDAO) exten
         runId,
         step,
         solution,
-        finished
+        finished || (step == maxIterations)
       )
     )
   }

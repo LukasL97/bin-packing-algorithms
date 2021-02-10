@@ -72,29 +72,34 @@ class GeometryBasedRectanglesPlacementSolutionHandler(
     neighborhood
   }
 
-  override def evaluate(solution: RectanglesPlacementSolution): Double = {
-    val boxWithMaxId = solution.placement.map {
-      case (rectangle, (box, coordinates)) => box
-    }.max((x: Box, y: Box) => x.id - y.id)
-    val numBoxesUsed = boxWithMaxId.id
-    val rectanglesInBoxWithMaxId = solution.placement.collect {
-      case (rectangle, (box, coordinates)) if box == boxWithMaxId => rectangle -> coordinates
+  override def evaluate(solution: RectanglesPlacementSolution): BigDecimal = {
+    val horizontalOrdering = new Ordering[(Rectangle, (Int, Int))]() {
+      override def compare(x: (Rectangle, (Int, Int)), y: (Rectangle, (Int, Int))): Int =
+        (x._1.width + x._2._1) - (y._1.width + y._2._1)
     }
-    val rightmostRectangleInBoxWithMaxId = rectanglesInBoxWithMaxId.max(
-      new Ordering[(Rectangle, (Int, Int))]() {
-        override def compare(x: (Rectangle, (Int, Int)), y: (Rectangle, (Int, Int))): Int =
-          (x._1.width + x._2._1) - (y._1.width + y._2._1)
-      }
-    )
-    val rightmostPointInBoxWithMaxId = rightmostRectangleInBoxWithMaxId._1.width + rightmostRectangleInBoxWithMaxId._2._1
-    val bottommostRectangleInBoxWithMaxId = rectanglesInBoxWithMaxId.max(
-      new Ordering[(Rectangle, (Int, Int))]() {
-        override def compare(x: (Rectangle, (Int, Int)), y: (Rectangle, (Int, Int))): Int =
-          (x._1.height + x._2._2) - (y._1.height + y._2._2)
-      }
-    )
-    val bottommostPointInBoxWithMaxId = bottommostRectangleInBoxWithMaxId._1.height + bottommostRectangleInBoxWithMaxId._2._2
-    val boxWithMaxIdFillRatio = (rightmostPointInBoxWithMaxId * bottommostPointInBoxWithMaxId).toFloat / (boxWithMaxId.width * boxWithMaxId.height)
-    numBoxesUsed - 1 + boxWithMaxIdFillRatio
+    val verticalOrdering = new Ordering[(Rectangle, (Int, Int))]() {
+      override def compare(x: (Rectangle, (Int, Int)), y: (Rectangle, (Int, Int))): Int =
+        (x._1.height + x._2._2) - (y._1.height + y._2._2)
+    }
+    val boxFillRates = boxes.map {
+      case Box(id, width, height) =>
+        val rectanglesInBox = solution.placement.collect {
+          case (rectangle, (box, coordinates)) if box.id == id => rectangle -> coordinates
+        }
+        val rightmostRectanglePointInBox = rectanglesInBox.maxOption(horizontalOrdering) match {
+          case Some((rectangle, (x, y))) => rectangle.width + x
+          case None => 0
+        }
+        val bottommostRectanglePointInBox = rectanglesInBox.maxOption(verticalOrdering) match {
+          case Some((rectangle, (x, y))) => rectangle.height + y
+          case None => 0
+        }
+        Box(id, width, height) -> BigDecimal(rightmostRectanglePointInBox * bottommostRectanglePointInBox) / (width * height)
+    }
+    val weightedBoxFillRates = boxFillRates.map {
+      case (box, fillRate) => fillRate * BigDecimal(box.width * box.height).pow(box.id)
+    }
+    weightedBoxFillRates.sum
   }
+
 }

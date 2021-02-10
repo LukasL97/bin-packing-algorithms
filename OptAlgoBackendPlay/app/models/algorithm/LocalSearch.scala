@@ -47,5 +47,5 @@ trait SolutionHandler[A <: Solution] {
 
   def getNeighborhood(solution: A): Set[A]
 
-  def evaluate(solution: A): Double
+  def evaluate(solution: A): BigDecimal
 }
