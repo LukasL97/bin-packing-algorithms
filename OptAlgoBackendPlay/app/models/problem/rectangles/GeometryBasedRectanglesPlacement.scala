@@ -45,6 +45,25 @@ class GeometryBasedRectanglesPlacementSolutionHandler(
     }
   }
 
+  def shiftUpSolution(solution: RectanglesPlacementSolution): RectanglesPlacementSolution = {
+    val usedBoxIds = solution.placement.map {
+      case (rectangle, (box, coordinates)) => box.id
+    }.toSet
+    val skippedBoxIds = (1 to usedBoxIds.max).filter(!usedBoxIds.contains(_))
+    skippedBoxIds match {
+      case Seq() => solution
+      case Seq(skippedBoxId) => RectanglesPlacementSolution(
+        solution.placement.map {
+          case (rectangle, (box, coordinates)) if box.id <= skippedBoxId =>
+            rectangle -> (box, coordinates)
+          case (rectangle, (box, coordinates)) if box.id > skippedBoxId =>
+            rectangle -> (box.copy(id = box.id - 1), coordinates)
+        }
+      )
+      case ids if ids.size > 1 => throw new RuntimeException("More than 1 box emptied in one neighborhood step")
+    }
+  }
+
   override def getNeighborhood(solution: RectanglesPlacementSolution): Set[RectanglesPlacementSolution] = {
     val solutionsWithBoxPullUp = solution.placement.collect {
       case (rectangle, (Box(id, width, height), (x, y))) if id > 1 =>
@@ -54,7 +73,7 @@ class GeometryBasedRectanglesPlacementSolutionHandler(
             (Box(id - 1, width, height), (width - rectangle.width, height - rectangle.height))
           )
         )
-    }.toSet
+    }.map(shiftUpSolution).toSet
     val solutionsWithUpShift = solution.placement.map {
       case (rectangle, (box, (x, y))) =>
         RectanglesPlacementSolution(
