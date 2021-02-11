@@ -14,6 +14,7 @@ class App extends Component {
   state = {
     running: false,
     runId: "",
+    fetchBlocked: false,
     solutionStepQueue: []
   }
 
@@ -40,12 +41,23 @@ class App extends Component {
       this.setState({
         running: true,
         runId: startSolutionStep.data.runId,
+        fetchBlocked: this.state.fetchBlocked,
         solutionStepQueue: [startSolutionStep.data]
       })
     })
   }
 
+  blockFetch = () => {
+    this.setState({
+      running: this.state.running,
+      runId: this.state.runId,
+      fetchBlocked: true,
+      solutionStepQueue: this.state.solutionStepQueue
+    })
+  }
+
   fetchSolutionSteps = () => {
+    this.blockFetch() // block fetching until fetched data is retrieved via the api and stored in the queue
     const lastLoadedStep = last(this.state.solutionStepQueue).step
     this.backendClient.fetchSolutionSteps(
       this.state.runId,
@@ -57,6 +69,7 @@ class App extends Component {
       this.setState({
         running: !finished,
         runId: this.state.runId,
+        fetchBlocked: false,
         solutionStepQueue: [
           ...this.state.solutionStepQueue,
           ...solutionSteps.data
@@ -71,6 +84,7 @@ class App extends Component {
       this.setState({
         running: this.state.running,
         runId: this.state.runId,
+        fetchBlocked: this.state.fetchBlocked,
         solutionStepQueue: newSolutionStepQueue
       })
     }
@@ -79,7 +93,7 @@ class App extends Component {
   componentDidMount() {
     this.fetchSolutionStepsInterval = setInterval(
       () => {
-        if (this.state.running) {
+        if (this.state.running && !this.state.fetchBlocked) {
           this.fetchSolutionSteps()
         }
       },
