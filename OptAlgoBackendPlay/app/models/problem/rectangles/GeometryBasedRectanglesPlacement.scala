@@ -25,6 +25,12 @@ class GeometryBasedRectanglesPlacementSolutionHandler(
   rectangles: Set[Rectangle]
 ) extends RectanglesPlacementSolutionHandler with Logging {
 
+  require(Set(boxes.map(_.width)).size == 1, "Not all boxes have the same width")
+  require(Set(boxes.map(_.height)).size == 1, "Not all boxes have the same height")
+  require(boxes.head.width == boxes.head.height, "Boxes have differing width and height")
+
+  private val boxLength = boxes.head.width
+
   override def createArbitraryFeasibleSolution(): RectanglesPlacementSolution = {
     require(boxes.size == rectangles.size)
     val solution = RectanglesPlacementSolution(
@@ -72,34 +78,44 @@ class GeometryBasedRectanglesPlacementSolutionHandler(
     neighborhood
   }
 
+  def buildLinearPointCostFunction(minimalCostWeight: BigDecimal, boxLength: Int): (Int, Int) => BigDecimal = {
+    require(minimalCostWeight < 1.0 && minimalCostWeight > 0.0)
+    val slope = 2 * (1 - minimalCostWeight) / (2 * boxLength - 2)
+    (x: Int, y: Int) => (slope * (x + y) + minimalCostWeight) / (boxLength * boxLength)
+  }
+
+  def calculateRectangleCost(
+    pointCostFunction: (Int, Int) => BigDecimal,
+    rectangle: Rectangle,
+    coordinates: (Int, Int)
+  ): BigDecimal = {
+    (coordinates._1 until (coordinates._1 + rectangle.width))
+      .flatMap(x => (coordinates._2 until (coordinates._2 + rectangle.height)).map(y => (x, y)))
+      .map { case (x, y) => pointCostFunction(x, y) }
+      .sum
+  }
+
+  def calculateBoxCostFactor(pointCostFunction: (Int, Int) => BigDecimal, id: Int): BigDecimal = {
+     ((1 / pointCostFunction(0, 0)) + 1).pow(id)
+  }
+
   override def evaluate(solution: RectanglesPlacementSolution): BigDecimal = {
-    val horizontalOrdering = new Ordering[(Rectangle, (Int, Int))]() {
-      override def compare(x: (Rectangle, (Int, Int)), y: (Rectangle, (Int, Int))): Int =
-        (x._1.width + x._2._1) - (y._1.width + y._2._1)
+    val minimalCostWeight = 0.9
+    val pointCostFunction = buildLinearPointCostFunction(minimalCostWeight, boxLength)
+    val boxIds = boxes.toSeq.map(_.id).sorted
+    val boxSkewedFillRates = boxIds.map { id =>
+      val rectanglesInBox = solution.placement.collect {
+        case (rectangle, (box, coordinates)) if box.id == id => rectangle -> coordinates
+      }
+      rectanglesInBox.map {
+        case (rectangle, coordinates) => calculateRectangleCost(pointCostFunction, rectangle, coordinates)
+      }.sum
     }
-    val verticalOrdering = new Ordering[(Rectangle, (Int, Int))]() {
-      override def compare(x: (Rectangle, (Int, Int)), y: (Rectangle, (Int, Int))): Int =
-        (x._1.height + x._2._2) - (y._1.height + y._2._2)
-    }
-    val boxFillRates = boxes.map {
-      case Box(id, width, height) =>
-        val rectanglesInBox = solution.placement.collect {
-          case (rectangle, (box, coordinates)) if box.id == id => rectangle -> coordinates
-        }
-        val rightmostRectanglePointInBox = rectanglesInBox.maxOption(horizontalOrdering) match {
-          case Some((rectangle, (x, y))) => rectangle.width + x
-          case None => 0
-        }
-        val bottommostRectanglePointInBox = rectanglesInBox.maxOption(verticalOrdering) match {
-          case Some((rectangle, (x, y))) => rectangle.height + y
-          case None => 0
-        }
-        Box(id, width, height) -> BigDecimal(rightmostRectanglePointInBox * bottommostRectanglePointInBox) / (width * height)
-    }
-    val weightedBoxFillRates = boxFillRates.map {
-      case (box, fillRate) => fillRate * BigDecimal(box.width * box.height).pow(box.id)
-    }
-    weightedBoxFillRates.sum
+    val boxCostFactors = boxIds.map(id => calculateBoxCostFactor(pointCostFunction, id))
+    (boxCostFactors zip boxSkewedFillRates)
+      .map {
+        case (factor, rate) => factor * rate
+      }.sum
   }
 
 }

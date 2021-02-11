@@ -10,7 +10,7 @@ class RectanglesPlacementSolutionHandlerSpec extends WordSpec with MustMatchers 
 
       val solutionHandler = new RectanglesPlacementSolutionHandler {
         override def getNeighborhood(solution: RectanglesPlacementSolution) = Set.empty[RectanglesPlacementSolution]
-        override def evaluate(solution: RectanglesPlacementSolution): Double = 0.0
+        override def evaluate(solution: RectanglesPlacementSolution): BigDecimal = 0.0
         override def createArbitraryFeasibleSolution(): RectanglesPlacementSolution = RectanglesPlacementSolution(Map.empty)
       }
 
