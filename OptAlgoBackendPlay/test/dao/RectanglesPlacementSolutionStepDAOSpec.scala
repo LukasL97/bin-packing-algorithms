@@ -3,12 +3,13 @@ package dao
 import actors.RectanglesPlacementSolutionStep
 import models.problem.rectangles.Coordinates
 import models.problem.rectangles.Placing
-import models.problem.rectangles.{Box, Rectangle, RectanglesPlacementSolution}
-import org.mongodb.scala.bson.BsonDocument
-import org.mongodb.scala.bson.collection.Document
-import org.mongodb.scala.{MongoCollection, MongoDatabase}
+import models.problem.rectangles.Box
+import models.problem.rectangles.Rectangle
+import models.problem.rectangles.RectanglesPlacementSolution
+import org.mongodb.scala.MongoDatabase
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.MustMatchers
+import org.scalatest.WordSpec
 
 class RectanglesPlacementSolutionStepDAOSpec extends WordSpec with MustMatchers with MockFactory {
 

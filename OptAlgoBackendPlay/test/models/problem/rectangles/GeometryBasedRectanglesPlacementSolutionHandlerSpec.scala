@@ -9,8 +9,8 @@ class GeometryBasedRectanglesPlacementSolutionHandlerSpec extends WordSpec with 
 
     "build linear point cost function whose point costs sum up to 1 for all points in a box" when {
       "given some box length" in {
-        val handler = new GeometryBasedRectanglesPlacementSolutionHandler(Set(Box(0, 1, 1)), Set())
         val boxLength = 10
+        val handler = new GeometryBasedRectanglesPlacementSolutionHandler(Set(), boxLength)
         val minimalCostWeight = 0.9
         val linearPointCostFunction = handler.buildLinearPointCostFunction(minimalCostWeight, boxLength)
         val boxPoints = (0 until boxLength).flatMap(x => (0 until boxLength).map(y => (x, y)))
@@ -24,8 +24,8 @@ class GeometryBasedRectanglesPlacementSolutionHandlerSpec extends WordSpec with 
     }
 
     "calculate single rectangle cost correctly" when {
-      val handler = new GeometryBasedRectanglesPlacementSolutionHandler(Set(Box(0, 1, 1)), Set())
       val boxLength = 10
+      val handler = new GeometryBasedRectanglesPlacementSolutionHandler(Set(), boxLength)
       val pointCostFunction = handler.buildLinearPointCostFunction(0.9, boxLength)
 
       "given a rectangle filling the entire box" in {

@@ -12,8 +12,6 @@ trait RectanglesPlacement {
   val rectangleWidthRange: (Int, Int)
   val rectangleHeightRange: (Int, Int)
 
-  lazy val boxes: Set[Box] = (1 to numRectangles).map(index => Box(index, boxLength, boxLength)).toSet
-
   private lazy val (rectangleWidthMin, rectangleWidthMax) = rectangleWidthRange
   private lazy val (rectangleHeightMin, rectangleHeightMax) = rectangleHeightRange
 

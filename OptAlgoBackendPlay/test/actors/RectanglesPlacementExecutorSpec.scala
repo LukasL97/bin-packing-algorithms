@@ -1,17 +1,15 @@
 package actors
 
 import dao.RectanglesPlacementSolutionStepDAO
+import models.problem.rectangles.Box
 import models.problem.rectangles.Coordinates
 import models.problem.rectangles.Placing
 import models.problem.rectangles.RectanglesPlacement
 import models.problem.rectangles.RectanglesPlacementLocalSearch
 import models.problem.rectangles.RectanglesPlacementSolution
 import models.problem.rectangles.RectanglesPlacementSolutionHandler
-import org.mongodb.scala.Completed
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.WordSpec
-
-import scala.concurrent.Future
 
 class RectanglesPlacementExecutorSpec extends WordSpec with MockFactory {
 
@@ -24,15 +22,18 @@ class RectanglesPlacementExecutorSpec extends WordSpec with MockFactory {
       "receiving rectanglesPlacement with top left start solution, bottom right optimum, and diagonal neighborhood path" in {
         val runId = "runId"
 
-        val rectanglesPlacement = new RectanglesPlacement {
-          override val boxLength: Int = 3
+        val boxLength_ = 3
+        val box = Box(1, boxLength_, boxLength_)
+
+        val rectanglesPlacement: RectanglesPlacement = new RectanglesPlacement {
+          override val boxLength: Int = boxLength_
           override val numRectangles: Int = 1
           override val rectangleWidthRange: (Int, Int) = (1, 1)
           override val rectangleHeightRange: (Int, Int) = (1, 1)
 
           override val solutionHandler: RectanglesPlacementSolutionHandler = new RectanglesPlacementSolutionHandler {
             override def createArbitraryFeasibleSolution(): RectanglesPlacementSolution = RectanglesPlacementSolution(
-              Map(rectangles.head -> Placing(boxes.head, Coordinates(0, 0)))
+              Map(rectangles.head -> Placing(box, Coordinates(0, 0)))
             )
 
             override def getNeighborhood(solution: RectanglesPlacementSolution): Set[RectanglesPlacementSolution] = Set(
@@ -56,22 +57,22 @@ class RectanglesPlacementExecutorSpec extends WordSpec with MockFactory {
 
         (dao.dumpSolutionStep _)
           .expects(RectanglesPlacementSolutionStep(runId, 0, solution = RectanglesPlacementSolution(
-            Map(rectanglesPlacement.rectangles.head -> Placing(rectanglesPlacement.boxes.head, Coordinates(0, 0)))
+            Map(rectanglesPlacement.rectangles.head -> Placing(box, Coordinates(0, 0)))
           )))
           .returns(null)
         (dao.dumpSolutionStep _)
           .expects(RectanglesPlacementSolutionStep(runId, 1, solution = RectanglesPlacementSolution(
-            Map(rectanglesPlacement.rectangles.head -> Placing(rectanglesPlacement.boxes.head, Coordinates(1, 1)))
+            Map(rectanglesPlacement.rectangles.head -> Placing(box, Coordinates(1, 1)))
           )))
           .returns(null)
         (dao.dumpSolutionStep _)
           .expects(RectanglesPlacementSolutionStep(runId, 2, solution = RectanglesPlacementSolution(
-            Map(rectanglesPlacement.rectangles.head -> Placing(rectanglesPlacement.boxes.head, Coordinates(2, 2)))
+            Map(rectanglesPlacement.rectangles.head -> Placing(box, Coordinates(2, 2)))
           )))
           .returns(null)
         (dao.dumpSolutionStep _)
           .expects(RectanglesPlacementSolutionStep(runId, 3, solution = RectanglesPlacementSolution(
-            Map(rectanglesPlacement.rectangles.head -> Placing(rectanglesPlacement.boxes.head, Coordinates(2, 2)))
+            Map(rectanglesPlacement.rectangles.head -> Placing(box, Coordinates(2, 2)))
           ), finished = true))
           .returns(null)
 

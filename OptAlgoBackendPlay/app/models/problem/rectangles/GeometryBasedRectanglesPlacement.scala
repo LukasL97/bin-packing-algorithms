@@ -10,7 +10,7 @@ class GeometryBasedRectanglesPlacement(
 ) extends RectanglesPlacement {
 
   override val solutionHandler: RectanglesPlacementSolutionHandler =
-    new GeometryBasedRectanglesPlacementSolutionHandler(boxes, rectangles)
+    new GeometryBasedRectanglesPlacementSolutionHandler(rectangles, boxLength)
 
   private val thisSolutionHandler = solutionHandler
 
@@ -21,22 +21,18 @@ class GeometryBasedRectanglesPlacement(
 }
 
 class GeometryBasedRectanglesPlacementSolutionHandler(
-  boxes: Set[Box],
-  rectangles: Set[Rectangle]
+  rectangles: Set[Rectangle],
+  boxLength: Int,
 ) extends RectanglesPlacementSolutionHandler with Logging {
 
-  require(Set(boxes.map(_.width)).size == 1, "Not all boxes have the same width")
-  require(Set(boxes.map(_.height)).size == 1, "Not all boxes have the same height")
-  require(boxes.head.width == boxes.head.height, "Boxes have differing width and height")
-
-  private val boxLength = boxes.head.width
-
   override def createArbitraryFeasibleSolution(): RectanglesPlacementSolution = {
-    require(boxes.size == rectangles.size)
     val solution = RectanglesPlacementSolution(
-      (rectangles zip boxes).map {
-        case (rectangle, box) => rectangle -> Placing(box, Coordinates(0, 0))
-      }.toMap
+      rectangles
+        .map(rectangle => rectangle -> Placing(
+          Box(rectangle.id, boxLength, boxLength),
+          Coordinates(0, 0)
+        ))
+        .toMap
     )
     if (isFeasible(solution)) {
       solution
@@ -115,13 +111,15 @@ class GeometryBasedRectanglesPlacementSolutionHandler(
   }
 
   def calculateBoxCostFactor(pointCostFunction: Coordinates => BigDecimal, id: Int): BigDecimal = {
-     ((1 / pointCostFunction(Coordinates(0, 0))) + 1).pow(id)
+    ((1 / pointCostFunction(Coordinates(0, 0))) + 1).pow(id)
   }
 
   override def evaluate(solution: RectanglesPlacementSolution): BigDecimal = {
     val minimalCostWeight = 0.9
     val pointCostFunction = buildLinearPointCostFunction(minimalCostWeight, boxLength)
-    val boxIds = boxes.toSeq.map(_.id).sorted
+    val boxIds = solution.placement.map {
+      case (rectangle, Placing(box, coordinates)) => box.id
+    }.toSeq.sorted
     val boxSkewedFillRates = boxIds.map { id =>
       val rectanglesInBox = solution.placement.collect {
         case (rectangle, Placing(box, coordinates)) if box.id == id => rectangle -> coordinates
