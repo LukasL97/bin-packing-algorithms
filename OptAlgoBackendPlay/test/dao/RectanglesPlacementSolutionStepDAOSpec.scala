@@ -1,6 +1,8 @@
 package dao
 
 import actors.RectanglesPlacementSolutionStep
+import models.problem.rectangles.Coordinates
+import models.problem.rectangles.Placing
 import models.problem.rectangles.{Box, Rectangle, RectanglesPlacementSolution}
 import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.bson.collection.Document
@@ -20,8 +22,8 @@ class RectanglesPlacementSolutionStepDAOSpec extends WordSpec with MustMatchers 
           42,
           RectanglesPlacementSolution(
             Map(
-              Rectangle(0, 2, 2) -> (Box(0, 4, 4), (1, 1)),
-              Rectangle(1, 1, 3) -> (Box(1, 4, 5), (0, 0))
+              Rectangle(0, 2, 2) -> Placing(Box(0, 4, 4), Coordinates(1, 1)),
+              Rectangle(1, 1, 3) -> Placing(Box(1, 4, 5), Coordinates(0, 0))
             )
           )
         )

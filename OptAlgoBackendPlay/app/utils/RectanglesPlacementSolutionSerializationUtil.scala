@@ -1,5 +1,7 @@
 package utils
 
+import models.problem.rectangles.Coordinates
+import models.problem.rectangles.Placing
 import models.problem.rectangles.{Box, Rectangle, RectanglesPlacementSolution}
 import org.json4s
 import org.json4s.JsonAST.{JArray, JInt, JObject, JValue}
@@ -23,7 +25,7 @@ object RectanglesPlacementSolutionSerializationUtil {
   private def solutionToJObject(solution: RectanglesPlacementSolution): JObject = JObject(
     "placement" -> JArray(
       solution.placement.toSeq.map {
-        case (rectangle, (box, (x, y))) => SerializationUtil.toJson(Map(
+        case (rectangle, Placing(box, Coordinates(x, y))) => SerializationUtil.toJson(Map(
           "rectangle" -> SerializationUtil.toJson(rectangle),
           "box" -> SerializationUtil.toJson(box),
           "coordinates" -> Map(
@@ -52,7 +54,7 @@ object RectanglesPlacementSolutionSerializationUtil {
         val coordinates = getFieldValue(placing, "coordinates").asInstanceOf[JObject]
         val x = getFieldValue(coordinates, "x").asInstanceOf[JInt].num.toInt
         val y = getFieldValue(coordinates, "y").asInstanceOf[JInt].num.toInt
-        rectangle -> (box, (x, y))
+        rectangle -> Placing(box, Coordinates(x, y))
       }.toMap
   )
 

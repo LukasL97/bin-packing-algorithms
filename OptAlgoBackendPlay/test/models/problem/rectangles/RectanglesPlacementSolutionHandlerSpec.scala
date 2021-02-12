@@ -19,11 +19,11 @@ class RectanglesPlacementSolutionHandlerSpec extends WordSpec with MustMatchers 
 
       "given a non-overlapping in-box placement" in {
         val solution = RectanglesPlacementSolution(Map(
-          Rectangle(0, 5, 5) -> (box1, (0, 0)),
-          Rectangle(1, 5, 7) -> (box1, (5, 2)),
-          Rectangle(2, 3, 3) -> (box1, (1, 6)),
-          Rectangle(3, 2, 8) -> (box2, (1, 1)),
-          Rectangle(4, 5, 5) -> (box2, (5, 5))
+          Rectangle(0, 5, 5) -> Placing(box1, Coordinates(0, 0)),
+          Rectangle(1, 5, 7) -> Placing(box1, Coordinates(5, 2)),
+          Rectangle(2, 3, 3) -> Placing(box1, Coordinates(1, 6)),
+          Rectangle(3, 2, 8) -> Placing(box2, Coordinates(1, 1)),
+          Rectangle(4, 5, 5) -> Placing(box2, Coordinates(5, 5))
         ))
 
         solutionHandler.isFeasible(solution) mustEqual true
@@ -31,11 +31,11 @@ class RectanglesPlacementSolutionHandlerSpec extends WordSpec with MustMatchers 
 
       "given an overlapping placement" in {
         val solution = RectanglesPlacementSolution(Map(
-          Rectangle(0, 5, 5) -> (box1, (0, 0)),
-          Rectangle(1, 5, 7) -> (box1, (5, 2)),
-          Rectangle(2, 3, 3) -> (box1, (1, 6)),
-          Rectangle(3, 2, 8) -> (box2, (1, 1)),
-          Rectangle(4, 5, 5) -> (box2, (2, 5))
+          Rectangle(0, 5, 5) -> Placing(box1, Coordinates(0, 0)),
+          Rectangle(1, 5, 7) -> Placing(box1, Coordinates(5, 2)),
+          Rectangle(2, 3, 3) -> Placing(box1, Coordinates(1, 6)),
+          Rectangle(3, 2, 8) -> Placing(box2, Coordinates(1, 1)),
+          Rectangle(4, 5, 5) -> Placing(box2, Coordinates(2, 5))
         ))
 
         solutionHandler.isFeasible(solution) mustBe false
@@ -43,8 +43,8 @@ class RectanglesPlacementSolutionHandlerSpec extends WordSpec with MustMatchers 
 
       "given an out-of-box placement" in {
         val solution = RectanglesPlacementSolution(Map(
-          Rectangle(0, 5, 5) -> (box1, (0, 0)),
-          Rectangle(1, 5, 5) -> (box2, (6, 5))
+          Rectangle(0, 5, 5) -> Placing(box1, Coordinates(0, 0)),
+          Rectangle(1, 5, 5) -> Placing(box2, Coordinates(6, 5))
         ))
 
         solutionHandler.isFeasible(solution) mustBe false

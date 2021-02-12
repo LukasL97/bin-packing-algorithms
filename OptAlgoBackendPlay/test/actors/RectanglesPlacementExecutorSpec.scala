@@ -1,6 +1,8 @@
 package actors
 
 import dao.RectanglesPlacementSolutionStepDAO
+import models.problem.rectangles.Coordinates
+import models.problem.rectangles.Placing
 import models.problem.rectangles.RectanglesPlacement
 import models.problem.rectangles.RectanglesPlacementLocalSearch
 import models.problem.rectangles.RectanglesPlacementSolution
@@ -30,19 +32,19 @@ class RectanglesPlacementExecutorSpec extends WordSpec with MockFactory {
 
           override val solutionHandler: RectanglesPlacementSolutionHandler = new RectanglesPlacementSolutionHandler {
             override def createArbitraryFeasibleSolution(): RectanglesPlacementSolution = RectanglesPlacementSolution(
-              Map(rectangles.head -> (boxes.head, (0, 0)))
+              Map(rectangles.head -> Placing(boxes.head, Coordinates(0, 0)))
             )
 
             override def getNeighborhood(solution: RectanglesPlacementSolution): Set[RectanglesPlacementSolution] = Set(
               Option(RectanglesPlacementSolution(
                 solution.placement.map {
-                  case (rectangle, (box, (x, y))) => rectangle -> (box, (x + 1, y + 1))
+                  case (rectangle, Placing(box, Coordinates(x, y))) => rectangle -> Placing(box, Coordinates(x + 1, y + 1))
                 }
               )).filter(solutionHandler.isFeasible)
             ).flatten
 
             override def evaluate(solution: RectanglesPlacementSolution): BigDecimal = solution.placement.head match {
-              case (rectangle, (box, (x, y))) => -(x + y)
+              case (rectangle, Placing(box, Coordinates(x, y))) => -(x + y)
             }
           }
 
@@ -54,22 +56,22 @@ class RectanglesPlacementExecutorSpec extends WordSpec with MockFactory {
 
         (dao.dumpSolutionStep _)
           .expects(RectanglesPlacementSolutionStep(runId, 0, solution = RectanglesPlacementSolution(
-            Map(rectanglesPlacement.rectangles.head -> (rectanglesPlacement.boxes.head, (0, 0)))
+            Map(rectanglesPlacement.rectangles.head -> Placing(rectanglesPlacement.boxes.head, Coordinates(0, 0)))
           )))
           .returns(null)
         (dao.dumpSolutionStep _)
           .expects(RectanglesPlacementSolutionStep(runId, 1, solution = RectanglesPlacementSolution(
-            Map(rectanglesPlacement.rectangles.head -> (rectanglesPlacement.boxes.head, (1, 1)))
+            Map(rectanglesPlacement.rectangles.head -> Placing(rectanglesPlacement.boxes.head, Coordinates(1, 1)))
           )))
           .returns(null)
         (dao.dumpSolutionStep _)
           .expects(RectanglesPlacementSolutionStep(runId, 2, solution = RectanglesPlacementSolution(
-            Map(rectanglesPlacement.rectangles.head -> (rectanglesPlacement.boxes.head, (2, 2)))
+            Map(rectanglesPlacement.rectangles.head -> Placing(rectanglesPlacement.boxes.head, Coordinates(2, 2)))
           )))
           .returns(null)
         (dao.dumpSolutionStep _)
           .expects(RectanglesPlacementSolutionStep(runId, 3, solution = RectanglesPlacementSolution(
-            Map(rectanglesPlacement.rectangles.head -> (rectanglesPlacement.boxes.head, (2, 2)))
+            Map(rectanglesPlacement.rectangles.head -> Placing(rectanglesPlacement.boxes.head, Coordinates(2, 2)))
           ), finished = true))
           .returns(null)
 

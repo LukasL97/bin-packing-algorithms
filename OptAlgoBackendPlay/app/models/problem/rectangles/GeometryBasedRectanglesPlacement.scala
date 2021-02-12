@@ -35,7 +35,7 @@ class GeometryBasedRectanglesPlacementSolutionHandler(
     require(boxes.size == rectangles.size)
     val solution = RectanglesPlacementSolution(
       (rectangles zip boxes).map {
-        case (rectangle, box) => rectangle -> (box, (0, 0))
+        case (rectangle, box) => rectangle -> Placing(box, Coordinates(0, 0))
       }.toMap
     )
     if (isFeasible(solution)) {
@@ -47,17 +47,17 @@ class GeometryBasedRectanglesPlacementSolutionHandler(
 
   def shiftUpSolution(solution: RectanglesPlacementSolution): RectanglesPlacementSolution = {
     val usedBoxIds = solution.placement.map {
-      case (rectangle, (box, coordinates)) => box.id
+      case (rectangle, Placing(box, coordinates)) => box.id
     }.toSet
     val skippedBoxIds = (1 to usedBoxIds.max).filter(!usedBoxIds.contains(_))
     skippedBoxIds match {
       case Seq() => solution
       case Seq(skippedBoxId) => RectanglesPlacementSolution(
         solution.placement.map {
-          case (rectangle, (box, coordinates)) if box.id <= skippedBoxId =>
-            rectangle -> (box, coordinates)
-          case (rectangle, (box, coordinates)) if box.id > skippedBoxId =>
-            rectangle -> (box.copy(id = box.id - 1), coordinates)
+          case (rectangle, Placing(box, coordinates)) if box.id <= skippedBoxId =>
+            rectangle -> Placing(box, coordinates)
+          case (rectangle, Placing(box, coordinates)) if box.id > skippedBoxId =>
+            rectangle -> Placing(box.copy(id = box.id - 1), coordinates)
         }
       )
       case ids if ids.size > 1 => throw new RuntimeException("More than 1 box emptied in one neighborhood step")
@@ -66,29 +66,29 @@ class GeometryBasedRectanglesPlacementSolutionHandler(
 
   override def getNeighborhood(solution: RectanglesPlacementSolution): Set[RectanglesPlacementSolution] = {
     val solutionsWithBoxPullUp = solution.placement.collect {
-      case (rectangle, (Box(id, width, height), (x, y))) if id > 1 =>
+      case (rectangle, Placing(Box(id, width, height), coordinates)) if id > 1 =>
         RectanglesPlacementSolution(
           solution.placement.updated(
             rectangle,
-            (Box(id - 1, width, height), (width - rectangle.width, height - rectangle.height))
+            Placing(Box(id - 1, width, height), Coordinates(width - rectangle.width, height - rectangle.height))
           )
         )
     }.map(shiftUpSolution).toSet
     val solutionsWithUpShift = solution.placement.map {
-      case (rectangle, (box, (x, y))) =>
+      case (rectangle, Placing(box, Coordinates(x, y))) =>
         RectanglesPlacementSolution(
           solution.placement.updated(
             rectangle,
-            (box, (x, y - 1))
+            Placing(box, Coordinates(x, y - 1))
           )
         )
     }.toSet
     val solutionsWithLeftShift = solution.placement.map {
-      case (rectangle, (box, (x, y))) =>
+      case (rectangle, Placing(box, Coordinates(x, y))) =>
         RectanglesPlacementSolution(
           solution.placement.updated(
             rectangle,
-            (box, (x - 1, y))
+            Placing(box, Coordinates(x - 1, y))
           )
         )
     }.toSet
@@ -97,25 +97,25 @@ class GeometryBasedRectanglesPlacementSolutionHandler(
     neighborhood
   }
 
-  def buildLinearPointCostFunction(minimalCostWeight: BigDecimal, boxLength: Int): (Int, Int) => BigDecimal = {
+  def buildLinearPointCostFunction(minimalCostWeight: BigDecimal, boxLength: Int): Coordinates => BigDecimal = {
     require(minimalCostWeight < 1.0 && minimalCostWeight > 0.0)
     val slope = 2 * (1 - minimalCostWeight) / (2 * boxLength - 2)
-    (x: Int, y: Int) => (slope * (x + y) + minimalCostWeight) / (boxLength * boxLength)
+    coordinates => (slope * (coordinates.x + coordinates.y) + minimalCostWeight) / (boxLength * boxLength)
   }
 
   def calculateRectangleCost(
-    pointCostFunction: (Int, Int) => BigDecimal,
+    pointCostFunction: Coordinates => BigDecimal,
     rectangle: Rectangle,
-    coordinates: (Int, Int)
+    coordinates: Coordinates
   ): BigDecimal = {
-    (coordinates._1 until (coordinates._1 + rectangle.width))
-      .flatMap(x => (coordinates._2 until (coordinates._2 + rectangle.height)).map(y => (x, y)))
-      .map { case (x, y) => pointCostFunction(x, y) }
+    (coordinates.x until (coordinates.x + rectangle.width))
+      .flatMap(x => (coordinates.y until (coordinates.y + rectangle.height)).map(y => Coordinates(x, y)))
+      .map(pointCostFunction)
       .sum
   }
 
-  def calculateBoxCostFactor(pointCostFunction: (Int, Int) => BigDecimal, id: Int): BigDecimal = {
-     ((1 / pointCostFunction(0, 0)) + 1).pow(id)
+  def calculateBoxCostFactor(pointCostFunction: Coordinates => BigDecimal, id: Int): BigDecimal = {
+     ((1 / pointCostFunction(Coordinates(0, 0))) + 1).pow(id)
   }
 
   override def evaluate(solution: RectanglesPlacementSolution): BigDecimal = {
@@ -124,7 +124,7 @@ class GeometryBasedRectanglesPlacementSolutionHandler(
     val boxIds = boxes.toSeq.map(_.id).sorted
     val boxSkewedFillRates = boxIds.map { id =>
       val rectanglesInBox = solution.placement.collect {
-        case (rectangle, (box, coordinates)) if box.id == id => rectangle -> coordinates
+        case (rectangle, Placing(box, coordinates)) if box.id == id => rectangle -> coordinates
       }
       rectanglesInBox.map {
         case (rectangle, coordinates) => calculateRectangleCost(pointCostFunction, rectangle, coordinates)

@@ -1,6 +1,7 @@
 package models.problem.rectangles
 
-import models.algorithm.{LocalSearch, Solution, SolutionHandler}
+import models.algorithm.LocalSearch
+import models.algorithm.SolutionHandler
 
 import scala.util.Random
 
@@ -31,10 +32,6 @@ trait RectanglesPlacementLocalSearch extends LocalSearch[RectanglesPlacementSolu
   override val solutionHandler: RectanglesPlacementSolutionHandler
 }
 
-case class RectanglesPlacementSolution (
-  placement: Map[Rectangle, (Box, (Int, Int))]
-) extends Solution
-
 trait RectanglesPlacementSolutionHandler extends SolutionHandler[RectanglesPlacementSolution] {
 
   def isFeasible(solution: RectanglesPlacementSolution): Boolean = {
@@ -43,52 +40,41 @@ trait RectanglesPlacementSolutionHandler extends SolutionHandler[RectanglesPlace
 
   def allRectanglesDisjunctive(solution: RectanglesPlacementSolution): Boolean = {
     solution.placement.groupBy {
-      case (rectangle, (box, (x, y))) => box
+      case (rectangle, placing) => placing.box
     }.map {
       case (box, placement) => isFeasibleInSingleBox(placement.map {
-        case (rectangle, (box, (x, y))) => (rectangle, (x, y))
+        case (rectangle, placing) => (rectangle, placing.coordinates)
       })
     }.forall(identity)
   }
 
-  def isFeasibleInSingleBox(placement: Map[Rectangle, (Int, Int)]): Boolean = buildPairs(placement).map {
+  def isFeasibleInSingleBox(placement: Map[Rectangle, Coordinates]): Boolean = buildPairs(placement).map {
     case (placingA, placingB) => disjunctive(placingA, placingB)
   }.forall(identity)
 
-  def buildPairs(placement: Map[Rectangle, (Int, Int)]): Seq[((Rectangle, (Int, Int)), (Rectangle, (Int, Int)))] = {
+  def buildPairs(placement: Map[Rectangle, Coordinates]): Seq[((Rectangle, Coordinates), (Rectangle, Coordinates))] = {
     val placementSeq = placement.toSeq
     placementSeq.zipWithIndex.flatMap {
-      case ((rectangleA, (xA, yA)), index) => placementSeq.take(index).map {
-        case (rectangleB, (xB, yB)) => ((rectangleA, (xA, yA)), (rectangleB, (xB, yB)))
+      case ((rectangleA, coordinatesA), index) => placementSeq.take(index).map {
+        case (rectangleB, coordinatesB) => ((rectangleA, coordinatesA), (rectangleB, coordinatesB))
       }
     }
   }
 
-  def disjunctive(placingA: (Rectangle, (Int, Int)), placingB: (Rectangle, (Int, Int))): Boolean = {
-    val (rectangleA, (xA, yA)) = placingA
-    val (rectangleB, (xB, yB)) = placingB
-    val aLeftOfB = xA + rectangleA.width <= xB
-    val aRightOfB = xA >= xB + rectangleB.width
-    val aAboveB = yA + rectangleA.height <= yB
-    val aBelowB = yA >= yB + rectangleB.height
+  def disjunctive(placingA: (Rectangle, Coordinates), placingB: (Rectangle, Coordinates)): Boolean = {
+    val (rectangleA, coordinatesA) = placingA
+    val (rectangleB, coordinatesB) = placingB
+    val aLeftOfB = coordinatesA.x + rectangleA.width <= coordinatesB.x
+    val aRightOfB = coordinatesA.x >= coordinatesB.x + rectangleB.width
+    val aAboveB = coordinatesA.y + rectangleA.height <= coordinatesB.y
+    val aBelowB = coordinatesA.y >= coordinatesB.y + rectangleB.height
     aLeftOfB || aRightOfB || aAboveB || aBelowB
   }
 
   def allRectanglesInBox(solution: RectanglesPlacementSolution): Boolean = solution.placement.map {
-    case (rectangle, (box, (x, y))) =>
+    case (rectangle, Placing(box, Coordinates(x, y))) =>
       0 <= x && x + rectangle.width <= box.width && 0 <= y && y + rectangle.height <= box.height
   }.forall(identity)
 
 }
 
-case class Rectangle(
-  id: Int,
-  width: Int,
-  height: Int
-)
-
-case class Box(
-  id: Int,
-  width: Int,
-  height: Int
-)
