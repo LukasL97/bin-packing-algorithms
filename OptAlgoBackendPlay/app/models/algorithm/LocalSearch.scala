@@ -1,14 +1,12 @@
 package models.algorithm
 
-trait LocalSearch[A <: Solution] {
+class LocalSearch[A <: Solution](solutionHandler: SolutionHandler[A]) {
 
   implicit def solutionToA(solution: Solution): A = solution.asInstanceOf[A]
 
   sealed trait StepResult
   case class Improvement(solution: A) extends StepResult
   case class Stagnation(solution: A) extends StepResult
-
-  val solutionHandler: SolutionHandler[A]
 
   lazy val startSolution: A = solutionHandler.createArbitraryFeasibleSolution()
 

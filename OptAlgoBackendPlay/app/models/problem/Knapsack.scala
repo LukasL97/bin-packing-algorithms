@@ -59,9 +59,7 @@ class Knapsack(
     }
   }
 
-  object KnapsackLocalSearch extends LocalSearch[KnapsackSolution] {
-    override val solutionHandler: SolutionHandler[KnapsackSolution] = KnapsackSolutionHandler
-  }
+  val localSearch = new LocalSearch[KnapsackSolution](KnapsackSolutionHandler)
 
 }
 
@@ -74,6 +72,6 @@ object Knapsack {
   )
 
   def main(args: Array[String]): Unit = {
-    problem.KnapsackLocalSearch.run(100, (solution, step, finished) => println(solution.toString + "\n\n"))
+    problem.localSearch.run(100, (solution, step, finished) => println(solution.toString + "\n\n"))
   }
 }

@@ -22,12 +22,8 @@ trait RectanglesPlacement {
   )).toSet
 
   val solutionHandler: RectanglesPlacementSolutionHandler
-  val localSearch: RectanglesPlacementLocalSearch
+  lazy val localSearch = new LocalSearch[RectanglesPlacementSolution](solutionHandler)
 
-}
-
-trait RectanglesPlacementLocalSearch extends LocalSearch[RectanglesPlacementSolution] {
-  override val solutionHandler: RectanglesPlacementSolutionHandler
 }
 
 trait RectanglesPlacementSolutionHandler extends SolutionHandler[RectanglesPlacementSolution] {

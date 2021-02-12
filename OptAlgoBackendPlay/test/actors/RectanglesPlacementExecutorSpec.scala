@@ -5,7 +5,6 @@ import models.problem.rectangles.Box
 import models.problem.rectangles.Coordinates
 import models.problem.rectangles.Placing
 import models.problem.rectangles.RectanglesPlacement
-import models.problem.rectangles.RectanglesPlacementLocalSearch
 import models.problem.rectangles.RectanglesPlacementSolution
 import models.problem.rectangles.RectanglesPlacementSolutionHandler
 import org.scalamock.scalatest.MockFactory
@@ -47,11 +46,6 @@ class RectanglesPlacementExecutorSpec extends WordSpec with MockFactory {
             override def evaluate(solution: RectanglesPlacementSolution): BigDecimal = solution.placement.head match {
               case (rectangle, Placing(box, Coordinates(x, y))) => -(x + y)
             }
-          }
-
-          private val thisSolutionHandler = solutionHandler
-          override val localSearch: RectanglesPlacementLocalSearch = new RectanglesPlacementLocalSearch {
-            override val solutionHandler: RectanglesPlacementSolutionHandler = thisSolutionHandler
           }
         }
 

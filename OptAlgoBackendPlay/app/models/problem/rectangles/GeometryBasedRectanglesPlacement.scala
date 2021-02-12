@@ -12,12 +12,6 @@ class GeometryBasedRectanglesPlacement(
   override val solutionHandler: RectanglesPlacementSolutionHandler =
     new GeometryBasedRectanglesPlacementSolutionHandler(rectangles, boxLength)
 
-  private val thisSolutionHandler = solutionHandler
-
-  override val localSearch: RectanglesPlacementLocalSearch = new RectanglesPlacementLocalSearch {
-    override val solutionHandler: RectanglesPlacementSolutionHandler = thisSolutionHandler
-  }
-
 }
 
 class GeometryBasedRectanglesPlacementSolutionHandler(
