@@ -13,6 +13,9 @@ javaOptions in Universal ++= Seq(
   "-Dpidfile.path=/dev/null"
 )
 
+dockerExposedPorts ++= Seq(9000)
+dockerUpdateLatest := true
+
 scalaVersion := "2.13.3"
 
 libraryDependencies += guice

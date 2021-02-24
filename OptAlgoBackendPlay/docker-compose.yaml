@@ -1,7 +1,0 @@
-version: "3.7"
-
-services:
-  optalgo-backend:
-    build: target/docker/stage
-    ports:
-      - 9000:9000

@@ -1,0 +1,18 @@
+version: "3.7"
+
+services:
+
+  optalgo-db:
+    container_name: optalgo-db
+    image: mongo:4.0
+    ports:
+      - 27018:27017
+
+  optalgo-backend:
+    container_name: optalgo-backend
+    build: OptAlgoBackendPlay/target/docker/stage
+    ports:
+      - 9000:9000
+    environment:
+      MONGODB_HOST: optalgo-db
+      MONGODB_PORT: 27017
