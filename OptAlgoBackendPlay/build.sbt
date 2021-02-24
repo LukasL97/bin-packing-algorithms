@@ -1,13 +1,17 @@
+
 name := """OptAlgoProject"""
 organization := "com.example"
 
 version := "1.0-SNAPSHOT"
 
-//lazy val root = (project in file(".")).enablePlugins(PlayScala)
-
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala, PlayNettyServer)
   .disablePlugins(PlayAkkaHttpServer)
+
+// needed to run docker image created via sbt docker:publishLocal
+javaOptions in Universal ++= Seq(
+  "-Dpidfile.path=/dev/null"
+)
 
 scalaVersion := "2.13.3"
 
