@@ -8,8 +8,8 @@ import akka.actor.ActorRef.noSender
 import akka.actor.ActorSystem
 import akka.actor.Props
 import dao.RectanglesPlacementSolutionStepDAO
-import models.problem.rectangles.GeometryBasedRectanglesPlacement
-import models.problem.rectangles.RectanglesPlacement
+import models.problem.rectangles.localsearch.GeometryBasedRectanglesPlacement
+import models.problem.rectangles.localsearch.RectanglesPlacementLocalSearch
 import play.api.libs.json.JsValue
 import play.api.mvc._
 import utils.JsonConversions._
@@ -85,7 +85,7 @@ private object RectanglesPlacementProvider {
     numRectangles: Int,
     rectangleWidthRange: (Int, Int),
     rectangleHeightRange: (Int, Int)
-  ): RectanglesPlacement = strategy match {
+  ): RectanglesPlacementLocalSearch = strategy match {
     case "geometryBased" => new GeometryBasedRectanglesPlacement(
       boxLength,
       numRectangles,

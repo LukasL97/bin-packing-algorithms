@@ -1,5 +1,7 @@
-package models.problem.rectangles
+package models.problem.rectangles.localsearch
 
+import models.problem.rectangles.Coordinates
+import models.problem.rectangles.Rectangle
 import org.scalatest.MustMatchers
 import org.scalatest.WordSpec
 

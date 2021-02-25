@@ -3,8 +3,8 @@ package actors
 import akka.actor.Actor
 import com.google.inject.Inject
 import dao.RectanglesPlacementSolutionStepDAO
-import models.problem.rectangles.RectanglesPlacement
 import models.problem.rectangles.RectanglesPlacementSolution
+import models.problem.rectangles.localsearch.RectanglesPlacementLocalSearch
 import play.api.Logging
 
 object RectanglesPlacementActor {
@@ -15,7 +15,7 @@ object RectanglesPlacementActor {
 
 class RectanglesPlacementActor @Inject()(val dao: RectanglesPlacementSolutionStepDAO) extends Actor {
   override def receive: Receive = {
-    case (runId: String, rectanglesPlacement: RectanglesPlacement) =>
+    case (runId: String, rectanglesPlacement: RectanglesPlacementLocalSearch) =>
       val executor = new RectanglesPlacementExecutor(dao)
       executor.execute(runId, rectanglesPlacement)
   }
@@ -26,7 +26,7 @@ class RectanglesPlacementExecutor(dao: RectanglesPlacementSolutionStepDAO) exten
   // TODO: proper configuration
   val maxIterations = 1000
 
-  def execute(runId: String, rectanglesPlacement: RectanglesPlacement): Unit = {
+  def execute(runId: String, rectanglesPlacement: RectanglesPlacementLocalSearch): Unit = {
     logger.info(s"Starting ${getClass.getSimpleName} for runId $runId")
     dao.dumpSolutionStep(
       RectanglesPlacementSolutionStep.getStartStep(

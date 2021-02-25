@@ -4,9 +4,9 @@ import dao.RectanglesPlacementSolutionStepDAO
 import models.problem.rectangles.Box
 import models.problem.rectangles.Coordinates
 import models.problem.rectangles.Placing
-import models.problem.rectangles.RectanglesPlacement
 import models.problem.rectangles.RectanglesPlacementSolution
-import models.problem.rectangles.RectanglesPlacementSolutionHandler
+import models.problem.rectangles.localsearch.RectanglesPlacementLocalSearch
+import models.problem.rectangles.localsearch.RectanglesPlacementSolutionHandler
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.WordSpec
 
@@ -24,7 +24,7 @@ class RectanglesPlacementExecutorSpec extends WordSpec with MockFactory {
         val boxLength_ = 3
         val box = Box(1, boxLength_, boxLength_)
 
-        val rectanglesPlacement: RectanglesPlacement = new RectanglesPlacement {
+        val rectanglesPlacement: RectanglesPlacementLocalSearch = new RectanglesPlacementLocalSearch {
           override val boxLength: Int = boxLength_
           override val numRectangles: Int = 1
           override val rectangleWidthRange: (Int, Int) = (1, 1)

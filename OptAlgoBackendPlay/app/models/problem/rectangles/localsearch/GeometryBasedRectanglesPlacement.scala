@@ -1,5 +1,10 @@
-package models.problem.rectangles
+package models.problem.rectangles.localsearch
 
+import models.problem.rectangles.Box
+import models.problem.rectangles.Coordinates
+import models.problem.rectangles.Placing
+import models.problem.rectangles.Rectangle
+import models.problem.rectangles.RectanglesPlacementSolution
 import play.api.Logging
 
 class GeometryBasedRectanglesPlacement(
@@ -7,7 +12,7 @@ class GeometryBasedRectanglesPlacement(
   override val numRectangles: Int,
   override val rectangleWidthRange: (Int, Int),
   override val rectangleHeightRange: (Int, Int)
-) extends RectanglesPlacement {
+) extends RectanglesPlacementLocalSearch {
 
   override val solutionHandler: RectanglesPlacementSolutionHandler =
     new GeometryBasedRectanglesPlacementSolutionHandler(rectangles, boxLength)
