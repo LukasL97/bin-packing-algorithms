@@ -3,7 +3,16 @@ import axios from "axios";
 class BackendClient {
 
   constructor() {
-    axios.defaults.baseURL = 'http://localhost:9000'
+    var backendHost = process.env.REACT_APP_API_HOST
+    if (typeof backendHost == 'undefined') {
+      backendHost = 'localhost'
+    }
+    var backendPort = process.env.REACT_APP_API_PORT
+    if (typeof backendPort == 'undefined') {
+      backendPort = 9000
+    }
+    axios.defaults.baseURL = 'http://' + backendHost + ':' + backendPort
+    console.info('Setup API connection to ' + axios.defaults.baseURL)
   }
 
   startRectanglesPlacement(strategy, boxLength, numRectangles, minWidth, maxWidth, minHeight, maxHeight) {

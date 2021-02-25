@@ -16,3 +16,19 @@ services:
     environment:
       MONGODB_HOST: optalgo-db
       MONGODB_PORT: 27017
+    depends_on:
+      - optalgo-db
+
+  optalgo-frontend:
+    container_name: optalgo-frontend
+    build: optalgo-frontend-react
+    volumes:
+      - ./optalgo-frontend-react:/app
+      - /app/node_modules
+    ports:
+      - 3000:3000
+    environment:
+      REACT_APP_API_HOST: localhost
+      REACT_APP_API_PORT: 9000
+    depends_on:
+      - optalgo-backend
