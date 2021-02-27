@@ -29,7 +29,7 @@ class App extends Component {
     maxHeight
   ) => {
     this.backendClient.startRectanglesPlacement(
-      'geometryBased',
+      'greedy randomSelection',
       boxLength,
       numRectangles,
       minWidth,
