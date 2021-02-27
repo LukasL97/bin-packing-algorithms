@@ -2,14 +2,14 @@ package controllers
 
 import actors.RectanglesPlacementActor
 import actors.RectanglesPlacementSolutionStep
-import akka.actor.Actor
 import akka.actor.ActorRef
 import akka.actor.ActorRef.noSender
 import akka.actor.ActorSystem
 import akka.actor.Props
 import dao.RectanglesPlacementSolutionStepDAO
+import models.problem.rectangles.RectanglesPlacement
+import models.problem.rectangles.greedy.RandomSelectionRectanglesPlacementGreedy
 import models.problem.rectangles.localsearch.GeometryBasedRectanglesPlacement
-import models.problem.rectangles.localsearch.RectanglesPlacementLocalSearch
 import play.api.libs.json.JsValue
 import play.api.mvc._
 import utils.JsonConversions._
@@ -26,43 +26,15 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class RectanglesPlacementController @Inject()(
   val controllerComponents: ControllerComponents,
-  val system: ActorSystem,
-  val rectanglesPlacementActorFactory: RectanglesPlacementActor.Factory,
+  val rectanglesPlacementActorStarter: RectanglesPlacementActorStarter,
   val dao: RectanglesPlacementSolutionStepDAO,
   implicit val ec: ExecutionContext
 ) extends BaseController {
 
-
-  def injectedChild2(create: => Actor, name: String): ActorRef = {
-    system.actorOf(Props(create), name)
-  }
-
-  private def createExecutor(runId: String): ActorRef = system.actorOf(
-    Props(rectanglesPlacementActorFactory.apply()),
-    s"rectangles-placement-executor-$runId"
-  )
-
-  private def generateRunId(): String = UUID.randomUUID().toString
-
-  private def startExecutor(startInfo: StartRequestBody): RectanglesPlacementSolutionStep = {
-    val runId = generateRunId()
-    val executor = createExecutor(runId)
-    val rectanglesPlacement = RectanglesPlacementProvider.get(
-      startInfo.strategy,
-      startInfo.boxLength,
-      startInfo.numRectangles,
-      (startInfo.rectanglesWidthRange.min, startInfo.rectanglesWidthRange.max),
-      (startInfo.rectanglesHeightRange.min, startInfo.rectanglesHeightRange.max)
-    )
-    val startSolution = rectanglesPlacement.localSearch.startSolution
-    executor.tell((runId, rectanglesPlacement), noSender)
-    RectanglesPlacementSolutionStep.getStartStep(runId, startSolution)
-  }
-
   def start(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
     request.body.asJson.map { json =>
       val startInfo = SerializationUtil.fromJson[StartRequestBody](json)
-      val startSolution = startExecutor(startInfo)
+      val startSolution = rectanglesPlacementActorStarter(startInfo)
       val response: JsValue = SerializationUtil.toJson(startSolution)
       Ok(response)
     }.getOrElse(
@@ -78,15 +50,50 @@ class RectanglesPlacementController @Inject()(
 
 }
 
-private object RectanglesPlacementProvider {
+@Singleton
+class RectanglesPlacementActorStarter @Inject()(
+  val system: ActorSystem,
+  val rectanglesPlacementActorFactory: RectanglesPlacementActor.Factory
+) {
+
+  def apply(startInfo: StartRequestBody): RectanglesPlacementSolutionStep = {
+    val runId = generateRunId()
+    val actor = createActor(runId)
+    val rectanglesPlacement = RectanglesPlacementProvider.get(
+      startInfo.strategy,
+      startInfo.boxLength,
+      startInfo.numRectangles,
+      (startInfo.rectanglesWidthRange.min, startInfo.rectanglesWidthRange.max),
+      (startInfo.rectanglesHeightRange.min, startInfo.rectanglesHeightRange.max)
+    )
+    val startSolution = rectanglesPlacement.startSolution
+    actor.tell((runId, rectanglesPlacement), noSender)
+    RectanglesPlacementSolutionStep.getStartStep(runId, startSolution)
+  }
+
+  private def createActor(runId: String): ActorRef = system.actorOf(
+    Props(rectanglesPlacementActorFactory.apply()),
+    s"rectangles-placement-actor-$runId"
+  )
+
+  private def generateRunId(): String = UUID.randomUUID().toString
+}
+
+object RectanglesPlacementProvider {
   def get(
     strategy: String,
     boxLength: Int,
     numRectangles: Int,
     rectangleWidthRange: (Int, Int),
     rectangleHeightRange: (Int, Int)
-  ): RectanglesPlacementLocalSearch = strategy match {
-    case "geometryBased" => new GeometryBasedRectanglesPlacement(
+  ): RectanglesPlacement = strategy match {
+    case "localSearch geometryBased" => new GeometryBasedRectanglesPlacement(
+      boxLength,
+      numRectangles,
+      rectangleWidthRange,
+      rectangleHeightRange
+    )
+    case "greedy randomSelection" => new RandomSelectionRectanglesPlacementGreedy(
       boxLength,
       numRectangles,
       rectangleWidthRange,
@@ -95,7 +102,7 @@ private object RectanglesPlacementProvider {
   }
 }
 
-private case class StartRequestBody(
+case class StartRequestBody(
   strategy: String,
   boxLength: Int,
   numRectangles: Int,
@@ -103,7 +110,7 @@ private case class StartRequestBody(
   rectanglesHeightRange: Range
 )
 
-private case class Range(
+case class Range(
   min: Int,
   max: Int
 )

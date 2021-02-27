@@ -1,5 +1,6 @@
-package actors
+package actors.executors
 
+import actors.RectanglesPlacementSolutionStep
 import dao.RectanglesPlacementSolutionStepDAO
 import models.problem.rectangles.Box
 import models.problem.rectangles.Coordinates
@@ -10,13 +11,13 @@ import models.problem.rectangles.localsearch.RectanglesPlacementSolutionHandler
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.WordSpec
 
-class RectanglesPlacementExecutorSpec extends WordSpec with MockFactory {
+class RectanglesPlacementLocalSearchExecutorSpec extends WordSpec with MockFactory {
 
   private val dao = mock[RectanglesPlacementSolutionStepDAO]
 
-  private val executor = new RectanglesPlacementExecutor(dao)
+  private val executor = new RectanglesPlacementLocalSearchExecutor(dao)
 
-  "RectanglesPlacementExecutor" should {
+  "RectanglesPlacementLocalSearchExecutor" should {
     "dump intermediate solution steps correctly" when {
       "receiving rectanglesPlacement with top left start solution, bottom right optimum, and diagonal neighborhood path" in {
         val runId = "runId"

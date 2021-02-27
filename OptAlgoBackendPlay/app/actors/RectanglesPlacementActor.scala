@@ -1,11 +1,12 @@
 package actors
 
+import actors.executors.RectanglesPlacementGreedyExecutor
+import actors.executors.RectanglesPlacementLocalSearchExecutor
 import akka.actor.Actor
 import com.google.inject.Inject
 import dao.RectanglesPlacementSolutionStepDAO
-import models.problem.rectangles.RectanglesPlacementSolution
+import models.problem.rectangles.greedy.RectanglesPlacementGreedy
 import models.problem.rectangles.localsearch.RectanglesPlacementLocalSearch
-import play.api.Logging
 
 object RectanglesPlacementActor {
   trait Factory {
@@ -16,39 +17,10 @@ object RectanglesPlacementActor {
 class RectanglesPlacementActor @Inject()(val dao: RectanglesPlacementSolutionStepDAO) extends Actor {
   override def receive: Receive = {
     case (runId: String, rectanglesPlacement: RectanglesPlacementLocalSearch) =>
-      val executor = new RectanglesPlacementExecutor(dao)
+      val executor = new RectanglesPlacementLocalSearchExecutor(dao)
+      executor.execute(runId, rectanglesPlacement)
+    case (runId: String, rectanglesPlacement: RectanglesPlacementGreedy) =>
+      val executor = new RectanglesPlacementGreedyExecutor(dao)
       executor.execute(runId, rectanglesPlacement)
   }
 }
-
-class RectanglesPlacementExecutor(dao: RectanglesPlacementSolutionStepDAO) extends Logging {
-
-  // TODO: proper configuration
-  val maxIterations = 1000
-
-  def execute(runId: String, rectanglesPlacement: RectanglesPlacementLocalSearch): Unit = {
-    logger.info(s"Starting ${getClass.getSimpleName} for runId $runId")
-    dao.dumpSolutionStep(
-      RectanglesPlacementSolutionStep.getStartStep(
-        runId,
-        rectanglesPlacement.localSearch.startSolution
-      )
-    )
-    rectanglesPlacement.localSearch.run(maxIterations, dumpSolutionStep(runId))
-    logger.info(s"Finished ${getClass.getSimpleName} for runId $runId")
-  }
-
-  private def dumpSolutionStep(runId: String)(solution: RectanglesPlacementSolution, step: Int, finished: Boolean): Unit = {
-    logger.trace(s"Dumping solution step $step for runId $runId")
-    dao.dumpSolutionStep(
-      RectanglesPlacementSolutionStep(
-        runId,
-        step,
-        solution,
-        finished || (step == maxIterations)
-      )
-    )
-  }
-}
-
-

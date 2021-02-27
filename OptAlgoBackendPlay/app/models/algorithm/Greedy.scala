@@ -4,18 +4,26 @@ import scala.annotation.tailrec
 
 class Greedy[Candidate, Solution](selectionHandler: SelectionHandler[Candidate, Solution]) {
 
-  def run(): Solution = {
+  def run(afterStep: (Solution, Int, Boolean) => Unit = (_, _, _) => {}): Solution = {
 
     @tailrec
-    def runRecursively(currentSolution: Solution, remainingObjectsToPlace: Iterable[Candidate]): Solution =
+    def runRecursively(
+      currentSolution: Solution,
+      remainingObjectsToPlace: Iterable[Candidate],
+      currentStep: Int
+    ): Solution =
       remainingObjectsToPlace match {
-        case candidates if candidates.isEmpty => currentSolution
+        case candidates if candidates.isEmpty =>
+          afterStep(currentSolution, currentStep, true)
+          currentSolution
         case candidates =>
           val (nextCandidate, remainingCandidates) = selectionHandler.selectNextCandidate(candidates)
-          runRecursively(selectionHandler.placeCandidateInSolution(nextCandidate, currentSolution), remainingCandidates)
+          val nextSolution = selectionHandler.placeCandidateInSolution(nextCandidate, currentSolution)
+          afterStep(nextSolution, currentStep, false)
+          runRecursively(nextSolution, remainingCandidates, currentStep + 1)
       }
 
-    runRecursively(selectionHandler.startSolution, selectionHandler.candidates)
+    runRecursively(selectionHandler.startSolution, selectionHandler.candidates, 1)
   }
 
 }

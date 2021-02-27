@@ -35,21 +35,31 @@ class RectanglesPlacementSelectionHandlerSpec extends WordSpec with MustMatchers
       "given a candidate fitting in the first box" in {
         val candidate = Rectangle(4, 1, 2)
         selectionHandler.placeCandidateInSolution(candidate, solution).placement mustEqual {
-          solution.placement + (candidate -> Placing(Box(1 ,5 ,5), Coordinates(3, 3)))
+          solution.placement + (candidate -> Placing(Box(1 ,boxLength ,boxLength), Coordinates(3, 3)))
         }
       }
 
       "given a candidate not fitting in the first but in the second box" in {
         val candidate = Rectangle(4, 3, 2)
         selectionHandler.placeCandidateInSolution(candidate, solution).placement mustEqual {
-          solution.placement + (candidate -> Placing(Box(2 ,5 ,5), Coordinates(0, 1)))
+          solution.placement + (candidate -> Placing(Box(2 ,boxLength ,boxLength), Coordinates(0, 1)))
         }
       }
 
       "given a candidate not fitting in any currently used box" in {
         val candidate = Rectangle(4, 4, 5)
         selectionHandler.placeCandidateInSolution(candidate, solution).placement mustEqual {
-          solution.placement + (candidate -> Placing(Box(3 ,5 ,5), Coordinates(0, 0)))
+          solution.placement + (candidate -> Placing(Box(3 ,boxLength ,boxLength), Coordinates(0, 0)))
+        }
+      }
+    }
+
+    "place a candidate in box 1 in the top left corner according to the top left strategy" when {
+      "given a solution without any candidate placed previously" in {
+        val candidate = Rectangle(1, 3, 3)
+        val solution = RectanglesPlacementSolution(Map())
+        selectionHandler.placeCandidateInSolution(candidate, solution).placement mustEqual {
+          Map(candidate -> Placing(Box(1 ,boxLength ,boxLength), Coordinates(0, 0)))
         }
       }
     }

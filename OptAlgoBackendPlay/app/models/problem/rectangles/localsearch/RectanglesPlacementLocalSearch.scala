@@ -14,6 +14,8 @@ import scala.util.Random
 trait RectanglesPlacementLocalSearch extends RectanglesPlacement {
   val solutionHandler: RectanglesPlacementSolutionHandler
   lazy val localSearch = new LocalSearch[RectanglesPlacementSolution](solutionHandler)
+
+  override def startSolution: RectanglesPlacementSolution = localSearch.startSolution
 }
 
 trait RectanglesPlacementSolutionHandler

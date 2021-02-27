@@ -23,4 +23,6 @@ trait RectanglesPlacement {
     )
     .toSet
 
+  def startSolution: RectanglesPlacementSolution
+
 }

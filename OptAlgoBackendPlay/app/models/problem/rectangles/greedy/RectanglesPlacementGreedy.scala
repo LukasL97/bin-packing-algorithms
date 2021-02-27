@@ -13,6 +13,8 @@ import models.problem.rectangles.RectanglesPlacementSolutionValidator
 trait RectanglesPlacementGreedy extends RectanglesPlacement {
   val selectionHandler: RectanglesPlacementSelectionHandler
   lazy val greedy = new Greedy[Rectangle, RectanglesPlacementSolution](selectionHandler)
+
+  override def startSolution: RectanglesPlacementSolution = selectionHandler.startSolution
 }
 
 trait RectanglesPlacementSelectionHandler
@@ -42,7 +44,7 @@ trait RectanglesPlacementSelectionHandler
     rectangle: Rectangle,
     placementsPerBox: Seq[(Box, Map[Rectangle, Coordinates])]
   ): Placing = {
-    val maxBoxId = placementsPerBox.toMap.keys.map(_.id).max
+    val maxBoxId = placementsPerBox.toMap.keys.map(_.id).maxOption.getOrElse(0)
     placementsPerBox
       .foldLeft(Option.empty[Placing]) {
         case (foundPlacing, (box, placement)) =>
