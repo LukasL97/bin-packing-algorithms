@@ -21,6 +21,7 @@ class App extends Component {
   }
 
   getCurrentSolutionStep = () => this.state.solutionStepQueue[0]
+  getRectanglesLastUpdate = () => this.state.rectanglesLastUpdate
 
   start = (
     strategy,
@@ -100,7 +101,6 @@ class App extends Component {
       const oldSolutionStep = this.state.solutionStepQueue[0]
       const newSolutionStepQueue = this.state.solutionStepQueue.slice(1)
       const newSolutionStep = newSolutionStepQueue[0]
-      const updatedRectangleIds = this.getUpdatedRectangleIdsInNewStep(oldSolutionStep, newSolutionStep)
       const newRectanglesLastUpdate = {...this.state.rectanglesLastUpdate}
       this.getUpdatedRectangleIdsInNewStep(oldSolutionStep, newSolutionStep).forEach(id => newRectanglesLastUpdate[id] = newSolutionStep.step)
       this.setState(oldState => ({
@@ -135,7 +135,11 @@ class App extends Component {
     return (
       <div className="main">
         <Header/>
-        <Content getCurrentSolutionStep={this.getCurrentSolutionStep} start={this.start}/>
+        <Content
+          getCurrentSolutionStep={this.getCurrentSolutionStep}
+          getRectanglesLastUpdate={this.getRectanglesLastUpdate}
+          start={this.start}
+        />
       </div>
     )
   }

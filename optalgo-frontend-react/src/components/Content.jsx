@@ -6,12 +6,12 @@ import RectanglesPlacementDisplay from "./RectanglesPlacementDisplay";
 class Content extends Component {
 
   render() {
-    const {getCurrentSolutionStep, start} = this.props
+    const {getCurrentSolutionStep, getRectanglesLastUpdate, start} = this.props
 
     return (
       <div className="content-container">
         <AlgorithmInputForm start={start}/>
-        <RectanglesPlacementDisplay getCurrentSolutionStep={getCurrentSolutionStep}/>
+        <RectanglesPlacementDisplay getCurrentSolutionStep={getCurrentSolutionStep} getRectanglesLastUpdate={getRectanglesLastUpdate}/>
       </div>
     )
   }

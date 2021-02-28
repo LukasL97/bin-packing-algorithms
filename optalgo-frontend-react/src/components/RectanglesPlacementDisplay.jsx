@@ -3,13 +3,14 @@ import Box from "./Box"
 
 class RectanglesPlacementDisplay extends Component {
 
+  getCurrentSolutionStep = this.props.getCurrentSolutionStep
+  getRectanglesLastUpdate = this.props.getRectanglesLastUpdate
+
   state = {
     placement: []
   }
 
   boxPixelLength = 300
-
-  getCurrentSolutionStep = this.props.getCurrentSolutionStep
 
   getRectangles(boxId) {
     return () => this.state.placement
@@ -19,7 +20,8 @@ class RectanglesPlacementDisplay extends Component {
           x: placing.coordinates.x,
           y: placing.coordinates.y,
           width: placing.rectangle.width,
-          height: placing.rectangle.height
+          height: placing.rectangle.height,
+          lastUpdate: this.getRectanglesLastUpdate()[placing.rectangle.id]
         }
       })
   }
@@ -47,6 +49,7 @@ class RectanglesPlacementDisplay extends Component {
           unitLength={box.width}
           pixelLength={this.boxPixelLength}
           getRectangles={this.getRectangles(box.id)}
+          currentStep={newSolutionStep.step}
         />
       ))
 
