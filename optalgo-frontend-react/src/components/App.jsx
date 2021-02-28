@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import Header from "./Header";
 import Content from "./Content";
 import BackendClient from "../client/BackendClient";
+import SolutionStepUtil from "../utils/SolutionStepUtil";
 
 class App extends Component {
 
@@ -15,7 +16,8 @@ class App extends Component {
     running: false,
     runId: "",
     fetchBlocked: false,
-    solutionStepQueue: []
+    solutionStepQueue: [],
+    rectanglesLastUpdate: {}
   }
 
   getCurrentSolutionStep = () => this.state.solutionStepQueue[0]
@@ -39,22 +41,20 @@ class App extends Component {
       maxHeight
     )(startSolutionStep => {
       console.log(startSolutionStep)
-      this.setState({
+      this.setState(oldState => ({
+        ...oldState,
         running: true,
         runId: startSolutionStep.data.runId,
-        fetchBlocked: this.state.fetchBlocked,
         solutionStepQueue: [startSolutionStep.data]
-      })
+      }))
     })
   }
 
   blockFetch = () => {
-    this.setState({
-      running: this.state.running,
-      runId: this.state.runId,
-      fetchBlocked: true,
-      solutionStepQueue: this.state.solutionStepQueue
-    })
+    this.setState(oldState => ({
+      ...oldState,
+      fetchBlocked: true
+    }))
   }
 
   fetchSolutionSteps = () => {
@@ -67,27 +67,47 @@ class App extends Component {
     )(solutionSteps => {
       console.log(solutionSteps)
       const finished = solutionSteps.data.length > 0 && last(solutionSteps.data).finished
-      this.setState({
+      this.setState(oldState => ({
+        ...oldState,
         running: !finished,
-        runId: this.state.runId,
         fetchBlocked: false,
         solutionStepQueue: [
           ...this.state.solutionStepQueue,
           ...solutionSteps.data
         ]
-      })
+      }))
     })
+  }
+
+  getUpdatedRectangleIdsInNewStep = (oldSolutionStep, newSolutionStep) => {
+    const zippedPlacements = SolutionStepUtil.zipPlacementsByRectangleId(
+      oldSolutionStep.solution.placement,
+      newSolutionStep.solution.placement
+    )
+    return zippedPlacements.map(p => {
+      if (p.left === null) {
+        return p.right.rectangle.id
+      } else if (p.right === null || p.left.coordinates.x !== p.right.coordinates.x || p.left.coordinates.y !== p.right.coordinates.y) {
+        return p.left.rectangle.id
+      } else {
+        return null
+      }
+    }).filter(id => id !== null)
   }
 
   removeFirstSolutionStepFromQueue = () => {
     if (this.state.solutionStepQueue.length > 1) {
+      const oldSolutionStep = this.state.solutionStepQueue[0]
       const newSolutionStepQueue = this.state.solutionStepQueue.slice(1)
-      this.setState({
-        running: this.state.running,
-        runId: this.state.runId,
-        fetchBlocked: this.state.fetchBlocked,
-        solutionStepQueue: newSolutionStepQueue
-      })
+      const newSolutionStep = newSolutionStepQueue[0]
+      const updatedRectangleIds = this.getUpdatedRectangleIdsInNewStep(oldSolutionStep, newSolutionStep)
+      const newRectanglesLastUpdate = {...this.state.rectanglesLastUpdate}
+      this.getUpdatedRectangleIdsInNewStep(oldSolutionStep, newSolutionStep).forEach(id => newRectanglesLastUpdate[id] = newSolutionStep.step)
+      this.setState(oldState => ({
+        ...oldState,
+        solutionStepQueue: newSolutionStepQueue,
+        rectanglesLastUpdate: newRectanglesLastUpdate
+      }))
     }
   }
 
