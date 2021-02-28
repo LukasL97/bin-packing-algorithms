@@ -24,23 +24,23 @@
     justify-content: space-between;
 }
 
-.local-search-input-form {
+.algorithm-input-form {
     margin: 10px;
 }
 
-.local-search-input-form-row {
+.numerical-input-form-row {
     margin-bottom: 10px;
     display: flex;
 }
 
-.local-search-input-form-row label {
+.numerical-input-form-row label {
     display: inline-block;
     width: 180px;
     text-align: right;
     margin-right: 10px;
 }
 
-.local-search-input-form-row input {
+.numerical-input-form-row input {
     display: inline-block;
     width: 50px;
 }

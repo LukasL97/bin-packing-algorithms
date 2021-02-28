@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
-import LocalSearchInputFormRow from "./LocalSearchInputFormRow";
+import NumericalInputFormRow from "./NumericalInputFormRow";
 
-class LocalSearchInputForm extends Component {
+class AlgorithmInputForm extends Component {
 
   constructor(props) {
     super(props);
@@ -41,39 +41,39 @@ class LocalSearchInputForm extends Component {
   render() {
 
     return (
-      <div className="local-search-input-form">
+      <div className="algorithm-input-form">
         <form>
-          <LocalSearchInputFormRow
+          <NumericalInputFormRow
             label={"Box Length"}
             name={"box-length"}
             value={this.state.boxLength}
             onChange={this.handleInputChange('boxLength').bind(this)}
           />
-          <LocalSearchInputFormRow
+          <NumericalInputFormRow
             label={"Number of Rectangles"}
             name={"num-rectangles"}
             value={this.state.numRectangles}
             onChange={this.handleInputChange('numRectangles').bind(this)}
           />
-          <LocalSearchInputFormRow
+          <NumericalInputFormRow
             label={"Min. Width"}
             name={"min-width"}
             value={this.state.minWidth}
             onChange={this.handleInputChange('minWidth').bind(this)}
           />
-          <LocalSearchInputFormRow
+          <NumericalInputFormRow
             label={"Max. Width"}
             name={"max-width"}
             value={this.state.maxWidth}
             onChange={this.handleInputChange('maxWidth').bind(this)}
           />
-          <LocalSearchInputFormRow
+          <NumericalInputFormRow
             label={"Min. Height"}
             name={"min-height"}
             value={this.state.minHeight}
             onChange={this.handleInputChange('minHeight').bind(this)}
           />
-          <LocalSearchInputFormRow
+          <NumericalInputFormRow
             label={"Max. Height"}
             name={"max-height"}
             value={this.state.maxHeight}
@@ -87,4 +87,4 @@ class LocalSearchInputForm extends Component {
 
 }
 
-export default LocalSearchInputForm
+export default AlgorithmInputForm

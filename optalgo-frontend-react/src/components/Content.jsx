@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import LocalSearchInputForm from "./LocalSearchInput/LocalSearchInputForm";
+import AlgorithmInputForm from "./AlgorithmInput/AlgorithmInputForm";
 import RectanglesPlacementDisplay from "./RectanglesPlacementDisplay";
 
 
@@ -10,7 +10,7 @@ class Content extends Component {
 
     return (
       <div className="content-container">
-        <LocalSearchInputForm start={start}/>
+        <AlgorithmInputForm start={start}/>
         <RectanglesPlacementDisplay getCurrentSolutionStep={getCurrentSolutionStep}/>
       </div>
     )
