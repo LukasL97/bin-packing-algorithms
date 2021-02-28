@@ -28,6 +28,14 @@
     margin: 10px;
 }
 
+.strategy-selector-form-row {
+    margin-bottom: 10px;
+}
+
+.strategy-selector-form-row select {
+    width: 100%;
+}
+
 .numerical-input-form-row {
     margin-bottom: 10px;
     display: flex;

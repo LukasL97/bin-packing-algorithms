@@ -21,6 +21,7 @@ class App extends Component {
   getCurrentSolutionStep = () => this.state.solutionStepQueue[0]
 
   start = (
+    strategy,
     boxLength,
     numRectangles,
     minWidth,
@@ -29,7 +30,7 @@ class App extends Component {
     maxHeight
   ) => {
     this.backendClient.startRectanglesPlacement(
-      'greedy randomSelection',
+      strategy,
       boxLength,
       numRectangles,
       minWidth,
