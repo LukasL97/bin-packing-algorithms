@@ -24,18 +24,17 @@ class Box extends Component {
     }
 
     function getRectShape(rectangle) {
+      const colorProportion = Math.max(
+        0.0,
+        (rectangle.lastUpdate - currentStep + self.rectangleHighlightDuration) / self.rectangleHighlightDuration
+      )
       return (
         <Rect
           x={unitToPixel(rectangle.x)}
           y={unitToPixel(rectangle.y)}
           width={unitToPixel(rectangle.width)}
           height={unitToPixel(rectangle.height)}
-          fill={self.rectangleFillColormap(
-            Math.max(
-              0.0,
-              (rectangle.lastUpdate - currentStep + self.rectangleHighlightDuration) / self.rectangleHighlightDuration
-            )
-          )}
+          fill={self.rectangleFillColormap(colorProportion)}
           stroke={self.rectangleBorderColor}
         />
       )

@@ -46,7 +46,8 @@ class App extends Component {
         ...oldState,
         running: true,
         runId: startSolutionStep.data.runId,
-        solutionStepQueue: [startSolutionStep.data]
+        solutionStepQueue: [startSolutionStep.data],
+        rectanglesLastUpdate: {}
       }))
     })
   }

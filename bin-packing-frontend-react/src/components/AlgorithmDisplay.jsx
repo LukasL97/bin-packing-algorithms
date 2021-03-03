@@ -12,6 +12,11 @@ class AlgorithmDisplay extends Component {
 
   boxPixelLength = 300
 
+  getRectanglesLastUpdateWithZeroDefault(rectangleId) {
+    const lastUpdate = this.getRectanglesLastUpdate()[rectangleId]
+    return lastUpdate !== undefined ? lastUpdate : 0
+  }
+
   getRectangles(boxId) {
     return () => this.state.placement
       .filter(placing => placing.box.id === boxId)
@@ -21,7 +26,7 @@ class AlgorithmDisplay extends Component {
           y: placing.coordinates.y,
           width: placing.rectangle.width,
           height: placing.rectangle.height,
-          lastUpdate: this.getRectanglesLastUpdate()[placing.rectangle.id]
+          lastUpdate: this.getRectanglesLastUpdateWithZeroDefault(placing.rectangle.id)
         }
       })
   }
@@ -34,7 +39,7 @@ class AlgorithmDisplay extends Component {
 
     const newSolutionStep = this.getCurrentSolutionStep()
 
-    if (typeof newSolutionStep !== 'undefined' && newSolutionStep.solution.placement !== this.state.placement) {
+    if (newSolutionStep !== undefined && newSolutionStep.solution.placement !== this.state.placement) {
       this.setState({
         placement: newSolutionStep.solution.placement
       })
