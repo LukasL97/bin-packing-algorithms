@@ -17,7 +17,7 @@ class Module extends AbstractModule with AkkaGuiceSupport {
     val uri = s"mongodb://$host:$port"
     val client = MongoClient(uri)
     println(s"Setup connection to MongoClient at $uri")
-    client.getDatabase("OptAlgo")
+    client.getDatabase("BinPacking")
   }
 
 }
