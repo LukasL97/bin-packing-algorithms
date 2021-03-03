@@ -2,28 +2,28 @@ version: "3.7"
 
 services:
 
-  optalgo-db:
-    container_name: optalgo-db
+  bin-packing-db:
+    container_name: bin-packing-db
     image: mongo:4.0
     ports:
       - 27018:27017
 
-  optalgo-backend:
-    container_name: optalgo-backend
-    build: OptAlgoBackendPlay/target/docker/stage
+  bin-packing-backend:
+    container_name: bin-packing-backend
+    build: bin-packing-backend-play/target/docker/stage
     ports:
       - 9000:9000
     environment:
-      MONGODB_HOST: optalgo-db
+      MONGODB_HOST: bin-packing-db
       MONGODB_PORT: 27017
     depends_on:
-      - optalgo-db
+      - bin-packing-db
 
-  optalgo-frontend:
-    container_name: optalgo-frontend
-    build: optalgo-frontend-react
+  bin-packing-frontend:
+    container_name: bin-packing-frontend
+    build: bin-packing-frontend-react
     volumes:
-      - ./optalgo-frontend-react:/app
+      - ./bin-packing-frontend-react:/app
       - /app/node_modules
     ports:
       - 3000:3000
@@ -31,4 +31,4 @@ services:
       REACT_APP_API_HOST: localhost
       REACT_APP_API_PORT: 9000
     depends_on:
-      - optalgo-backend
+      - bin-packing-backend

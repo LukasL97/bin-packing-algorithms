@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # build backend image
-cd OptAlgoBackendPlay
+cd bin-packing-backend-play
 sbt docker:publishLocal
 cd ..
 
