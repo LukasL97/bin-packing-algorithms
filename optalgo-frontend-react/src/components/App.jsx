@@ -32,7 +32,7 @@ class App extends Component {
     minHeight,
     maxHeight
   ) => {
-    this.backendClient.startRectanglesPlacement(
+    this.backendClient.startAlgorithm(
       strategy,
       boxLength,
       numRectangles,

@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import AlgorithmInputForm from "./AlgorithmInput/AlgorithmInputForm";
-import RectanglesPlacementDisplay from "./RectanglesPlacementDisplay";
+import AlgorithmDisplay from "./AlgorithmDisplay";
 
 
 class Content extends Component {
@@ -11,7 +11,7 @@ class Content extends Component {
     return (
       <div className="content-container">
         <AlgorithmInputForm start={start}/>
-        <RectanglesPlacementDisplay getCurrentSolutionStep={getCurrentSolutionStep} getRectanglesLastUpdate={getRectanglesLastUpdate}/>
+        <AlgorithmDisplay getCurrentSolutionStep={getCurrentSolutionStep} getRectanglesLastUpdate={getRectanglesLastUpdate}/>
       </div>
     )
   }

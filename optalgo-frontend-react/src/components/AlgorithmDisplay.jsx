@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import Box from "./Box"
 
-class RectanglesPlacementDisplay extends Component {
+class AlgorithmDisplay extends Component {
 
   getCurrentSolutionStep = this.props.getCurrentSolutionStep
   getRectanglesLastUpdate = this.props.getRectanglesLastUpdate
@@ -54,7 +54,7 @@ class RectanglesPlacementDisplay extends Component {
       ))
 
     return (
-      <div className="rectangles-placement-display">
+      <div className="algorithm-display">
         <div className="boxes-container">
           {boxes}
         </div>
@@ -63,4 +63,4 @@ class RectanglesPlacementDisplay extends Component {
   }
 }
 
-export default RectanglesPlacementDisplay
+export default AlgorithmDisplay

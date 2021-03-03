@@ -2,7 +2,7 @@ const Header = () => {
   return (
     <div className="header-container">
       <header>
-        <h1>Rectangles Placement Algorithms</h1>
+        <h1>Bin Packing Algorithms</h1>
       </header>
     </div>
   )

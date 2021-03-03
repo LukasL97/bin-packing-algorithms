@@ -15,7 +15,7 @@ class BackendClient {
     console.info('Setup API connection to ' + axios.defaults.baseURL)
   }
 
-  startRectanglesPlacement(strategy, boxLength, numRectangles, minWidth, maxWidth, minHeight, maxHeight) {
+  startAlgorithm(strategy, boxLength, numRectangles, minWidth, maxWidth, minHeight, maxHeight) {
     return (callback) => {
       console.trace('Starting algorithm')
       axios.put(
