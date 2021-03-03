@@ -1,5 +1,5 @@
 
-name := """OptAlgoProject"""
+name := """bin-packing-backend"""
 organization := "com.example"
 
 version := "1.0-SNAPSHOT"
