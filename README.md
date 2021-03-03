@@ -1,1 +1,1 @@
-# OptAlgoProject
+# Bin Packing Algorithms
