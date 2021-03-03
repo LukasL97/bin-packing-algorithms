@@ -1,21 +1,20 @@
-package models.problem.rectangles
+package models.problem.binpacking
 
-import models.problem.rectangles.localsearch.RectanglesPlacementSolutionHandler
 import org.scalatest.MustMatchers
 import org.scalatest.WordSpec
 
-class RectanglesPlacementSolutionValidatorSpec extends WordSpec with MustMatchers {
+class BinPackingSolutionValidatorSpec extends WordSpec with MustMatchers {
 
-  private val solutionValidator = new RectanglesPlacementSolutionValidator {}
+  private val solutionValidator = new BinPackingSolutionValidator {}
 
-  "RectanglesPlacementSolutionValidator" should {
+  "BinPackingSolutionValidator" should {
     "validate feasibility correctly" when {
 
       val box1 = Box(0, 10, 10)
       val box2 = Box(1, 10, 10)
 
       "given a non-overlapping in-box placement" in {
-        val solution = RectanglesPlacementSolution(
+        val solution = BinPackingSolution(
           Map(
             Rectangle(0, 5, 5) -> Placing(box1, Coordinates(0, 0)),
             Rectangle(1, 5, 7) -> Placing(box1, Coordinates(5, 2)),
@@ -28,7 +27,7 @@ class RectanglesPlacementSolutionValidatorSpec extends WordSpec with MustMatcher
       }
 
       "given an overlapping placement" in {
-        val solution = RectanglesPlacementSolution(
+        val solution = BinPackingSolution(
           Map(
             Rectangle(0, 5, 5) -> Placing(box1, Coordinates(0, 0)),
             Rectangle(1, 5, 7) -> Placing(box1, Coordinates(5, 2)),
@@ -41,7 +40,7 @@ class RectanglesPlacementSolutionValidatorSpec extends WordSpec with MustMatcher
       }
 
       "given an out-of-box placement" in {
-        val solution = RectanglesPlacementSolution(
+        val solution = BinPackingSolution(
           Map(
             Rectangle(0, 5, 5) -> Placing(box1, Coordinates(0, 0)),
             Rectangle(1, 5, 5) -> Placing(box2, Coordinates(6, 5))

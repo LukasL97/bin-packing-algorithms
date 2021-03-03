@@ -1,12 +1,12 @@
-package models.problem.rectangles
+package models.problem.binpacking
 
-trait RectanglesPlacementSolutionValidator {
+trait BinPackingSolutionValidator {
 
-  def isFeasible(solution: RectanglesPlacementSolution): Boolean = {
+  def isFeasible(solution: BinPackingSolution): Boolean = {
     allRectanglesInBox(solution) && allRectanglesDisjunctive(solution)
   }
 
-  def allRectanglesInBox(solution: RectanglesPlacementSolution): Boolean =
+  def allRectanglesInBox(solution: BinPackingSolution): Boolean =
     solution.placement.map {
       case (rectangle, Placing(box, Coordinates(x, y))) =>
         0 <= x && x + rectangle.width <= box.width && 0 <= y && y + rectangle.height <= box.height
@@ -19,7 +19,7 @@ trait RectanglesPlacementSolutionValidator {
     }.forall(identity)
   }
 
-  private def allRectanglesDisjunctive(solution: RectanglesPlacementSolution): Boolean = {
+  private def allRectanglesDisjunctive(solution: BinPackingSolution): Boolean = {
     solution.placement.groupBy {
       case (rectangle, placing) => placing.box
     }.map {

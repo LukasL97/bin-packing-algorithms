@@ -1,24 +1,24 @@
-package models.problem.rectangles.greedy
+package models.problem.binpacking.greedy
 
-import models.problem.rectangles.Box
-import models.problem.rectangles.Coordinates
-import models.problem.rectangles.Placing
-import models.problem.rectangles.Rectangle
-import models.problem.rectangles.RectanglesPlacementSolution
+import models.problem.binpacking.Box
+import models.problem.binpacking.Coordinates
+import models.problem.binpacking.Placing
+import models.problem.binpacking.Rectangle
+import models.problem.binpacking.BinPackingSolution
 import org.scalatest.MustMatchers
 import org.scalatest.WordSpec
 
-class RectanglesPlacementGreedySpec extends WordSpec with MustMatchers {
+class BinPackingGreedySpec extends WordSpec with MustMatchers {
 
-  "RectanglesPlacementGreedy" should {
-    "should place rectangles in separate boxes in the given candidate order" when {
+  "BinPackingGreedy" should {
+    "place rectangles in separate boxes in the given candidate order" when {
       "given a selection strategy with sequential candidate selection and one box per rectangle placing strategy" in {
 
-        val rectanglesPlacement = new RectanglesPlacementGreedyImpl(10, 4, (3, 3), (3, 3))
+        val binPacking = new BinPackingGreedyImpl(10, 4, (3, 3), (3, 3))
 
-        val finalSolution = rectanglesPlacement.greedy.run()
+        val finalSolution = binPacking.greedy.run()
 
-        finalSolution.placement.keys.map(_.id).toSeq mustEqual rectanglesPlacement.orderedRectangles.map(_.id)
+        finalSolution.placement.keys.map(_.id).toSeq mustEqual binPacking.orderedRectangles.map(_.id)
 
         finalSolution.placement.foreach {
           case (rectangle, placing) =>
@@ -30,25 +30,25 @@ class RectanglesPlacementGreedySpec extends WordSpec with MustMatchers {
 
 }
 
-private class RectanglesPlacementGreedyImpl(
+private class BinPackingGreedyImpl(
   override val boxLength: Int = 10,
   override val numRectangles: Int = 4,
   override val rectangleWidthRange: (Int, Int) = (3, 3),
   override val rectangleHeightRange: (Int, Int) = (3, 3)
-) extends RectanglesPlacementGreedy {
+) extends BinPackingGreedy {
 
   val orderedRectangles: Seq[Rectangle] = rectangles.toSeq.sortBy(_.id)
 
-  override val selectionHandler: RectanglesPlacementSelectionHandler = new RectanglesPlacementSelectionHandlerImpl(
+  override val selectionHandler: BinPackingSelectionHandler = new BinPackingSelectionHandlerImpl(
     boxLength,
     orderedRectangles
   )
 }
 
-private class RectanglesPlacementSelectionHandlerImpl(
+private class BinPackingSelectionHandlerImpl(
   override val boxLength: Int,
   override val candidates: Iterable[Rectangle]
-) extends RectanglesPlacementSelectionHandler {
+) extends BinPackingSelectionHandler {
 
   override def selectNextCandidate(candidates: Iterable[Rectangle]): (Rectangle, Iterable[Rectangle]) = {
     (candidates.head, candidates.tail)
@@ -56,10 +56,10 @@ private class RectanglesPlacementSelectionHandlerImpl(
 
   override def placeCandidateInSolution(
     candidate: Rectangle,
-    solution: RectanglesPlacementSolution
-  ): RectanglesPlacementSolution = {
+    solution: BinPackingSolution
+  ): BinPackingSolution = {
     val maxBoxId = solution.placement.values.map(_.box.id).maxOption.getOrElse(0)
-    RectanglesPlacementSolution(
+    BinPackingSolution(
       solution.placement + (candidate -> Placing(Box(maxBoxId + 1, boxLength, boxLength), Coordinates(0, 0)))
     )
   }

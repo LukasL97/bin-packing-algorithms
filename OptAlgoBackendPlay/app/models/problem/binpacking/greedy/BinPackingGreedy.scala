@@ -1,33 +1,33 @@
-package models.problem.rectangles.greedy
+package models.problem.binpacking.greedy
 
 import models.algorithm.Greedy
 import models.algorithm.SelectionHandler
-import models.problem.rectangles.Box
-import models.problem.rectangles.Coordinates
-import models.problem.rectangles.Placing
-import models.problem.rectangles.Rectangle
-import models.problem.rectangles.RectanglesPlacement
-import models.problem.rectangles.RectanglesPlacementSolution
-import models.problem.rectangles.RectanglesPlacementSolutionValidator
+import models.problem.binpacking.Box
+import models.problem.binpacking.Coordinates
+import models.problem.binpacking.Placing
+import models.problem.binpacking.Rectangle
+import models.problem.binpacking.BinPacking
+import models.problem.binpacking.BinPackingSolution
+import models.problem.binpacking.BinPackingSolutionValidator
 
-trait RectanglesPlacementGreedy extends RectanglesPlacement {
-  val selectionHandler: RectanglesPlacementSelectionHandler
-  lazy val greedy = new Greedy[Rectangle, RectanglesPlacementSolution](selectionHandler)
+trait BinPackingGreedy extends BinPacking {
+  val selectionHandler: BinPackingSelectionHandler
+  lazy val greedy = new Greedy[Rectangle, BinPackingSolution](selectionHandler)
 
-  override def startSolution: RectanglesPlacementSolution = selectionHandler.startSolution
+  override def startSolution: BinPackingSolution = selectionHandler.startSolution
 }
 
-trait RectanglesPlacementSelectionHandler
-    extends SelectionHandler[Rectangle, RectanglesPlacementSolution] with RectanglesPlacementSolutionValidator {
+trait BinPackingSelectionHandler
+    extends SelectionHandler[Rectangle, BinPackingSolution] with BinPackingSolutionValidator {
 
   val boxLength: Int
 
-  override val startSolution: RectanglesPlacementSolution = RectanglesPlacementSolution(Map())
+  override val startSolution: BinPackingSolution = BinPackingSolution(Map())
 
   override def placeCandidateInSolution(
     candidate: Rectangle,
-    solution: RectanglesPlacementSolution
-  ): RectanglesPlacementSolution = {
+    solution: BinPackingSolution
+  ): BinPackingSolution = {
     val placementsPerBox = solution.placement.groupBy {
       case (rectangle, placing) => placing.box
     }.toSeq.sortBy {
@@ -35,7 +35,7 @@ trait RectanglesPlacementSelectionHandler
     }.map {
       case (box, placement) => box -> placement.map { case (rectangle, placing) => rectangle -> placing.coordinates }
     }
-    RectanglesPlacementSolution(
+    BinPackingSolution(
       solution.placement + (candidate -> placeRectangleInFirstPossiblePosition(candidate, placementsPerBox))
     )
   }

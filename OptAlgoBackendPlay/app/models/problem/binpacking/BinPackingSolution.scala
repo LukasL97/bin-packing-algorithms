@@ -1,8 +1,8 @@
-package models.problem.rectangles
+package models.problem.binpacking
 
 import models.algorithm.Solution
 
-case class RectanglesPlacementSolution(
+case class BinPackingSolution(
   placement: Map[Rectangle, Placing]
 ) extends Solution
 

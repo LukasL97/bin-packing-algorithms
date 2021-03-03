@@ -1,8 +1,8 @@
-package models.problem.rectangles
+package models.problem.binpacking
 
 import scala.util.Random
 
-trait RectanglesPlacement {
+trait BinPacking {
 
   val boxLength: Int
   val numRectangles: Int
@@ -23,6 +23,6 @@ trait RectanglesPlacement {
     )
     .toSet
 
-  def startSolution: RectanglesPlacementSolution
+  def startSolution: BinPackingSolution
 
 }

@@ -19,7 +19,7 @@ class BackendClient {
     return (callback) => {
       console.trace('Starting algorithm')
       axios.put(
-        '/rectanglesPlacement/start',
+        '/binPacking/start',
         {
           strategy: strategy,
           boxLength: boxLength,
@@ -41,7 +41,7 @@ class BackendClient {
     return (callback) => {
       console.trace('Fetching steps ' + minStep  + ' - ' + maxStep + ' for runId ' + runId)
       axios.get(
-        '/rectanglesPlacement/steps',
+        '/binPacking/steps',
         {
           params: {
             runId: runId,

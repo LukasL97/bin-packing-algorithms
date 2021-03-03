@@ -1,31 +1,31 @@
-package models.problem.rectangles.localsearch
+package models.problem.binpacking.localsearch
 
-import models.problem.rectangles.Box
-import models.problem.rectangles.Coordinates
-import models.problem.rectangles.Placing
-import models.problem.rectangles.Rectangle
-import models.problem.rectangles.RectanglesPlacementSolution
+import models.problem.binpacking.Box
+import models.problem.binpacking.Coordinates
+import models.problem.binpacking.Placing
+import models.problem.binpacking.Rectangle
+import models.problem.binpacking.BinPackingSolution
 import play.api.Logging
 
-class GeometryBasedRectanglesPlacement(
+class GeometryBasedBinPacking(
   override val boxLength: Int,
   override val numRectangles: Int,
   override val rectangleWidthRange: (Int, Int),
   override val rectangleHeightRange: (Int, Int)
-) extends RectanglesPlacementLocalSearch {
+) extends BinPackingLocalSearch {
 
-  override val solutionHandler: RectanglesPlacementSolutionHandler =
-    new GeometryBasedRectanglesPlacementSolutionHandler(rectangles, boxLength)
+  override val solutionHandler: BinPackingSolutionHandler =
+    new GeometryBasedBinPackingSolutionHandler(rectangles, boxLength)
 
 }
 
-class GeometryBasedRectanglesPlacementSolutionHandler(
+class GeometryBasedBinPackingSolutionHandler(
   rectangles: Set[Rectangle],
   boxLength: Int,
-) extends RectanglesPlacementSolutionHandler with Logging {
+) extends BinPackingSolutionHandler with Logging {
 
-  override def createArbitraryFeasibleSolution(): RectanglesPlacementSolution = {
-    val solution = RectanglesPlacementSolution(
+  override def createArbitraryFeasibleSolution(): BinPackingSolution = {
+    val solution = BinPackingSolution(
       rectangles
         .map(rectangle => rectangle -> Placing(
           Box(rectangle.id, boxLength, boxLength),
@@ -40,14 +40,14 @@ class GeometryBasedRectanglesPlacementSolutionHandler(
     }
   }
 
-  def shiftUpSolution(solution: RectanglesPlacementSolution): RectanglesPlacementSolution = {
+  def shiftUpSolution(solution: BinPackingSolution): BinPackingSolution = {
     val usedBoxIds = solution.placement.map {
       case (rectangle, Placing(box, coordinates)) => box.id
     }.toSet
     val skippedBoxIds = (1 to usedBoxIds.max).filter(!usedBoxIds.contains(_))
     skippedBoxIds match {
       case Seq() => solution
-      case Seq(skippedBoxId) => RectanglesPlacementSolution(
+      case Seq(skippedBoxId) => BinPackingSolution(
         solution.placement.map {
           case (rectangle, Placing(box, coordinates)) if box.id <= skippedBoxId =>
             rectangle -> Placing(box, coordinates)
@@ -59,10 +59,10 @@ class GeometryBasedRectanglesPlacementSolutionHandler(
     }
   }
 
-  override def getNeighborhood(solution: RectanglesPlacementSolution): Set[RectanglesPlacementSolution] = {
+  override def getNeighborhood(solution: BinPackingSolution): Set[BinPackingSolution] = {
     val solutionsWithBoxPullUp = solution.placement.collect {
       case (rectangle, Placing(Box(id, width, height), coordinates)) if id > 1 =>
-        RectanglesPlacementSolution(
+        BinPackingSolution(
           solution.placement.updated(
             rectangle,
             Placing(Box(id - 1, width, height), Coordinates(width - rectangle.width, height - rectangle.height))
@@ -71,7 +71,7 @@ class GeometryBasedRectanglesPlacementSolutionHandler(
     }.map(shiftUpSolution).toSet
     val solutionsWithUpShift = solution.placement.map {
       case (rectangle, Placing(box, Coordinates(x, y))) =>
-        RectanglesPlacementSolution(
+        BinPackingSolution(
           solution.placement.updated(
             rectangle,
             Placing(box, Coordinates(x, y - 1))
@@ -80,7 +80,7 @@ class GeometryBasedRectanglesPlacementSolutionHandler(
     }.toSet
     val solutionsWithLeftShift = solution.placement.map {
       case (rectangle, Placing(box, Coordinates(x, y))) =>
-        RectanglesPlacementSolution(
+        BinPackingSolution(
           solution.placement.updated(
             rectangle,
             Placing(box, Coordinates(x - 1, y))
@@ -113,7 +113,7 @@ class GeometryBasedRectanglesPlacementSolutionHandler(
     ((1 / pointCostFunction(Coordinates(0, 0))) + 1).pow(id)
   }
 
-  override def evaluate(solution: RectanglesPlacementSolution): BigDecimal = {
+  override def evaluate(solution: BinPackingSolution): BigDecimal = {
     val minimalCostWeight = 0.9
     val pointCostFunction = buildLinearPointCostFunction(minimalCostWeight, boxLength)
     val boxIds = solution.placement.map {

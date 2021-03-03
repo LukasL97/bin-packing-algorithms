@@ -1,4 +1,4 @@
-import actors.RectanglesPlacementActor
+import actors.BinPackingActor
 import com.google.inject.AbstractModule
 import org.mongodb.scala.MongoClient
 import org.mongodb.scala.MongoDatabase
@@ -8,7 +8,7 @@ class Module extends AbstractModule with AkkaGuiceSupport {
 
   override def configure(): Unit = {
     bind(classOf[MongoDatabase]).toInstance(getDB)
-    bindActorFactory[RectanglesPlacementActor, RectanglesPlacementActor.Factory]
+    bindActorFactory[BinPackingActor, BinPackingActor.Factory]
   }
 
   private def getDB: MongoDatabase = {

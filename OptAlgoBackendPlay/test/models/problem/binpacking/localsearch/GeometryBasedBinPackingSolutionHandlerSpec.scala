@@ -1,18 +1,18 @@
-package models.problem.rectangles.localsearch
+package models.problem.binpacking.localsearch
 
-import models.problem.rectangles.Coordinates
-import models.problem.rectangles.Rectangle
+import models.problem.binpacking.Coordinates
+import models.problem.binpacking.Rectangle
 import org.scalatest.MustMatchers
 import org.scalatest.WordSpec
 
-class GeometryBasedRectanglesPlacementSolutionHandlerSpec extends WordSpec with MustMatchers {
+class GeometryBasedBinPackingSolutionHandlerSpec extends WordSpec with MustMatchers {
 
-  "GeometryBasedRectanglesPlacementSolutionHandler" should {
+  "GeometryBasedBinPackingSolutionHandler" should {
 
     "build linear point cost function whose point costs sum up to 1 for all points in a box" when {
       "given some box length" in {
         val boxLength = 10
-        val handler = new GeometryBasedRectanglesPlacementSolutionHandler(Set(), boxLength)
+        val handler = new GeometryBasedBinPackingSolutionHandler(Set(), boxLength)
         val minimalCostWeight = 0.9
         val linearPointCostFunction = handler.buildLinearPointCostFunction(minimalCostWeight, boxLength)
         val boxPoints = (0 until boxLength).flatMap(x => (0 until boxLength).map(y => (x, y)))
@@ -27,7 +27,7 @@ class GeometryBasedRectanglesPlacementSolutionHandlerSpec extends WordSpec with 
 
     "calculate single rectangle cost correctly" when {
       val boxLength = 10
-      val handler = new GeometryBasedRectanglesPlacementSolutionHandler(Set(), boxLength)
+      val handler = new GeometryBasedBinPackingSolutionHandler(Set(), boxLength)
       val pointCostFunction = handler.buildLinearPointCostFunction(0.9, boxLength)
 
       "given a rectangle filling the entire box" in {

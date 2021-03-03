@@ -1,24 +1,24 @@
-package models.problem.rectangles.greedy
-import models.problem.rectangles.Rectangle
+package models.problem.binpacking.greedy
+import models.problem.binpacking.Rectangle
 
-class RandomSelectionRectanglesPlacementGreedy(
+class RandomSelectionBinPackingGreedy(
   override val boxLength: Int,
   override val numRectangles: Int,
   override val rectangleWidthRange: (Int, Int),
   override val rectangleHeightRange: (Int, Int)
-) extends RectanglesPlacementGreedy {
+) extends BinPackingGreedy {
 
-  override val selectionHandler: RectanglesPlacementSelectionHandler =
-    new RandomSelectionRectanglesPlacementSelectionHandler(
+  override val selectionHandler: BinPackingSelectionHandler =
+    new RandomSelectionBinPackingSelectionHandler(
       boxLength,
       rectangles
     )
 }
 
-class RandomSelectionRectanglesPlacementSelectionHandler(
+class RandomSelectionBinPackingSelectionHandler(
   override val boxLength: Int,
   override val candidates: Iterable[Rectangle]
-) extends RectanglesPlacementSelectionHandler {
+) extends BinPackingSelectionHandler {
 
   override def selectNextCandidate(candidates: Iterable[Rectangle]): (Rectangle, Iterable[Rectangle]) = {
     (candidates.head, candidates.tail)

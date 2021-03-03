@@ -1,32 +1,32 @@
-package models.problem.rectangles.greedy
+package models.problem.binpacking.greedy
 
-import models.problem.rectangles.Box
-import models.problem.rectangles.Coordinates
-import models.problem.rectangles.Placing
-import models.problem.rectangles.Rectangle
-import models.problem.rectangles.RectanglesPlacementSolution
+import models.problem.binpacking.Box
+import models.problem.binpacking.Coordinates
+import models.problem.binpacking.Placing
+import models.problem.binpacking.Rectangle
+import models.problem.binpacking.BinPackingSolution
 import org.scalatest.MustMatchers
 import org.scalatest.WordSpec
 
-class RectanglesPlacementSelectionHandlerSpec extends WordSpec with MustMatchers {
+class BinPackingSelectionHandlerSpec extends WordSpec with MustMatchers {
 
-  private class RectanglesPlacementSelectionHandlerImpl(
+  private class BinPackingSelectionHandlerImpl(
     override val boxLength: Int,
     override val candidates: Iterable[Rectangle]
-  ) extends RectanglesPlacementSelectionHandler {
+  ) extends BinPackingSelectionHandler {
     override def selectNextCandidate(candidates: Iterable[Rectangle]): (Rectangle, Iterable[Rectangle]) = {
       (candidates.head, candidates.tail)
     }
   }
 
   private val boxLength = 5
-  private val selectionHandler = new RectanglesPlacementSelectionHandlerImpl(boxLength, Seq.empty)
+  private val selectionHandler = new BinPackingSelectionHandlerImpl(boxLength, Seq.empty)
 
-  "RectanglesPlacementSelectionHandler" should {
+  "BinPackingSelectionHandler" should {
 
     "place a candidate in the first possible position according to the top left strategy" when {
 
-      val solution = RectanglesPlacementSolution(Map(
+      val solution = BinPackingSolution(Map(
         Rectangle(1, 5, 3) -> Placing(Box(1, 5, 5), Coordinates(0, 0)),
         Rectangle(2, 3, 2) -> Placing(Box(1, 5, 5), Coordinates(0, 3)),
         Rectangle(3, 2, 1) -> Placing(Box(2, 5, 5), Coordinates(0, 0))
@@ -57,7 +57,7 @@ class RectanglesPlacementSelectionHandlerSpec extends WordSpec with MustMatchers
     "place a candidate in box 1 in the top left corner according to the top left strategy" when {
       "given a solution without any candidate placed previously" in {
         val candidate = Rectangle(1, 3, 3)
-        val solution = RectanglesPlacementSolution(Map())
+        val solution = BinPackingSolution(Map())
         selectionHandler.placeCandidateInSolution(candidate, solution).placement mustEqual {
           Map(candidate -> Placing(Box(1 ,boxLength ,boxLength), Coordinates(0, 0)))
         }
