@@ -1,0 +1,20 @@
+{
+  "files": {
+    "main.css": "/bin-packing-algorithms/static/css/main.3154fec6.chunk.css",
+    "main.js": "/bin-packing-algorithms/static/js/main.6888abc1.chunk.js",
+    "main.js.map": "/bin-packing-algorithms/static/js/main.6888abc1.chunk.js.map",
+    "runtime-main.js": "/bin-packing-algorithms/static/js/runtime-main.ca473fe1.js",
+    "runtime-main.js.map": "/bin-packing-algorithms/static/js/runtime-main.ca473fe1.js.map",
+    "static/js/2.cf6d83dd.chunk.js": "/bin-packing-algorithms/static/js/2.cf6d83dd.chunk.js",
+    "static/js/2.cf6d83dd.chunk.js.map": "/bin-packing-algorithms/static/js/2.cf6d83dd.chunk.js.map",
+    "index.html": "/bin-packing-algorithms/index.html",
+    "static/css/main.3154fec6.chunk.css.map": "/bin-packing-algorithms/static/css/main.3154fec6.chunk.css.map",
+    "static/js/2.cf6d83dd.chunk.js.LICENSE.txt": "/bin-packing-algorithms/static/js/2.cf6d83dd.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.ca473fe1.js",
+    "static/js/2.cf6d83dd.chunk.js",
+    "static/css/main.3154fec6.chunk.css",
+    "static/js/main.6888abc1.chunk.js"
+  ]
+}
