@@ -24,11 +24,5 @@ libraryDependencies += "org.scalamock" %% "scalamock" % "4.4.0" % Test
 libraryDependencies += "org.mongodb.scala" %% "mongo-scala-driver" % "2.9.0"
 libraryDependencies += "org.json4s" %% "json4s-native" % "3.7.0-M8"
 
-// Adds additional packages into Twirl
-//TwirlKeys.templateImports += "com.example.controllers._"
-
-// Adds additional packages into conf/routes
-// play.sbt.routes.RoutesKeys.routesImport += "com.example.binders._"
-
 herokuAppName in Compile := "bin-packing-backend"
 
