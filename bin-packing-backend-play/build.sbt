@@ -29,3 +29,6 @@ libraryDependencies += "org.json4s" %% "json4s-native" % "3.7.0-M8"
 
 // Adds additional packages into conf/routes
 // play.sbt.routes.RoutesKeys.routesImport += "com.example.binders._"
+
+herokuAppName in Compile := "bin-packing-backend"
+
