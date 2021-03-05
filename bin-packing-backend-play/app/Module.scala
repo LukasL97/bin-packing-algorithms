@@ -12,9 +12,7 @@ class Module extends AbstractModule with AkkaGuiceSupport {
   }
 
   private def getDB: MongoDatabase = {
-    val host = sys.env.getOrElse("MONGODB_HOST", "localhost")
-    val port = sys.env.getOrElse("MONGODB_PORT", "27017")
-    val uri = s"mongodb://$host:$port"
+    val uri = sys.env.getOrElse("MONGODB_URI", "mongodb://localhost:27017")
     val client = MongoClient(uri)
     println(s"Setup connection to MongoClient at $uri")
     client.getDatabase("BinPacking")

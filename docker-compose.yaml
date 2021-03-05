@@ -14,8 +14,7 @@ services:
     ports:
       - 9000:9000
     environment:
-      MONGODB_HOST: bin-packing-db
-      MONGODB_PORT: 27017
+      MONGODB_URI: mongodb://bin-packing-db:27017
     depends_on:
       - bin-packing-db
 
