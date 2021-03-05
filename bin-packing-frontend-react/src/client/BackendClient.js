@@ -3,15 +3,11 @@ import axios from "axios";
 class BackendClient {
 
   constructor() {
-    var backendHost = process.env.REACT_APP_API_HOST
-    if (typeof backendHost == 'undefined') {
-      backendHost = 'localhost'
+    let apiUrl = process.env.REACT_APP_API_URL
+    if (typeof apiUrl == 'undefined') {
+      apiUrl = 'http://localhost:9000'
     }
-    var backendPort = process.env.REACT_APP_API_PORT
-    if (typeof backendPort == 'undefined') {
-      backendPort = 9000
-    }
-    axios.defaults.baseURL = 'http://' + backendHost + ':' + backendPort
+    axios.defaults.baseURL = apiUrl
     console.info('Setup API connection to ' + axios.defaults.baseURL)
   }
 
