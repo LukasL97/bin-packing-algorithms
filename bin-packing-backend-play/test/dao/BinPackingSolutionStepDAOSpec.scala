@@ -1,19 +1,21 @@
 package dao
 
 import actors.BinPackingSolutionStep
+import models.problem.binpacking.BinPackingSolution
+import models.problem.binpacking.Box
 import models.problem.binpacking.Coordinates
 import models.problem.binpacking.Placing
-import models.problem.binpacking.Box
 import models.problem.binpacking.Rectangle
-import models.problem.binpacking.BinPackingSolution
 import org.mongodb.scala.MongoDatabase
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.MustMatchers
 import org.scalatest.WordSpec
 
+import scala.concurrent.ExecutionContext
+
 class BinPackingSolutionStepDAOSpec extends WordSpec with MustMatchers with MockFactory {
 
-  val dao = new BinPackingSolutionStepDAO(mock[MongoDatabase])
+  val dao = new BinPackingSolutionStepDAO(mock[MongoDatabase], mock[ExecutionContext])
 
   "BinPackingSolutionStepDAO" should {
     "serialize and deserialize correctly" when {

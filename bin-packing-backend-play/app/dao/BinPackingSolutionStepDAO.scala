@@ -9,9 +9,10 @@ import utils.BinPackingSolutionSerializationUtil.formats
 import utils.SerializationUtil
 
 import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-class BinPackingSolutionStepDAO @Inject()(val db: MongoDatabase) {
+class BinPackingSolutionStepDAO @Inject()(val db: MongoDatabase, implicit val ec: ExecutionContext) {
 
   private lazy val collection = db.getCollection[BsonDocument]("BinPackingSolutionSteps")
 
@@ -20,13 +21,17 @@ class BinPackingSolutionStepDAO @Inject()(val db: MongoDatabase) {
   }
 
   def getSolutionStepsInStepRange(runId: String, stepMin: Int, stepMax: Int): Future[Seq[BinPackingSolutionStep]] = {
-    collection.find(
-      and(
-        equal("runId", runId),
-        gte("step", stepMin),
-        lte("step", stepMax)
+    collection
+      .find(
+        and(
+          equal("runId", runId),
+          gte("step", stepMin),
+          lte("step", stepMax)
+        )
       )
-    ).map(convertDocumentToSolutionStep).toFuture()
+      .map(convertDocumentToSolutionStep)
+      .toFuture
+      .map(steps => steps.sortBy(_.step))
   }
 
   def convertSolutionStepToDocument(solutionStep: BinPackingSolutionStep): BsonDocument = {
