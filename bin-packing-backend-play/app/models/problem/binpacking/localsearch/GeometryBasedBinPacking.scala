@@ -24,7 +24,7 @@ class GeometryBasedBinPackingSolutionHandler(
   boxLength: Int,
 ) extends BinPackingSolutionHandler with Logging {
 
-  override def createArbitraryFeasibleSolution(): BinPackingSolution = {
+  override val startSolution: BinPackingSolution = {
     val solution = BinPackingSolution(
       rectangles
         .map(rectangle => rectangle -> Placing(

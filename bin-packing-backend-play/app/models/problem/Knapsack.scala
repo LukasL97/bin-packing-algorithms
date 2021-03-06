@@ -14,7 +14,7 @@ class Knapsack(
 
   object KnapsackSolutionHandler extends SolutionHandler[KnapsackSolution] {
 
-    override def createArbitraryFeasibleSolution(): KnapsackSolution = KnapsackSolution(Seq.fill(weights.length)(false))
+    override val startSolution: KnapsackSolution = KnapsackSolution(Seq.fill(weights.length)(false))
 
     private def isFeasible(solution: KnapsackSolution): Boolean = solution.getWeight <= maxWeight
 

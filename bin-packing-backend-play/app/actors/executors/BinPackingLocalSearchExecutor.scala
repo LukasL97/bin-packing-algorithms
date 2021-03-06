@@ -17,7 +17,7 @@ class BinPackingLocalSearchExecutor(dao: BinPackingSolutionStepDAO)
     dao.dumpSolutionStep(
       BinPackingSolutionStep.startStep(
         runId,
-        binPacking.localSearch.startSolution
+        binPacking.solutionHandler.startSolution
       )
     )
     binPacking.localSearch.run(maxIterations, dumpSolutionStep(runId))

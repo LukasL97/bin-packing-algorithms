@@ -32,7 +32,7 @@ class BinPackingLocalSearchExecutorSpec extends WordSpec with MockFactory {
           override val rectangleHeightRange: (Int, Int) = (1, 1)
 
           override val solutionHandler: BinPackingSolutionHandler = new BinPackingSolutionHandler {
-            override def createArbitraryFeasibleSolution(): BinPackingSolution = BinPackingSolution(
+            override val startSolution: BinPackingSolution = BinPackingSolution(
               Map(rectangles.head -> Placing(box, Coordinates(0, 0)))
             )
 

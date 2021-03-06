@@ -1,14 +1,12 @@
 package models.algorithm
 
-class LocalSearch[A <: Solution](solutionHandler: SolutionHandler[A]) {
+import scala.annotation.tailrec
 
-  implicit def solutionToA(solution: Solution): A = solution.asInstanceOf[A]
+class LocalSearch[A <: Solution](solutionHandler: SolutionHandler[A]) {
 
   sealed trait StepResult
   case class Improvement(solution: A) extends StepResult
   case class Stagnation(solution: A) extends StepResult
-
-  lazy val startSolution: A = solutionHandler.createArbitraryFeasibleSolution()
 
   def step(currentSolution: A): StepResult = {
     val currentSolutionResult = solutionHandler.evaluate(currentSolution)
@@ -20,6 +18,7 @@ class LocalSearch[A <: Solution](solutionHandler: SolutionHandler[A]) {
   }
 
   def run(maxSteps: Int, afterStep: (A, Int, Boolean) => Unit): A = {
+    @tailrec
     def runRecursively(currentSolution: A, currentStep: Int): A = if (currentStep <= maxSteps) {
       step(currentSolution) match {
         case Improvement(solution) =>
@@ -32,7 +31,7 @@ class LocalSearch[A <: Solution](solutionHandler: SolutionHandler[A]) {
     } else {
       currentSolution
     }
-    runRecursively(startSolution, 1)
+    runRecursively(solutionHandler.startSolution, 1)
   }
 
 }
@@ -41,7 +40,7 @@ trait Solution
 
 trait SolutionHandler[A <: Solution] {
 
-  def createArbitraryFeasibleSolution(): A
+  val startSolution: A
 
   def getNeighborhood(solution: A): Set[A]
 

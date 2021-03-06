@@ -15,7 +15,7 @@ trait BinPackingLocalSearch extends BinPacking {
   val solutionHandler: BinPackingSolutionHandler
   lazy val localSearch = new LocalSearch[BinPackingSolution](solutionHandler)
 
-  override def startSolution: BinPackingSolution = localSearch.startSolution
+  override def startSolution: BinPackingSolution = solutionHandler.startSolution
 }
 
 trait BinPackingSolutionHandler
