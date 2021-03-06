@@ -1,11 +1,13 @@
 package models.problem.binpacking.localsearch
 
+import models.problem.binpacking.BinPackingSolution
 import models.problem.binpacking.Box
 import models.problem.binpacking.Coordinates
 import models.problem.binpacking.Placing
 import models.problem.binpacking.Rectangle
-import models.problem.binpacking.BinPackingSolution
 import play.api.Logging
+
+import scala.math.BigDecimal.RoundingMode
 
 class GeometryBasedBinPacking(
   override val boxLength: Int,
@@ -40,7 +42,7 @@ class GeometryBasedBinPackingSolutionHandler(
     }
   }
 
-  def shiftUpSolution(solution: BinPackingSolution): BinPackingSolution = {
+  private def shiftUpSolution(solution: BinPackingSolution): BinPackingSolution = {
     val usedBoxIds = solution.placement.map {
       case (rectangle, Placing(box, coordinates)) => box.id
     }.toSet
@@ -88,7 +90,6 @@ class GeometryBasedBinPackingSolutionHandler(
         )
     }.toSet
     val neighborhood = (solutionsWithBoxPullUp ++ solutionsWithUpShift ++ solutionsWithLeftShift).filter(isFeasible)
-    logger.trace(s"Get neighborhood of size ${neighborhood.size}")
     neighborhood
   }
 
@@ -109,8 +110,10 @@ class GeometryBasedBinPackingSolutionHandler(
       .sum
   }
 
-  def calculateBoxCostFactor(pointCostFunction: Coordinates => BigDecimal, id: Int): BigDecimal = {
-    ((1 / pointCostFunction(Coordinates(0, 0))) + 1).pow(id)
+  private def calculateBoxCostFactor(pointCostFunction: Coordinates => BigDecimal, id: Int): BigDecimal = {
+    val minBoxCostChange = pointCostFunction(Coordinates(1, 0)) - pointCostFunction(Coordinates(0, 0))
+    require(minBoxCostChange > 0)
+    (1 / minBoxCostChange).setScale(0, RoundingMode.UP).pow(id)
   }
 
   override def evaluate(solution: BinPackingSolution): BigDecimal = {

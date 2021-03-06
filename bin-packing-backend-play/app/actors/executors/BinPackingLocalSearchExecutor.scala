@@ -27,7 +27,6 @@ class BinPackingLocalSearchExecutor(dao: BinPackingSolutionStepDAO)
   private def dumpSolutionStep(
     runId: String
   )(solution: BinPackingSolution, step: Int, finished: Boolean): Unit = {
-    logger.trace(s"Dumping solution step $step for runId $runId")
     dao.dumpSolutionStep(
       BinPackingSolutionStep(
         runId,
