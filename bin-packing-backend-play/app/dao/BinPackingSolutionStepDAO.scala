@@ -13,7 +13,7 @@ import scala.concurrent.Future
 
 class BinPackingSolutionStepDAO @Inject()(val db: MongoDatabase) {
 
-  private lazy val collection = db.getCollection[BsonDocument]("BinPackingSolutionsSteps")
+  private lazy val collection = db.getCollection[BsonDocument]("BinPackingSolutionSteps")
 
   def dumpSolutionStep(solutionStep: BinPackingSolutionStep): Future[Completed] = {
     collection.insertOne(convertSolutionStepToDocument(solutionStep)).toFuture()
