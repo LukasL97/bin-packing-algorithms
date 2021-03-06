@@ -24,8 +24,20 @@
     justify-content: space-between;
 }
 
-.algorithm-input-form {
+.input-container {
     margin: 10px;
+}
+
+.input-container h3 {
+    margin-bottom: 10px;
+}
+
+.input-form {
+    margin-bottom: 20px;
+}
+
+.input-form-button-container {
+    text-align: right;
 }
 
 .strategy-selector-form-row {

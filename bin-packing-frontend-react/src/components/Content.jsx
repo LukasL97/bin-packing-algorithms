@@ -1,17 +1,33 @@
 import React, {Component} from 'react'
-import AlgorithmInputForm from "./AlgorithmInput/AlgorithmInputForm";
-import AlgorithmDisplay from "./AlgorithmDisplay";
+import AlgorithmInputForm from './Input/AlgorithmInput/AlgorithmInputForm'
+import AlgorithmDisplay from './AlgorithmDisplay'
+import VisualizationConfigForm from './Input/VisualizationConfig/VisualizationConfigForm'
 
 
 class Content extends Component {
 
   render() {
-    const {getCurrentSolutionStep, getRectanglesLastUpdate, start} = this.props
+    const {
+      getCurrentSolutionStep,
+      getRectanglesLastUpdate,
+      start,
+      visualizationIterationPeriodDefault,
+      updateVisualizationIterationPeriod
+    } = this.props
 
     return (
       <div className="content-container">
-        <AlgorithmInputForm start={start}/>
-        <AlgorithmDisplay getCurrentSolutionStep={getCurrentSolutionStep} getRectanglesLastUpdate={getRectanglesLastUpdate}/>
+        <div className="input-container">
+          <AlgorithmInputForm start={start}/>
+          <VisualizationConfigForm
+            visualizationIterationPeriodDefault={visualizationIterationPeriodDefault}
+            updateVisualizationIterationPeriod={updateVisualizationIterationPeriod}
+          />
+        </div>
+        <AlgorithmDisplay
+          getCurrentSolutionStep={getCurrentSolutionStep}
+          getRectanglesLastUpdate={getRectanglesLastUpdate}
+        />
       </div>
     )
   }

@@ -1,4 +1,4 @@
-import AlgorithmStrategies from "../../utils/AlgorithmStrategies";
+import AlgorithmStrategies from '../../../utils/AlgorithmStrategies'
 
 const StrategySelectorFormRow = (props) => {
 

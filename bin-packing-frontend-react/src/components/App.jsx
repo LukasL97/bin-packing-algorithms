@@ -8,7 +8,7 @@ class App extends Component {
 
   fetchSolutionStepsPeriod = 100
   fetchSolutionStepsCount = 100
-  removeFirstSolutionStepFromQueuePeriod = 100
+  visualizationIterationPeriodDefault = 100
 
   backendClient = new BackendClient()
 
@@ -112,6 +112,14 @@ class App extends Component {
     }
   }
 
+  updateRemoveFirstSolutionStepFromQueueInterval(visualizationIterationPeriod) {
+    clearInterval(this.removeFirstSolutionStepFromQueueInterval)
+    this.removeFirstSolutionStepFromQueueInterval = setInterval(
+      this.removeFirstSolutionStepFromQueue,
+      visualizationIterationPeriod
+    )
+  }
+
   componentDidMount() {
     this.fetchSolutionStepsInterval = setInterval(
       () => {
@@ -123,7 +131,7 @@ class App extends Component {
     )
     this.removeFirstSolutionStepFromQueueInterval = setInterval(
       this.removeFirstSolutionStepFromQueue,
-      this.removeFirstSolutionStepFromQueuePeriod
+      this.visualizationIterationPeriodDefault
     )
   }
 
@@ -140,6 +148,8 @@ class App extends Component {
           getCurrentSolutionStep={this.getCurrentSolutionStep}
           getRectanglesLastUpdate={this.getRectanglesLastUpdate}
           start={this.start}
+          visualizationIterationPeriodDefault={this.visualizationIterationPeriodDefault}
+          updateVisualizationIterationPeriod={this.updateRemoveFirstSolutionStepFromQueueInterval.bind(this)}
         />
       </div>
     )

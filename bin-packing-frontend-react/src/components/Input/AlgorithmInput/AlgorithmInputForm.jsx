@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
-import NumericalInputFormRow from "./NumericalInputFormRow";
+import NumericalInputFormRow from "../NumericalInputFormRow";
 import StrategySelectorFormRow from "./StrategySelectorFormRow";
-import AlgorithmStrategies from "../../utils/AlgorithmStrategies";
+import AlgorithmStrategies from "../../../utils/AlgorithmStrategies";
 
 class AlgorithmInputForm extends Component {
 
@@ -50,7 +50,8 @@ class AlgorithmInputForm extends Component {
   render() {
 
     return (
-      <div className="algorithm-input-form">
+      <div className="input-form">
+        <h3>Algorithm Input</h3>
         <form>
           <StrategySelectorFormRow onChange={this.handleTextualInputChange('strategy').bind(this)}/>
           <NumericalInputFormRow
@@ -89,7 +90,9 @@ class AlgorithmInputForm extends Component {
             value={this.state.maxHeight}
             onChange={this.handleNumericalInputChange('maxHeight').bind(this)}
           />
-          <button onClick={this.startWithoutPageRefresh.bind(this)}>Start</button>
+          <div className="input-form-button-container">
+            <button onClick={this.startWithoutPageRefresh.bind(this)}>Start</button>
+          </div>
         </form>
       </div>
     )
