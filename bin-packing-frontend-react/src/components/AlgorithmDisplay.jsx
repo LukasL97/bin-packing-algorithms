@@ -51,7 +51,7 @@ class AlgorithmDisplay extends Component {
       .map(box => (
         <Box
           id={box.id}
-          unitLength={box.width}
+          unitLength={box.length}
           pixelLength={this.boxPixelLength}
           getRectangles={this.getRectangles(box.id)}
           currentStep={newSolutionStep.step}
