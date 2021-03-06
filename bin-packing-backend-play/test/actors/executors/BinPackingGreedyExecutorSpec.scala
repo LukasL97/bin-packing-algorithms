@@ -45,7 +45,7 @@ class BinPackingGreedyExecutorSpec extends WordSpec with MockFactory {
         val rectanglesWidthRange = (3, 3)
         val rectanglesHeightRange = (2, 2)
 
-        val box = Box(1, boxLength, boxLength)
+        val box = Box(1, boxLength)
 
         val binPacking = new BinPackingGreedyImpl(
           boxLength,

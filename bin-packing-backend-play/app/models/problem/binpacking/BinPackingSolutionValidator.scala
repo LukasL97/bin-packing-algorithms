@@ -9,7 +9,7 @@ trait BinPackingSolutionValidator {
   def allRectanglesInBox(solution: BinPackingSolution): Boolean =
     solution.placement.map {
       case (rectangle, Placing(box, Coordinates(x, y))) =>
-        0 <= x && x + rectangle.width <= box.width && 0 <= y && y + rectangle.height <= box.height
+        0 <= x && x + rectangle.width <= box.length && 0 <= y && y + rectangle.height <= box.length
     }.forall(identity)
 
   def allRectanglesInBoundsForSingleBox(placement: Map[Rectangle, Coordinates], boxLength: Int): Boolean = {

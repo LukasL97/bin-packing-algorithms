@@ -23,8 +23,8 @@ class BinPackingSolutionStepDAOSpec extends WordSpec with MustMatchers with Mock
           42,
           BinPackingSolution(
             Map(
-              Rectangle(0, 2, 2) -> Placing(Box(0, 4, 4), Coordinates(1, 1)),
-              Rectangle(1, 1, 3) -> Placing(Box(1, 4, 5), Coordinates(0, 0))
+              Rectangle(0, 2, 2) -> Placing(Box(0, 4), Coordinates(1, 1)),
+              Rectangle(1, 1, 3) -> Placing(Box(1, 4), Coordinates(0, 0))
             )
           )
         )

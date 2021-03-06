@@ -28,7 +28,7 @@ class GeometryBasedBinPackingSolutionHandler(
     val solution = BinPackingSolution(
       rectangles
         .map(rectangle => rectangle -> Placing(
-          Box(rectangle.id, boxLength, boxLength),
+          Box(rectangle.id, boxLength),
           Coordinates(0, 0)
         ))
         .toMap
@@ -61,11 +61,11 @@ class GeometryBasedBinPackingSolutionHandler(
 
   override def getNeighborhood(solution: BinPackingSolution): Set[BinPackingSolution] = {
     val solutionsWithBoxPullUp = solution.placement.collect {
-      case (rectangle, Placing(Box(id, width, height), coordinates)) if id > 1 =>
+      case (rectangle, Placing(Box(id, length), coordinates)) if id > 1 =>
         BinPackingSolution(
           solution.placement.updated(
             rectangle,
-            Placing(Box(id - 1, width, height), Coordinates(width - rectangle.width, height - rectangle.height))
+            Placing(Box(id - 1, length), Coordinates(length - rectangle.width, length - rectangle.height))
           )
         )
     }.map(shiftUpSolution).toSet

@@ -20,8 +20,7 @@ case class Placing(
 
 case class Box(
   id: Int,
-  width: Int,
-  height: Int
+  length: Int
 )
 
 case class Coordinates(

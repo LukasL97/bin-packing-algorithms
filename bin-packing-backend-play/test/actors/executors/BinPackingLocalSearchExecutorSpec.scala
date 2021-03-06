@@ -23,7 +23,7 @@ class BinPackingLocalSearchExecutorSpec extends WordSpec with MockFactory {
         val runId = "runId"
 
         val boxLength_ = 3
-        val box = Box(1, boxLength_, boxLength_)
+        val box = Box(1, boxLength_)
 
         val binPacking: BinPackingLocalSearch = new BinPackingLocalSearch {
           override val boxLength: Int = boxLength_

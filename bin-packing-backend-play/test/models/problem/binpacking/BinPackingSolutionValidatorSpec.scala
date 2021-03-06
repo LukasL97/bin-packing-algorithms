@@ -10,8 +10,8 @@ class BinPackingSolutionValidatorSpec extends WordSpec with MustMatchers {
   "BinPackingSolutionValidator" should {
     "validate feasibility correctly" when {
 
-      val box1 = Box(0, 10, 10)
-      val box2 = Box(1, 10, 10)
+      val box1 = Box(0, 10)
+      val box2 = Box(1, 10)
 
       "given a non-overlapping in-box placement" in {
         val solution = BinPackingSolution(

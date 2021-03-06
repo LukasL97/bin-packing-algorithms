@@ -60,7 +60,7 @@ private class BinPackingSelectionHandlerImpl(
   ): BinPackingSolution = {
     val maxBoxId = solution.placement.values.map(_.box.id).maxOption.getOrElse(0)
     BinPackingSolution(
-      solution.placement + (candidate -> Placing(Box(maxBoxId + 1, boxLength, boxLength), Coordinates(0, 0)))
+      solution.placement + (candidate -> Placing(Box(maxBoxId + 1, boxLength), Coordinates(0, 0)))
     )
   }
 }

@@ -55,7 +55,7 @@ trait BinPackingSelectionHandler
       }
       .getOrElse(
         Placing(
-          Box(maxBoxId + 1, boxLength, boxLength),
+          Box(maxBoxId + 1, boxLength),
           Coordinates(0, 0)
         )
       )
