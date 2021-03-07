@@ -5,7 +5,10 @@ import models.problem.binpacking.Box
 import models.problem.binpacking.Coordinates
 import models.problem.binpacking.Placing
 import models.problem.binpacking.Rectangle
-import play.api.Logging
+import models.problem.binpacking.localsearch.neighborhood.BoxPullUpNeighborhood
+import models.problem.binpacking.localsearch.neighborhood.GeometricShiftNeighborhood
+import models.problem.binpacking.localsearch.neighborhood.Up
+import models.problem.binpacking.localsearch.neighborhood.Left
 
 import scala.math.BigDecimal.RoundingMode
 
@@ -22,9 +25,9 @@ class GeometryBasedBinPacking(
 }
 
 class GeometryBasedBinPackingSolutionHandler(
-  rectangles: Set[Rectangle],
-  boxLength: Int,
-) extends BinPackingSolutionHandler with Logging {
+  val rectangles: Set[Rectangle],
+  val boxLength: Int,
+) extends BinPackingSolutionHandler with BoxPullUpNeighborhood with GeometricShiftNeighborhood {
 
   override val startSolution: BinPackingSolution = {
     val solution = BinPackingSolution(
@@ -42,55 +45,11 @@ class GeometryBasedBinPackingSolutionHandler(
     }
   }
 
-  private def shiftUpSolution(solution: BinPackingSolution): BinPackingSolution = {
-    val usedBoxIds = solution.placement.map {
-      case (rectangle, Placing(box, coordinates)) => box.id
-    }.toSet
-    val skippedBoxIds = (1 to usedBoxIds.max).filter(!usedBoxIds.contains(_))
-    skippedBoxIds match {
-      case Seq() => solution
-      case Seq(skippedBoxId) => BinPackingSolution(
-        solution.placement.map {
-          case (rectangle, Placing(box, coordinates)) if box.id <= skippedBoxId =>
-            rectangle -> Placing(box, coordinates)
-          case (rectangle, Placing(box, coordinates)) if box.id > skippedBoxId =>
-            rectangle -> Placing(box.copy(id = box.id - 1), coordinates)
-        }
-      )
-      case ids if ids.size > 1 => throw new RuntimeException("More than 1 box emptied in one neighborhood step")
-    }
-  }
-
   override def getNeighborhood(solution: BinPackingSolution): Set[BinPackingSolution] = {
-    val solutionsWithBoxPullUp = solution.placement.collect {
-      case (rectangle, Placing(Box(id, length), coordinates)) if id > 1 =>
-        BinPackingSolution(
-          solution.placement.updated(
-            rectangle,
-            Placing(Box(id - 1, length), Coordinates(length - rectangle.width, length - rectangle.height))
-          )
-        )
-    }.map(shiftUpSolution).toSet
-    val solutionsWithUpShift = solution.placement.map {
-      case (rectangle, Placing(box, Coordinates(x, y))) =>
-        BinPackingSolution(
-          solution.placement.updated(
-            rectangle,
-            Placing(box, Coordinates(x, y - 1))
-          )
-        )
-    }.toSet
-    val solutionsWithLeftShift = solution.placement.map {
-      case (rectangle, Placing(box, Coordinates(x, y))) =>
-        BinPackingSolution(
-          solution.placement.updated(
-            rectangle,
-            Placing(box, Coordinates(x - 1, y))
-          )
-        )
-    }.toSet
-    val neighborhood = (solutionsWithBoxPullUp ++ solutionsWithUpShift ++ solutionsWithLeftShift).filter(isFeasible)
-    neighborhood
+    val solutionsWithBoxPullUp = createBoxPullUpNeighborhood(solution)
+    val solutionsWithUpShift = createMaximallyShiftedSolutions(solution, Up)
+    val solutionsWithLeftShift = createMaximallyShiftedSolutions(solution, Left)
+    solutionsWithBoxPullUp ++ solutionsWithUpShift ++ solutionsWithLeftShift
   }
 
   def buildLinearPointCostFunction(minimalCostWeight: BigDecimal, boxLength: Int): Coordinates => BigDecimal = {

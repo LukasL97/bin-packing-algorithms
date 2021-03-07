@@ -12,13 +12,6 @@ trait BinPackingSolutionValidator {
         0 <= x && x + rectangle.width <= box.length && 0 <= y && y + rectangle.height <= box.length
     }.forall(identity)
 
-  def allRectanglesInBoundsForSingleBox(placement: Map[Rectangle, Coordinates], boxLength: Int): Boolean = {
-    placement.map {
-      case (rectangle, Coordinates(x, y)) =>
-        0 <= x && x + rectangle.width <= boxLength && 0 <= y && y + rectangle.height <= boxLength
-    }.forall(identity)
-  }
-
   private def allRectanglesDisjunctive(solution: BinPackingSolution): Boolean = {
     solution.placement.groupBy {
       case (rectangle, placing) => placing.box
@@ -27,6 +20,17 @@ trait BinPackingSolutionValidator {
         allRectanglesDisjunctiveInSingleBox(placement.map {
           case (rectangle, placing) => (rectangle, placing.coordinates)
         })
+    }.forall(identity)
+  }
+
+  def isFeasibleInSingleBox(placement: Map[Rectangle, Coordinates], boxLength: Int): Boolean = {
+    allRectanglesInBoundsForSingleBox(placement, boxLength) && allRectanglesDisjunctiveInSingleBox(placement)
+  }
+
+  def allRectanglesInBoundsForSingleBox(placement: Map[Rectangle, Coordinates], boxLength: Int): Boolean = {
+    placement.map {
+      case (rectangle, Coordinates(x, y)) =>
+        0 <= x && x + rectangle.width <= boxLength && 0 <= y && y + rectangle.height <= boxLength
     }.forall(identity)
   }
 
