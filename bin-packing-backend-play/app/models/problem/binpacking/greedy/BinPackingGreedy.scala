@@ -30,25 +30,25 @@ trait BinPackingSelectionHandler
   ): BinPackingSolution = {
     val placementsPerBox = getPlacementsPerBox(solution)
     BinPackingSolution(
-      solution.placement + (candidate -> placeRectangleInFirstPossiblePosition(candidate, placementsPerBox))
+      solution.placement + placeRectangleInFirstPossiblePosition(candidate, placementsPerBox)
     )
   }
 
   private def placeRectangleInFirstPossiblePosition(
     rectangle: Rectangle,
     placementsPerBox: Map[Int, Map[Rectangle, Coordinates]]
-  ): Placing = {
+  ): (Rectangle, Placing) = {
     val maxBoxId = placementsPerBox.keys.maxOption.getOrElse(0)
     placementsPerBox
-      .foldLeft(Option.empty[Placing]) {
+      .foldLeft(Option.empty[(Rectangle, Placing)]) {
         case (foundPlacing, (boxId, placement)) =>
           foundPlacing.orElse(
-            placeRectangleInBoxAtMostTopLeftPoint(rectangle, placement)
-              .map(Placing(Box(boxId, boxLength), _))
+            placeRectangleInBoxAtMostTopLeftPoint(rectangle, placement, considerRotation = true)
+              .map { case (rectangle, coordinates) => rectangle -> Placing(Box(boxId, boxLength), coordinates) }
           )
       }
       .getOrElse(
-        Placing(
+        rectangle -> Placing(
           Box(maxBoxId + 1, boxLength),
           Coordinates(0, 0)
         )

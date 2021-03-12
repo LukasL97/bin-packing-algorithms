@@ -47,7 +47,7 @@ class BinPackingSelectionHandlerSpec extends WordSpec with MustMatchers {
       }
 
       "given a candidate not fitting in any currently used box" in {
-        val candidate = Rectangle(4, 4, 5)
+        val candidate = Rectangle(4, 5, 5)
         selectionHandler.placeCandidateInSolution(candidate, solution).placement mustEqual {
           solution.placement + (candidate -> Placing(Box(3 ,boxLength), Coordinates(0, 0)))
         }

@@ -6,12 +6,24 @@ trait BinPackingTopLeftFirstPlacing extends BinPackingSolutionValidator {
 
   def placeRectangleInBoxAtMostTopLeftPoint(
     rectangle: Rectangle,
-    placement: Map[Rectangle, Coordinates]
-  ): Option[Coordinates] = {
-    coordinatesInTopLeftFirstOrder.find { coordinates =>
-      val newPlacement = placement + (rectangle -> coordinates)
-      allRectanglesInBoundsForSingleBox(newPlacement, boxLength) && allRectanglesDisjunctiveInSingleBox(newPlacement)
+    placement: Map[Rectangle, Coordinates],
+    considerRotation: Boolean
+  ): Option[(Rectangle, Coordinates)] = {
+    val rotatedRectangle = rectangle.rotated
+    coordinatesInTopLeftFirstOrder.collectFirst {
+      case coordinates if isPlaceable(rectangle, coordinates, placement) => rectangle -> coordinates
+      case coordinates if considerRotation && isPlaceable(rotatedRectangle, coordinates, placement) =>
+        rotatedRectangle -> coordinates
     }
+  }
+
+  private def isPlaceable(
+    rectangle: Rectangle,
+    coordinates: Coordinates,
+    placement: Map[Rectangle, Coordinates]
+  ): Boolean = {
+    val newPlacement = placement + (rectangle -> coordinates)
+    allRectanglesInBoundsForSingleBox(newPlacement, boxLength) && allRectanglesDisjunctiveInSingleBox(newPlacement)
   }
 
   private implicit val topLeftFirstOrdering: Ordering[Coordinates] = (left: Coordinates, right: Coordinates) => {

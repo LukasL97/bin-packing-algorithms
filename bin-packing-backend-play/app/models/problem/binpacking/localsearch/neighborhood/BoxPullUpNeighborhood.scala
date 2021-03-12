@@ -12,15 +12,9 @@ trait BoxPullUpNeighborhood extends BinPackingTopLeftFirstPlacing with BinPackin
     val placementPerBox = getPlacementsPerBox(solution)
     solution.placement.collect {
       case (rectangle, Placing(Box(id, length), _)) if id > 1 =>
-        placeRectangleInBoxAtMostTopLeftPoint(rectangle, placementPerBox(id - 1)).map(
-          coordinates =>
-            BinPackingSolution(
-              solution.placement.updated(
-                rectangle,
-                Placing(Box(id - 1, length), coordinates)
-              )
-          )
-        )
+        placeRectangleInBoxAtMostTopLeftPoint(rectangle, placementPerBox(id - 1), considerRotation = true).map {
+          case (rectangle, coordinates) => solution.updated(rectangle, Placing(Box(id - 1, length), coordinates))
+        }
     }.flatten.map(shiftUpSolution).toSet
   }
 
