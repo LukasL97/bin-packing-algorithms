@@ -13,8 +13,7 @@ trait BinPackingSolutionValidator {
 
   def allRectanglesInBox(solution: BinPackingSolution): Boolean =
     solution.placement.map {
-      case (rectangle, Placing(box, Coordinates(x, y))) =>
-        0 <= x && x + rectangle.width <= box.length && 0 <= y && y + rectangle.height <= box.length
+      case (rectangle, Placing(box, coordinates)) => inBounds(rectangle, coordinates, box.length)
     }.forall(identity)
 
   private def allRectanglesDisjunctive(solution: BinPackingSolution): Boolean = {
@@ -28,21 +27,25 @@ trait BinPackingSolutionValidator {
     }.forall(identity)
   }
 
-  def isFeasibleInSingleBox(placement: Map[Rectangle, Coordinates], boxLength: Int): Boolean = {
-    allRectanglesInBoundsForSingleBox(placement, boxLength) && allRectanglesDisjunctiveInSingleBox(placement)
-  }
-
-  def allRectanglesInBoundsForSingleBox(placement: Map[Rectangle, Coordinates], boxLength: Int): Boolean = {
-    placement.map {
-      case (rectangle, Coordinates(x, y)) =>
-        0 <= x && x + rectangle.width <= boxLength && 0 <= y && y + rectangle.height <= boxLength
-    }.forall(identity)
-  }
-
   def allRectanglesDisjunctiveInSingleBox(placement: Map[Rectangle, Coordinates]): Boolean =
     buildPairs(placement).map {
       case (placingA, placingB) => disjunctive(placingA, placingB)
     }.forall(identity)
+
+  /**
+    * @param existingPlacement assumed to be a feasible placement
+    */
+  def validateNewPlacingInSingleBox(
+    newRectangle: Rectangle,
+    newCoordinates: Coordinates,
+    existingPlacement: Map[Rectangle, Coordinates],
+    boxLength: Int
+  ): Boolean = {
+    val newRectangleInBounds = inBounds(newRectangle, newCoordinates, boxLength)
+    val newRectangleDisjunctiveToExistingRectangles = existingPlacement
+      .forall(placing => disjunctive(placing, (newRectangle, newCoordinates)))
+    newRectangleInBounds && newRectangleDisjunctiveToExistingRectangles
+  }
 
   private def buildPairs(
     placement: Map[Rectangle, Coordinates]
@@ -64,5 +67,13 @@ trait BinPackingSolutionValidator {
     val aAboveB = coordinatesA.y + rectangleA.height <= coordinatesB.y
     val aBelowB = coordinatesA.y >= coordinatesB.y + rectangleB.height
     aLeftOfB || aRightOfB || aAboveB || aBelowB
+  }
+
+  private def inBounds(rectangle: Rectangle, coordinates: Coordinates, boxLength: Int): Boolean = {
+    val inBoundsLeft = 0 <= coordinates.x
+    val inBoundsRight = coordinates.x + rectangle.width <= boxLength
+    val inBoundsTop = 0 <= coordinates.y
+    val inBoundsBottom = coordinates.y + rectangle.height <= boxLength
+    inBoundsLeft && inBoundsRight && inBoundsTop && inBoundsBottom
   }
 }

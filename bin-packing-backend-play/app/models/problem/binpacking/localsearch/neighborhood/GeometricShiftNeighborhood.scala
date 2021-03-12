@@ -58,19 +58,21 @@ trait GeometricShiftNeighborhood extends BinPackingSolutionValidator {
     stepSize: Int,
     ensureFeasibility: Boolean
   ): Option[SimpleBinPackingSolution] = {
-    val shiftedSolution = SimpleBinPackingSolution(
-      solution.placement.updated(
-        rectangle,
-        Placing(placing.box, shift(placing.coordinates, direction, stepSize))
-      )
-    )
-    if (ensureFeasibility && !isFeasibleInSingleBox(
-          shiftedSolution.getPlacementInSingleBox(placing.box.id),
+    val newCoordinates = shift(placing.coordinates, direction, stepSize)
+    if (ensureFeasibility && !validateNewPlacingInSingleBox(
+          rectangle,
+          newCoordinates,
+          solution.getPlacementInSingleBox(placing.box.id).removed(rectangle),
           placing.box.length
         )) {
       Option.empty[SimpleBinPackingSolution]
     } else {
-      Option(shiftedSolution)
+      Option(SimpleBinPackingSolution(
+        solution.placement.updated(
+          rectangle,
+          Placing(placing.box, newCoordinates)
+        )
+      ))
     }
   }
 

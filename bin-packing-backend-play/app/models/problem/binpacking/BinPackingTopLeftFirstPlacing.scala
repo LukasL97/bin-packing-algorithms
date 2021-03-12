@@ -25,8 +25,7 @@ trait BinPackingTopLeftFirstPlacing extends BinPackingSolutionValidator {
     coordinates: Coordinates,
     placement: Map[Rectangle, Coordinates]
   ): Boolean = {
-    val newPlacement = placement + (rectangle -> coordinates)
-    allRectanglesInBoundsForSingleBox(newPlacement, boxLength) && allRectanglesDisjunctiveInSingleBox(newPlacement)
+    validateNewPlacingInSingleBox(rectangle, coordinates, placement, boxLength)
   }
 
   private implicit val topLeftFirstOrdering: Ordering[Coordinates] = (left: Coordinates, right: Coordinates) => {
