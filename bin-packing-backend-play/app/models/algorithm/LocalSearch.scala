@@ -2,13 +2,13 @@ package models.algorithm
 
 import scala.annotation.tailrec
 
-class LocalSearch[A <: Solution](solutionHandler: SolutionHandler[A]) {
+class LocalSearch[Solution](solutionHandler: SolutionHandler[Solution]) {
 
   sealed trait StepResult
-  case class Improvement(solution: A) extends StepResult
-  case class Stagnation(solution: A) extends StepResult
+  case class Improvement(solution: Solution) extends StepResult
+  case class Stagnation(solution: Solution) extends StepResult
 
-  def step(currentSolution: A): StepResult = {
+  def step(currentSolution: Solution): StepResult = {
     val currentSolutionResult = solutionHandler.evaluate(currentSolution)
     val neighborhood = solutionHandler.getNeighborhood(currentSolution)
     neighborhood.find(solutionHandler.evaluate(_) < currentSolutionResult) match {
@@ -17,9 +17,9 @@ class LocalSearch[A <: Solution](solutionHandler: SolutionHandler[A]) {
     }
   }
 
-  def run(maxSteps: Int, afterStep: (A, Int, Boolean) => Unit): A = {
+  def run(maxSteps: Int, afterStep: (Solution, Int, Boolean) => Unit): Solution = {
     @tailrec
-    def runRecursively(currentSolution: A, currentStep: Int): A = if (currentStep <= maxSteps) {
+    def runRecursively(currentSolution: Solution, currentStep: Int): Solution = if (currentStep <= maxSteps) {
       step(currentSolution) match {
         case Improvement(solution) =>
           afterStep(solution, currentStep, false)
@@ -36,13 +36,11 @@ class LocalSearch[A <: Solution](solutionHandler: SolutionHandler[A]) {
 
 }
 
-trait Solution
+trait SolutionHandler[Solution] {
 
-trait SolutionHandler[A <: Solution] {
+  val startSolution: Solution
 
-  val startSolution: A
+  def getNeighborhood(solution: Solution): Set[Solution]
 
-  def getNeighborhood(solution: A): Set[A]
-
-  def evaluate(solution: A): BigDecimal
+  def evaluate(solution: Solution): BigDecimal
 }

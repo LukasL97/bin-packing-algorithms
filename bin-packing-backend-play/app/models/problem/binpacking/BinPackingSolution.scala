@@ -1,10 +1,9 @@
 package models.problem.binpacking
 
-import models.algorithm.Solution
 
 case class BinPackingSolution(
   placement: Map[Rectangle, Placing]
-) extends Solution {
+) {
 
   def updated(rectangle: Rectangle, placing: Placing): BinPackingSolution = {
     BinPackingSolution(

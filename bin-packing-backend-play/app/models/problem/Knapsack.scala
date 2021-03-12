@@ -1,6 +1,7 @@
 package models.problem
 
-import models.algorithm.{LocalSearch, Solution, SolutionHandler}
+import models.algorithm.LocalSearch
+import models.algorithm.SolutionHandler
 
 class Knapsack(
   weights: Seq[Double],
@@ -18,39 +19,42 @@ class Knapsack(
 
     private def isFeasible(solution: KnapsackSolution): Boolean = solution.getWeight <= maxWeight
 
-    override def getNeighborhood(solution: KnapsackSolution): Set[KnapsackSolution] = solution.contains
-      .zipWithIndex
-      .map { case (doesContain, index) =>
-        solution.contains.updated(index, !doesContain)
-      }
-      .map(KnapsackSolution)
-      .filter(isFeasible)
-      .toSet
+    override def getNeighborhood(solution: KnapsackSolution): Set[KnapsackSolution] =
+      solution.contains.zipWithIndex.map {
+        case (doesContain, index) =>
+          solution.contains.updated(index, !doesContain)
+      }.map(KnapsackSolution)
+        .filter(isFeasible)
+        .toSet
 
     override def evaluate(solution: KnapsackSolution): BigDecimal = {
-      val overallValue = (solution.contains zip values)
-        .collect { case (doesContain, value) if doesContain => value }
-        .sum
+      val overallValue = (solution.contains zip values).collect { case (doesContain, value) if doesContain => value }.sum
       -overallValue
     }
   }
 
-  case class KnapsackSolution(contains: Seq[Boolean]) extends Solution {
+  case class KnapsackSolution(contains: Seq[Boolean]) {
 
-    def getWeight: Double = (contains zip weights)
-      .collect { case (doesContain, weight) if doesContain => weight }
-      .sum
+    def getWeight: Double = (contains zip weights).collect { case (doesContain, weight) if doesContain => weight }.sum
 
     override def toString: String = {
       val columnWidths = (weights zip values).map {
         case (weight, value) => Set(weight, value).map(_.toString.length).max
       }
-      val weightLine = "weights | " + weights.map(_.toString).zipWithIndex.map {
-        case (weight, index) => " " * (columnWidths(index) - weight.length) + weight
-      }.mkString(" ") + " | " + getWeight
-      val valueLine = "values  | " + values.map(_.toString).zipWithIndex.map{
-        case (value, index) => " " * (columnWidths(index) - value.length) + value
-      }.mkString(" ") + " | " + -KnapsackSolutionHandler.evaluate(this)
+      val weightLine = "weights | " + weights
+        .map(_.toString)
+        .zipWithIndex
+        .map {
+          case (weight, index) => " " * (columnWidths(index) - weight.length) + weight
+        }
+        .mkString(" ") + " | " + getWeight
+      val valueLine = "values  | " + values
+        .map(_.toString)
+        .zipWithIndex
+        .map {
+          case (value, index) => " " * (columnWidths(index) - value.length) + value
+        }
+        .mkString(" ") + " | " + -KnapsackSolutionHandler.evaluate(this)
       val containsLine = "          " + contains.zipWithIndex.map {
         case (doesContain, index) if doesContain => " " * (columnWidths(index) - 1) + "x"
         case (_, index) => " " * columnWidths(index)
