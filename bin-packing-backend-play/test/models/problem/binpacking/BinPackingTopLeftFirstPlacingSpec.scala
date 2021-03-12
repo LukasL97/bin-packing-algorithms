@@ -1,5 +1,7 @@
 package models.problem.binpacking
 
+import models.problem.binpacking.solution.Coordinates
+import models.problem.binpacking.solution.Rectangle
 import org.scalatest.MustMatchers
 import org.scalatest.WordSpec
 

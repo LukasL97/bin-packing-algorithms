@@ -1,11 +1,11 @@
 package dao
 
 import actors.BinPackingSolutionStep
-import models.problem.binpacking.SimpleBinPackingSolution
-import models.problem.binpacking.Box
-import models.problem.binpacking.Coordinates
-import models.problem.binpacking.Placing
-import models.problem.binpacking.Rectangle
+import models.problem.binpacking.solution.Box
+import models.problem.binpacking.solution.Coordinates
+import models.problem.binpacking.solution.Placing
+import models.problem.binpacking.solution.Rectangle
+import models.problem.binpacking.solution.SimpleBinPackingSolution
 import org.mongodb.scala.MongoDatabase
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.MustMatchers

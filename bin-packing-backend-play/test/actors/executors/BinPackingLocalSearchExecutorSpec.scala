@@ -2,12 +2,12 @@ package actors.executors
 
 import actors.BinPackingSolutionStep
 import dao.BinPackingSolutionStepDAO
-import models.problem.binpacking.Box
-import models.problem.binpacking.Coordinates
-import models.problem.binpacking.Placing
-import models.problem.binpacking.SimpleBinPackingSolution
 import models.problem.binpacking.localsearch.BinPackingLocalSearch
 import models.problem.binpacking.localsearch.BinPackingSolutionHandler
+import models.problem.binpacking.solution.Box
+import models.problem.binpacking.solution.Coordinates
+import models.problem.binpacking.solution.Placing
+import models.problem.binpacking.solution.SimpleBinPackingSolution
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.WordSpec
 

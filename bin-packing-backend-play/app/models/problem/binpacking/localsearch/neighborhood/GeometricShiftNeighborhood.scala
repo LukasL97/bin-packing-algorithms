@@ -1,10 +1,10 @@
 package models.problem.binpacking.localsearch.neighborhood
 
 import models.problem.binpacking.BinPackingSolutionValidator
-import models.problem.binpacking.Coordinates
-import models.problem.binpacking.Placing
-import models.problem.binpacking.Rectangle
-import models.problem.binpacking.SimpleBinPackingSolution
+import models.problem.binpacking.solution.Coordinates
+import models.problem.binpacking.solution.Placing
+import models.problem.binpacking.solution.Rectangle
+import models.problem.binpacking.solution.SimpleBinPackingSolution
 
 trait GeometricShiftNeighborhood extends BinPackingSolutionValidator {
 

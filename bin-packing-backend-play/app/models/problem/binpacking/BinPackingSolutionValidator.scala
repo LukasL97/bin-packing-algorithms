@@ -1,5 +1,10 @@
 package models.problem.binpacking
 
+import models.problem.binpacking.solution.BinPackingSolution
+import models.problem.binpacking.solution.Coordinates
+import models.problem.binpacking.solution.Placing
+import models.problem.binpacking.solution.Rectangle
+
 trait BinPackingSolutionValidator {
 
   def isFeasible(solution: BinPackingSolution): Boolean = {

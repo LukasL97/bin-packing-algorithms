@@ -1,6 +1,6 @@
 package actors
 
-import models.problem.binpacking.BinPackingSolution
+import models.problem.binpacking.solution.BinPackingSolution
 
 case class BinPackingSolutionStep(
   runId: String,

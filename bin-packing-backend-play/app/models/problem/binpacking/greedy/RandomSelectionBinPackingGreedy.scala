@@ -1,5 +1,6 @@
 package models.problem.binpacking.greedy
-import models.problem.binpacking.Rectangle
+
+import models.problem.binpacking.solution.Rectangle
 
 class RandomSelectionBinPackingGreedy(
   override val boxLength: Int,

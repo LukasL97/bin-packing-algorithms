@@ -2,8 +2,8 @@ package actors.executors
 
 import actors.BinPackingSolutionStep
 import dao.BinPackingSolutionStepDAO
-import models.problem.binpacking.BinPackingSolution
 import models.problem.binpacking.greedy.BinPackingGreedy
+import models.problem.binpacking.solution.BinPackingSolution
 import play.api.Logging
 
 class BinPackingGreedyExecutor(dao: BinPackingSolutionStepDAO)

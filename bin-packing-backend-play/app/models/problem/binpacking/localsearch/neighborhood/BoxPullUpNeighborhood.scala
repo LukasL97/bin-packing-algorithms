@@ -1,9 +1,9 @@
 package models.problem.binpacking.localsearch.neighborhood
 
 import models.problem.binpacking.BinPackingTopLeftFirstPlacing
-import models.problem.binpacking.Box
-import models.problem.binpacking.Placing
-import models.problem.binpacking.SimpleBinPackingSolution
+import models.problem.binpacking.solution.Box
+import models.problem.binpacking.solution.Placing
+import models.problem.binpacking.solution.SimpleBinPackingSolution
 
 trait BoxPullUpNeighborhood extends BinPackingTopLeftFirstPlacing {
 

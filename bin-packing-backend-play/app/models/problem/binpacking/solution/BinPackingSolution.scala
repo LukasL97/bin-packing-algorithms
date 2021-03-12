@@ -1,5 +1,4 @@
-package models.problem.binpacking
-
+package models.problem.binpacking.solution
 
 trait BinPackingSolution {
   val placement: Map[Rectangle, Placing]
@@ -18,19 +17,6 @@ trait BinPackingSolution {
 
   def getPlacementInSingleBox(boxId: Int): Map[Rectangle, Coordinates] = {
     getPlacementsPerBox(boxId)
-  }
-}
-
-case class SimpleBinPackingSolution(
-  override val placement: Map[Rectangle, Placing]
-) extends BinPackingSolution {
-
-  override def updated(rectangle: Rectangle, placing: Placing): SimpleBinPackingSolution = {
-    SimpleBinPackingSolution(
-      placement.filterNot {
-        case (oldRectangle, _) => oldRectangle.id == rectangle.id
-      } + (rectangle -> placing)
-    )
   }
 }
 

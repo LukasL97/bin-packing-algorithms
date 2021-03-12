@@ -1,11 +1,11 @@
 package utils
 
-import models.problem.binpacking.BinPackingSolution
-import models.problem.binpacking.Box
-import models.problem.binpacking.Coordinates
-import models.problem.binpacking.Placing
-import models.problem.binpacking.Rectangle
-import models.problem.binpacking.SimpleBinPackingSolution
+import models.problem.binpacking.solution.BinPackingSolution
+import models.problem.binpacking.solution.Box
+import models.problem.binpacking.solution.Coordinates
+import models.problem.binpacking.solution.Placing
+import models.problem.binpacking.solution.Rectangle
+import models.problem.binpacking.solution.SimpleBinPackingSolution
 import org.json4s
 import org.json4s.Formats
 import org.json4s.JsonAST.JArray

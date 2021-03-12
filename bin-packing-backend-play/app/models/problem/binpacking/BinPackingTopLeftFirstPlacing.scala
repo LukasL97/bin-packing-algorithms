@@ -1,5 +1,8 @@
 package models.problem.binpacking
 
+import models.problem.binpacking.solution.Coordinates
+import models.problem.binpacking.solution.Rectangle
+
 trait BinPackingTopLeftFirstPlacing extends BinPackingSolutionValidator {
 
   val boxLength: Int
