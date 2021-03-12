@@ -5,6 +5,20 @@ trait BinPackingSolution {
   val placement: Map[Rectangle, Placing]
 
   def updated(rectangle: Rectangle, placing: Placing): BinPackingSolution
+
+  def getPlacementsPerBox: Map[Int, Map[Rectangle, Coordinates]] = {
+    placement.groupBy {
+      case (_, placing) => placing.box
+    }.toSeq.sortBy {
+      case (box, _) => box.id
+    }.map {
+      case (box, placement) => box.id -> placement.map { case (rectangle, placing) => rectangle -> placing.coordinates }
+    }.toMap
+  }
+
+  def getPlacementInSingleBox(boxId: Int): Map[Rectangle, Coordinates] = {
+    getPlacementsPerBox(boxId)
+  }
 }
 
 case class SimpleBinPackingSolution(

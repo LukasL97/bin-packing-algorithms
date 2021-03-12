@@ -3,13 +3,12 @@ package models.problem.binpacking.greedy
 import models.algorithm.Greedy
 import models.algorithm.SelectionHandler
 import models.problem.binpacking.BinPacking
-import models.problem.binpacking.SimpleBinPackingSolution
 import models.problem.binpacking.BinPackingTopLeftFirstPlacing
 import models.problem.binpacking.Box
 import models.problem.binpacking.Coordinates
 import models.problem.binpacking.Placing
 import models.problem.binpacking.Rectangle
-import models.problem.binpacking.utils.BinPackingSolutionUtil
+import models.problem.binpacking.SimpleBinPackingSolution
 
 trait BinPackingGreedy extends BinPacking {
   val selectionHandler: BinPackingSelectionHandler
@@ -19,8 +18,7 @@ trait BinPackingGreedy extends BinPacking {
 }
 
 trait BinPackingSelectionHandler
-    extends SelectionHandler[Rectangle, SimpleBinPackingSolution] with BinPackingTopLeftFirstPlacing
-    with BinPackingSolutionUtil {
+    extends SelectionHandler[Rectangle, SimpleBinPackingSolution] with BinPackingTopLeftFirstPlacing {
 
   override val startSolution: SimpleBinPackingSolution = SimpleBinPackingSolution(Map())
 
@@ -28,9 +26,8 @@ trait BinPackingSelectionHandler
     candidate: Rectangle,
     solution: SimpleBinPackingSolution
   ): SimpleBinPackingSolution = {
-    val placementsPerBox = getPlacementsPerBox(solution)
     SimpleBinPackingSolution(
-      solution.placement + placeRectangleInFirstPossiblePosition(candidate, placementsPerBox)
+      solution.placement + placeRectangleInFirstPossiblePosition(candidate, solution.getPlacementsPerBox)
     )
   }
 

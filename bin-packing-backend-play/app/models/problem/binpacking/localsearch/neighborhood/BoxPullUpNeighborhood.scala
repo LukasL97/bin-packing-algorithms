@@ -1,18 +1,16 @@
 package models.problem.binpacking.localsearch.neighborhood
 
-import models.problem.binpacking.SimpleBinPackingSolution
 import models.problem.binpacking.BinPackingTopLeftFirstPlacing
 import models.problem.binpacking.Box
 import models.problem.binpacking.Placing
-import models.problem.binpacking.utils.BinPackingSolutionUtil
+import models.problem.binpacking.SimpleBinPackingSolution
 
-trait BoxPullUpNeighborhood extends BinPackingTopLeftFirstPlacing with BinPackingSolutionUtil {
+trait BoxPullUpNeighborhood extends BinPackingTopLeftFirstPlacing {
 
   def createBoxPullUpNeighborhood(solution: SimpleBinPackingSolution): Set[SimpleBinPackingSolution] = {
-    val placementPerBox = getPlacementsPerBox(solution)
     solution.placement.collect {
       case (rectangle, Placing(Box(id, length), _)) if id > 1 =>
-        placeRectangleInBoxAtMostTopLeftPoint(rectangle, placementPerBox(id - 1), considerRotation = true).map {
+        placeRectangleInBoxAtMostTopLeftPoint(rectangle, solution.getPlacementsPerBox(id - 1), considerRotation = true).map {
           case (rectangle, coordinates) => solution.updated(rectangle, Placing(Box(id - 1, length), coordinates))
         }
     }.flatten.map(shiftUpSolution).toSet

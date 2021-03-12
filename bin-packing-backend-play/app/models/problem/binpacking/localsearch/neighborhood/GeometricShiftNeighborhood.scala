@@ -1,15 +1,12 @@
 package models.problem.binpacking.localsearch.neighborhood
 
-import models.problem.binpacking.SimpleBinPackingSolution
 import models.problem.binpacking.BinPackingSolutionValidator
 import models.problem.binpacking.Coordinates
 import models.problem.binpacking.Placing
 import models.problem.binpacking.Rectangle
-import models.problem.binpacking.utils.BinPackingSolutionUtil
+import models.problem.binpacking.SimpleBinPackingSolution
 
-import scala.collection.mutable
-
-trait GeometricShiftNeighborhood extends BinPackingSolutionValidator with BinPackingSolutionUtil {
+trait GeometricShiftNeighborhood extends BinPackingSolutionValidator {
 
   def createShiftedSolutions(
     solution: SimpleBinPackingSolution,
@@ -68,7 +65,7 @@ trait GeometricShiftNeighborhood extends BinPackingSolutionValidator with BinPac
       )
     )
     if (ensureFeasibility && !isFeasibleInSingleBox(
-          getPlacementInSingleBox(shiftedSolution, placing.box.id),
+          shiftedSolution.getPlacementInSingleBox(placing.box.id),
           placing.box.length
         )) {
       Option.empty[SimpleBinPackingSolution]
