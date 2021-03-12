@@ -4,7 +4,7 @@ import models.problem.binpacking.Box
 import models.problem.binpacking.Coordinates
 import models.problem.binpacking.Placing
 import models.problem.binpacking.Rectangle
-import models.problem.binpacking.BinPackingSolution
+import models.problem.binpacking.SimpleBinPackingSolution
 import org.scalatest.MustMatchers
 import org.scalatest.WordSpec
 
@@ -56,10 +56,10 @@ private class BinPackingSelectionHandlerImpl(
 
   override def placeCandidateInSolution(
     candidate: Rectangle,
-    solution: BinPackingSolution
-  ): BinPackingSolution = {
+    solution: SimpleBinPackingSolution
+  ): SimpleBinPackingSolution = {
     val maxBoxId = solution.placement.values.map(_.box.id).maxOption.getOrElse(0)
-    BinPackingSolution(
+    SimpleBinPackingSolution(
       solution.placement + (candidate -> Placing(Box(maxBoxId + 1, boxLength), Coordinates(0, 0)))
     )
   }

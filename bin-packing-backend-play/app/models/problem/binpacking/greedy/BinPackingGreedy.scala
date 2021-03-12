@@ -3,7 +3,7 @@ package models.problem.binpacking.greedy
 import models.algorithm.Greedy
 import models.algorithm.SelectionHandler
 import models.problem.binpacking.BinPacking
-import models.problem.binpacking.BinPackingSolution
+import models.problem.binpacking.SimpleBinPackingSolution
 import models.problem.binpacking.BinPackingTopLeftFirstPlacing
 import models.problem.binpacking.Box
 import models.problem.binpacking.Coordinates
@@ -13,23 +13,23 @@ import models.problem.binpacking.utils.BinPackingSolutionUtil
 
 trait BinPackingGreedy extends BinPacking {
   val selectionHandler: BinPackingSelectionHandler
-  lazy val greedy = new Greedy[Rectangle, BinPackingSolution](selectionHandler)
+  lazy val greedy = new Greedy[Rectangle, SimpleBinPackingSolution](selectionHandler)
 
-  override def startSolution: BinPackingSolution = selectionHandler.startSolution
+  override def startSolution: SimpleBinPackingSolution = selectionHandler.startSolution
 }
 
 trait BinPackingSelectionHandler
-    extends SelectionHandler[Rectangle, BinPackingSolution] with BinPackingTopLeftFirstPlacing
+    extends SelectionHandler[Rectangle, SimpleBinPackingSolution] with BinPackingTopLeftFirstPlacing
     with BinPackingSolutionUtil {
 
-  override val startSolution: BinPackingSolution = BinPackingSolution(Map())
+  override val startSolution: SimpleBinPackingSolution = SimpleBinPackingSolution(Map())
 
   override def placeCandidateInSolution(
     candidate: Rectangle,
-    solution: BinPackingSolution
-  ): BinPackingSolution = {
+    solution: SimpleBinPackingSolution
+  ): SimpleBinPackingSolution = {
     val placementsPerBox = getPlacementsPerBox(solution)
-    BinPackingSolution(
+    SimpleBinPackingSolution(
       solution.placement + placeRectangleInFirstPossiblePosition(candidate, placementsPerBox)
     )
   }

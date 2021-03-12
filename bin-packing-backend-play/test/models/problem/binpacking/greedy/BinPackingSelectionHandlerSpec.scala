@@ -4,7 +4,7 @@ import models.problem.binpacking.Box
 import models.problem.binpacking.Coordinates
 import models.problem.binpacking.Placing
 import models.problem.binpacking.Rectangle
-import models.problem.binpacking.BinPackingSolution
+import models.problem.binpacking.SimpleBinPackingSolution
 import org.scalatest.MustMatchers
 import org.scalatest.WordSpec
 
@@ -26,7 +26,7 @@ class BinPackingSelectionHandlerSpec extends WordSpec with MustMatchers {
 
     "place a candidate in the first possible position according to the top left strategy" when {
 
-      val solution = BinPackingSolution(Map(
+      val solution = SimpleBinPackingSolution(Map(
         Rectangle(1, 5, 3) -> Placing(Box(1, 5), Coordinates(0, 0)),
         Rectangle(2, 3, 2) -> Placing(Box(1, 5), Coordinates(0, 3)),
         Rectangle(3, 2, 1) -> Placing(Box(2, 5), Coordinates(0, 0))
@@ -57,7 +57,7 @@ class BinPackingSelectionHandlerSpec extends WordSpec with MustMatchers {
     "place a candidate in box 1 in the top left corner according to the top left strategy" when {
       "given a solution without any candidate placed previously" in {
         val candidate = Rectangle(1, 3, 3)
-        val solution = BinPackingSolution(Map())
+        val solution = SimpleBinPackingSolution(Map())
         selectionHandler.placeCandidateInSolution(candidate, solution).placement mustEqual {
           Map(candidate -> Placing(Box(1 ,boxLength), Coordinates(0, 0)))
         }

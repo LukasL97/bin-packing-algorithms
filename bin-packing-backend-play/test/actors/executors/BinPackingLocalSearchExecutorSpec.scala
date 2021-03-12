@@ -5,7 +5,7 @@ import dao.BinPackingSolutionStepDAO
 import models.problem.binpacking.Box
 import models.problem.binpacking.Coordinates
 import models.problem.binpacking.Placing
-import models.problem.binpacking.BinPackingSolution
+import models.problem.binpacking.SimpleBinPackingSolution
 import models.problem.binpacking.localsearch.BinPackingLocalSearch
 import models.problem.binpacking.localsearch.BinPackingSolutionHandler
 import org.scalamock.scalatest.MockFactory
@@ -32,41 +32,41 @@ class BinPackingLocalSearchExecutorSpec extends WordSpec with MockFactory {
           override val rectangleHeightRange: (Int, Int) = (1, 1)
 
           override val solutionHandler: BinPackingSolutionHandler = new BinPackingSolutionHandler {
-            override val startSolution: BinPackingSolution = BinPackingSolution(
+            override val startSolution: SimpleBinPackingSolution = SimpleBinPackingSolution(
               Map(rectangles.head -> Placing(box, Coordinates(0, 0)))
             )
 
-            override def getNeighborhood(solution: BinPackingSolution): Set[BinPackingSolution] = Set(
-              Option(BinPackingSolution(
+            override def getNeighborhood(solution: SimpleBinPackingSolution): Set[SimpleBinPackingSolution] = Set(
+              Option(SimpleBinPackingSolution(
                 solution.placement.map {
                   case (rectangle, Placing(box, Coordinates(x, y))) => rectangle -> Placing(box, Coordinates(x + 1, y + 1))
                 }
               )).filter(solutionHandler.isFeasible)
             ).flatten
 
-            override def evaluate(solution: BinPackingSolution): BigDecimal = solution.placement.head match {
+            override def evaluate(solution: SimpleBinPackingSolution): BigDecimal = solution.placement.head match {
               case (rectangle, Placing(box, Coordinates(x, y))) => -(x + y)
             }
           }
         }
 
         (dao.dumpSolutionStep _)
-          .expects(BinPackingSolutionStep(runId, 0, solution = BinPackingSolution(
+          .expects(BinPackingSolutionStep(runId, 0, solution = SimpleBinPackingSolution(
             Map(binPacking.rectangles.head -> Placing(box, Coordinates(0, 0)))
           )))
           .returns(null)
         (dao.dumpSolutionStep _)
-          .expects(BinPackingSolutionStep(runId, 1, solution = BinPackingSolution(
+          .expects(BinPackingSolutionStep(runId, 1, solution = SimpleBinPackingSolution(
             Map(binPacking.rectangles.head -> Placing(box, Coordinates(1, 1)))
           )))
           .returns(null)
         (dao.dumpSolutionStep _)
-          .expects(BinPackingSolutionStep(runId, 2, solution = BinPackingSolution(
+          .expects(BinPackingSolutionStep(runId, 2, solution = SimpleBinPackingSolution(
             Map(binPacking.rectangles.head -> Placing(box, Coordinates(2, 2)))
           )))
           .returns(null)
         (dao.dumpSolutionStep _)
-          .expects(BinPackingSolutionStep(runId, 3, solution = BinPackingSolution(
+          .expects(BinPackingSolutionStep(runId, 3, solution = SimpleBinPackingSolution(
             Map(binPacking.rectangles.head -> Placing(box, Coordinates(2, 2)))
           ), finished = true))
           .returns(null)

@@ -1,6 +1,6 @@
 package models.problem.binpacking.localsearch.neighborhood
 
-import models.problem.binpacking.BinPackingSolution
+import models.problem.binpacking.SimpleBinPackingSolution
 import models.problem.binpacking.BinPackingSolutionValidator
 import models.problem.binpacking.Coordinates
 import models.problem.binpacking.Placing
@@ -12,11 +12,11 @@ import scala.collection.mutable
 trait GeometricShiftNeighborhood extends BinPackingSolutionValidator with BinPackingSolutionUtil {
 
   def createShiftedSolutions(
-    solution: BinPackingSolution,
+    solution: SimpleBinPackingSolution,
     direction: Direction,
     stepSize: Int,
     ensureFeasibility: Boolean
-  ): Set[BinPackingSolution] = {
+  ): Set[SimpleBinPackingSolution] = {
     solution.placement.flatMap {
       case (rectangle, placing) =>
         shiftRectangleInSolution(solution, rectangle, placing, direction, stepSize, ensureFeasibility)
@@ -24,17 +24,17 @@ trait GeometricShiftNeighborhood extends BinPackingSolutionValidator with BinPac
   }
 
   def createMaximallyShiftedSolutions(
-    solution: BinPackingSolution,
+    solution: SimpleBinPackingSolution,
     direction: Direction,
-  ): Set[BinPackingSolution] = {
+  ): Set[SimpleBinPackingSolution] = {
 
     def shiftRectangleInSolutionUntilHittingBarrier(
-      originalSolution: BinPackingSolution,
+      originalSolution: SimpleBinPackingSolution,
       rectangle: Rectangle,
       placing: Placing
-    ): Option[BinPackingSolution] = {
+    ): Option[SimpleBinPackingSolution] = {
       var stepSize = 1
-      var solutions: Seq[Option[BinPackingSolution]] =
+      var solutions: Seq[Option[SimpleBinPackingSolution]] =
         Seq(
           shiftRectangleInSolution(originalSolution, rectangle, placing, direction, stepSize, ensureFeasibility = true)
         )
@@ -54,14 +54,14 @@ trait GeometricShiftNeighborhood extends BinPackingSolutionValidator with BinPac
   }
 
   private def shiftRectangleInSolution(
-    solution: BinPackingSolution,
+    solution: SimpleBinPackingSolution,
     rectangle: Rectangle,
     placing: Placing,
     direction: Direction,
     stepSize: Int,
     ensureFeasibility: Boolean
-  ): Option[BinPackingSolution] = {
-    val shiftedSolution = BinPackingSolution(
+  ): Option[SimpleBinPackingSolution] = {
+    val shiftedSolution = SimpleBinPackingSolution(
       solution.placement.updated(
         rectangle,
         Placing(placing.box, shift(placing.coordinates, direction, stepSize))
@@ -71,7 +71,7 @@ trait GeometricShiftNeighborhood extends BinPackingSolutionValidator with BinPac
           getPlacementInSingleBox(shiftedSolution, placing.box.id),
           placing.box.length
         )) {
-      Option.empty[BinPackingSolution]
+      Option.empty[SimpleBinPackingSolution]
     } else {
       Option(shiftedSolution)
     }

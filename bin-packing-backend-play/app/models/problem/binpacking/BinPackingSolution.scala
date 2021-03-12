@@ -1,12 +1,18 @@
 package models.problem.binpacking
 
 
-case class BinPackingSolution(
-  placement: Map[Rectangle, Placing]
-) {
+trait BinPackingSolution {
+  val placement: Map[Rectangle, Placing]
 
-  def updated(rectangle: Rectangle, placing: Placing): BinPackingSolution = {
-    BinPackingSolution(
+  def updated(rectangle: Rectangle, placing: Placing): BinPackingSolution
+}
+
+case class SimpleBinPackingSolution(
+  override val placement: Map[Rectangle, Placing]
+) extends BinPackingSolution {
+
+  override def updated(rectangle: Rectangle, placing: Placing): SimpleBinPackingSolution = {
+    SimpleBinPackingSolution(
       placement.filterNot {
         case (oldRectangle, _) => oldRectangle.id == rectangle.id
       } + (rectangle -> placing)

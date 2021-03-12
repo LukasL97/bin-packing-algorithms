@@ -14,7 +14,7 @@ class BinPackingSolutionValidatorSpec extends WordSpec with MustMatchers {
       val box2 = Box(1, 10)
 
       "given a non-overlapping in-box placement" in {
-        val solution = BinPackingSolution(
+        val solution = SimpleBinPackingSolution(
           Map(
             Rectangle(0, 5, 5) -> Placing(box1, Coordinates(0, 0)),
             Rectangle(1, 5, 7) -> Placing(box1, Coordinates(5, 2)),
@@ -27,7 +27,7 @@ class BinPackingSolutionValidatorSpec extends WordSpec with MustMatchers {
       }
 
       "given an overlapping placement" in {
-        val solution = BinPackingSolution(
+        val solution = SimpleBinPackingSolution(
           Map(
             Rectangle(0, 5, 5) -> Placing(box1, Coordinates(0, 0)),
             Rectangle(1, 5, 7) -> Placing(box1, Coordinates(5, 2)),
@@ -40,7 +40,7 @@ class BinPackingSolutionValidatorSpec extends WordSpec with MustMatchers {
       }
 
       "given an out-of-box placement" in {
-        val solution = BinPackingSolution(
+        val solution = SimpleBinPackingSolution(
           Map(
             Rectangle(0, 5, 5) -> Placing(box1, Coordinates(0, 0)),
             Rectangle(1, 5, 5) -> Placing(box2, Coordinates(6, 5))

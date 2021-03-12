@@ -1,7 +1,7 @@
 package dao
 
 import actors.BinPackingSolutionStep
-import models.problem.binpacking.BinPackingSolution
+import models.problem.binpacking.SimpleBinPackingSolution
 import models.problem.binpacking.Box
 import models.problem.binpacking.Coordinates
 import models.problem.binpacking.Placing
@@ -23,7 +23,7 @@ class BinPackingSolutionStepDAOSpec extends WordSpec with MustMatchers with Mock
         val solutionStep = BinPackingSolutionStep(
           "run",
           42,
-          BinPackingSolution(
+          SimpleBinPackingSolution(
             Map(
               Rectangle(0, 2, 2) -> Placing(Box(0, 4), Coordinates(1, 1)),
               Rectangle(1, 1, 3) -> Placing(Box(1, 4), Coordinates(0, 0))

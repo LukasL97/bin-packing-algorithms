@@ -6,7 +6,7 @@ import models.problem.binpacking.Box
 import models.problem.binpacking.Coordinates
 import models.problem.binpacking.Placing
 import models.problem.binpacking.Rectangle
-import models.problem.binpacking.BinPackingSolution
+import models.problem.binpacking.SimpleBinPackingSolution
 import models.problem.binpacking.greedy.BinPackingGreedy
 import models.problem.binpacking.greedy.BinPackingSelectionHandler
 import org.scalamock.scalatest.MockFactory
@@ -59,7 +59,7 @@ class BinPackingGreedyExecutorSpec extends WordSpec with MockFactory {
             BinPackingSolutionStep(
               runId,
               0,
-              BinPackingSolution(
+              SimpleBinPackingSolution(
                 Map()
               )
             )
@@ -70,7 +70,7 @@ class BinPackingGreedyExecutorSpec extends WordSpec with MockFactory {
             BinPackingSolutionStep(
               runId,
               1,
-              BinPackingSolution(
+              SimpleBinPackingSolution(
                 Map(
                   binPacking.rectangles.toSeq(0) -> Placing(box, Coordinates(0, 0))
                 )
@@ -83,7 +83,7 @@ class BinPackingGreedyExecutorSpec extends WordSpec with MockFactory {
             BinPackingSolutionStep(
               runId,
               2,
-              BinPackingSolution(
+              SimpleBinPackingSolution(
                 Map(
                   binPacking.rectangles.toSeq(0) -> Placing(box, Coordinates(0, 0)),
                   binPacking.rectangles.toSeq(1) -> Placing(box, Coordinates(0, 2))
@@ -97,7 +97,7 @@ class BinPackingGreedyExecutorSpec extends WordSpec with MockFactory {
             BinPackingSolutionStep(
               runId,
               3,
-              BinPackingSolution(
+              SimpleBinPackingSolution(
                 Map(
                   binPacking.rectangles.toSeq(0) -> Placing(box, Coordinates(0, 0)),
                   binPacking.rectangles.toSeq(1) -> Placing(box, Coordinates(0, 2)),
@@ -112,7 +112,7 @@ class BinPackingGreedyExecutorSpec extends WordSpec with MockFactory {
             BinPackingSolutionStep(
               runId,
               4,
-              BinPackingSolution(
+              SimpleBinPackingSolution(
                 Map(
                   binPacking.rectangles.toSeq(0) -> Placing(box, Coordinates(0, 0)),
                   binPacking.rectangles.toSeq(1) -> Placing(box, Coordinates(0, 2)),

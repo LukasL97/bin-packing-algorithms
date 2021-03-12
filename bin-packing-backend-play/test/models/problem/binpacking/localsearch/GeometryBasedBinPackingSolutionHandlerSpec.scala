@@ -1,7 +1,7 @@
 package models.problem.binpacking.localsearch
 
 import models.problem.binpacking
-import models.problem.binpacking.BinPackingSolution
+import models.problem.binpacking.SimpleBinPackingSolution
 import models.problem.binpacking.Box
 import models.problem.binpacking.Coordinates
 import models.problem.binpacking.Placing
@@ -78,11 +78,11 @@ class GeometryBasedBinPackingSolutionHandlerSpec extends WordSpec with MustMatch
         val handler = new GeometryBasedBinPackingSolutionHandler(Set(), boxLength)
         val box1 = Box(1, boxLength)
         val box2 = Box(2, boxLength)
-        val originalSolution = BinPackingSolution(Map(
+        val originalSolution = SimpleBinPackingSolution(Map(
           Rectangle(1, 1, 1) -> Placing(box1, Coordinates(0, 0)),
           Rectangle(2, 1, 1) -> Placing(box2, Coordinates(4, 3))
         ))
-        val improvedSolution = BinPackingSolution(Map(
+        val improvedSolution = SimpleBinPackingSolution(Map(
           Rectangle(1, boxLength, boxLength) -> Placing(box1, Coordinates(0, 0)),
           Rectangle(2, 1, 1) -> Placing(box2, Coordinates(3, 3))
         ))

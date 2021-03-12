@@ -1,6 +1,6 @@
 package models.problem.binpacking.localsearch.neighborhood
 
-import models.problem.binpacking.BinPackingSolution
+import models.problem.binpacking.SimpleBinPackingSolution
 import models.problem.binpacking.BinPackingTopLeftFirstPlacing
 import models.problem.binpacking.Box
 import models.problem.binpacking.Placing
@@ -8,7 +8,7 @@ import models.problem.binpacking.utils.BinPackingSolutionUtil
 
 trait BoxPullUpNeighborhood extends BinPackingTopLeftFirstPlacing with BinPackingSolutionUtil {
 
-  def createBoxPullUpNeighborhood(solution: BinPackingSolution): Set[BinPackingSolution] = {
+  def createBoxPullUpNeighborhood(solution: SimpleBinPackingSolution): Set[SimpleBinPackingSolution] = {
     val placementPerBox = getPlacementsPerBox(solution)
     solution.placement.collect {
       case (rectangle, Placing(Box(id, length), _)) if id > 1 =>
@@ -18,13 +18,13 @@ trait BoxPullUpNeighborhood extends BinPackingTopLeftFirstPlacing with BinPackin
     }.flatten.map(shiftUpSolution).toSet
   }
 
-  private def shiftUpSolution(solution: BinPackingSolution): BinPackingSolution = {
+  private def shiftUpSolution(solution: SimpleBinPackingSolution): SimpleBinPackingSolution = {
     val usedBoxIds = solution.placement.values.map(_.box.id).toSet
     val skippedBoxIds = (1 to usedBoxIds.max).filter(!usedBoxIds.contains(_))
     skippedBoxIds match {
       case Seq() => solution
       case Seq(skippedBoxId) =>
-        BinPackingSolution(
+        SimpleBinPackingSolution(
           solution.placement.map {
             case (rectangle, Placing(box, coordinates)) if box.id <= skippedBoxId =>
               rectangle -> Placing(box, coordinates)

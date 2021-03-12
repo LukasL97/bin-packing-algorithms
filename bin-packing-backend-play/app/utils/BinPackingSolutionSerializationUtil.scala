@@ -1,29 +1,30 @@
 package utils
 
+import models.problem.binpacking.BinPackingSolution
+import models.problem.binpacking.Box
 import models.problem.binpacking.Coordinates
 import models.problem.binpacking.Placing
-import models.problem.binpacking.Box
 import models.problem.binpacking.Rectangle
-import models.problem.binpacking.BinPackingSolution
+import models.problem.binpacking.SimpleBinPackingSolution
 import org.json4s
+import org.json4s.Formats
 import org.json4s.JsonAST.JArray
 import org.json4s.JsonAST.JInt
 import org.json4s.JsonAST.JObject
 import org.json4s.JsonAST.JValue
-import org.json4s.Formats
 import org.json4s.ShortTypeHints
 
 object BinPackingSolutionSerializationUtil {
 
   implicit val formats: Formats = SerializationUtil.defaultFormats(
-    new ShortTypeHints(List(classOf[BinPackingSolution])) {
+    new ShortTypeHints(List(classOf[SimpleBinPackingSolution])) {
 
       override def serialize: PartialFunction[Any, json4s.JObject] = {
-        case solution: BinPackingSolution => solutionToJObject(solution)
+        case solution: SimpleBinPackingSolution => solutionToJObject(solution)
       }
 
       override def deserialize: PartialFunction[(String, json4s.JObject), Any] = {
-        case ("BinPackingSolution", jObject) => jObjectToSolution(jObject)
+        case ("SimpleBinPackingSolution", jObject) => jObjectToSolution(jObject)
       }
     }
   )
@@ -50,7 +51,7 @@ object BinPackingSolutionSerializationUtil {
     jObject.obj.collect { case (key_, value) if key_ == key => value }.head
   }
 
-  private def jObjectToSolution(jObject: JObject): BinPackingSolution = BinPackingSolution(
+  private def jObjectToSolution(jObject: JObject): SimpleBinPackingSolution = SimpleBinPackingSolution(
     getFieldValue(jObject, "placement")
       .asInstanceOf[JArray]
       .arr
