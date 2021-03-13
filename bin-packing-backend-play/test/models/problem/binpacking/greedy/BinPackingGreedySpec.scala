@@ -1,5 +1,6 @@
 package models.problem.binpacking.greedy
 
+import models.problem.binpacking.solution.BinPackingSolution
 import models.problem.binpacking.solution.Box
 import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
@@ -56,8 +57,8 @@ private class BinPackingSelectionHandlerImpl(
 
   override def placeCandidateInSolution(
     candidate: Rectangle,
-    solution: SimpleBinPackingSolution
-  ): SimpleBinPackingSolution = {
+    solution: BinPackingSolution
+  ): BinPackingSolution = {
     val maxBoxId = solution.placement.values.map(_.box.id).maxOption.getOrElse(0)
     SimpleBinPackingSolution(
       solution.placement + (candidate -> Placing(Box(maxBoxId + 1, boxLength), Coordinates(0, 0)))

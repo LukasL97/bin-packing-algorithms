@@ -4,6 +4,7 @@ import models.problem.binpacking.localsearch.neighborhood.BoxPullUpNeighborhood
 import models.problem.binpacking.localsearch.neighborhood.GeometricShiftNeighborhood
 import models.problem.binpacking.localsearch.neighborhood.Up
 import models.problem.binpacking.localsearch.neighborhood.Left
+import models.problem.binpacking.solution.BinPackingSolution
 import models.problem.binpacking.solution.Box
 import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
@@ -29,7 +30,7 @@ class GeometryBasedBinPackingSolutionHandler(
   val boxLength: Int,
 ) extends BinPackingSolutionHandler with BoxPullUpNeighborhood with GeometricShiftNeighborhood {
 
-  override val startSolution: SimpleBinPackingSolution = {
+  override val startSolution: BinPackingSolution = {
     val solution = SimpleBinPackingSolution(
       rectangles
         .map(rectangle => rectangle -> Placing(
@@ -45,7 +46,7 @@ class GeometryBasedBinPackingSolutionHandler(
     }
   }
 
-  override def getNeighborhood(solution: SimpleBinPackingSolution): Set[SimpleBinPackingSolution] = {
+  override def getNeighborhood(solution: BinPackingSolution): Set[BinPackingSolution] = {
     val solutionsWithBoxPullUp = createBoxPullUpNeighborhood(solution)
     val solutionsWithUpShift = createMaximallyShiftedSolutions(solution, Up)
     val solutionsWithLeftShift = createMaximallyShiftedSolutions(solution, Left)
@@ -75,7 +76,7 @@ class GeometryBasedBinPackingSolutionHandler(
     (1 / minBoxCostChange).setScale(0, RoundingMode.UP).pow(id)
   }
 
-  override def evaluate(solution: SimpleBinPackingSolution): BigDecimal = {
+  override def evaluate(solution: BinPackingSolution): BigDecimal = {
     val minimalCostWeight = 0.9
     val pointCostFunction = buildLinearPointCostFunction(minimalCostWeight, boxLength)
     val boxIds = solution.placement.map {

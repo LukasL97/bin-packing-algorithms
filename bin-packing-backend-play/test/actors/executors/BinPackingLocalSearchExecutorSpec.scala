@@ -4,6 +4,7 @@ import actors.BinPackingSolutionStep
 import dao.BinPackingSolutionStepDAO
 import models.problem.binpacking.localsearch.BinPackingLocalSearch
 import models.problem.binpacking.localsearch.BinPackingSolutionHandler
+import models.problem.binpacking.solution.BinPackingSolution
 import models.problem.binpacking.solution.Box
 import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
@@ -36,7 +37,7 @@ class BinPackingLocalSearchExecutorSpec extends WordSpec with MockFactory {
               Map(rectangles.head -> Placing(box, Coordinates(0, 0)))
             )
 
-            override def getNeighborhood(solution: SimpleBinPackingSolution): Set[SimpleBinPackingSolution] = Set(
+            override def getNeighborhood(solution: BinPackingSolution): Set[BinPackingSolution] = Set(
               Option(SimpleBinPackingSolution(
                 solution.placement.map {
                   case (rectangle, Placing(box, Coordinates(x, y))) => rectangle -> Placing(box, Coordinates(x + 1, y + 1))
@@ -44,7 +45,7 @@ class BinPackingLocalSearchExecutorSpec extends WordSpec with MockFactory {
               )).filter(solutionHandler.isFeasible)
             ).flatten
 
-            override def evaluate(solution: SimpleBinPackingSolution): BigDecimal = solution.placement.head match {
+            override def evaluate(solution: BinPackingSolution): BigDecimal = solution.placement.head match {
               case (rectangle, Placing(box, Coordinates(x, y))) => -(x + y)
             }
           }

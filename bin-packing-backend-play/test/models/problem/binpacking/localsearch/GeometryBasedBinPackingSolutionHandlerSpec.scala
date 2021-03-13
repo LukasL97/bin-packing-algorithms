@@ -1,6 +1,5 @@
 package models.problem.binpacking.localsearch
 
-import models.problem.binpacking
 import models.problem.binpacking.solution.Box
 import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing

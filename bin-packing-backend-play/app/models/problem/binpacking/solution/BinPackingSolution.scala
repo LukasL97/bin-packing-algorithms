@@ -5,6 +5,8 @@ trait BinPackingSolution {
 
   def updated(rectangle: Rectangle, placing: Placing): BinPackingSolution
 
+  def updated(placement: Map[Rectangle, Placing]): BinPackingSolution
+
   def getPlacementsPerBox: Map[Int, Map[Rectangle, Coordinates]] = {
     placement.groupBy {
       case (_, placing) => placing.box
