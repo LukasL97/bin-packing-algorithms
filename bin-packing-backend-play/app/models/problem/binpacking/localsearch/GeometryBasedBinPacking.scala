@@ -2,8 +2,8 @@ package models.problem.binpacking.localsearch
 
 import models.problem.binpacking.localsearch.neighborhood.BoxPullUpNeighborhood
 import models.problem.binpacking.localsearch.neighborhood.GeometricShiftNeighborhood
-import models.problem.binpacking.localsearch.neighborhood.Up
 import models.problem.binpacking.localsearch.neighborhood.Left
+import models.problem.binpacking.localsearch.neighborhood.Up
 import models.problem.binpacking.solution.BinPackingSolution
 import models.problem.binpacking.solution.Box
 import models.problem.binpacking.solution.Coordinates
@@ -76,11 +76,11 @@ class GeometryBasedBinPackingSolutionHandler(
     (1 / minBoxCostChange).setScale(0, RoundingMode.UP).pow(id)
   }
 
-  override def evaluate(solution: BinPackingSolution): BigDecimal = {
+  override def evaluate(solution: BinPackingSolution, step: Int): BigDecimal = {
     val minimalCostWeight = 0.9
     val pointCostFunction = buildLinearPointCostFunction(minimalCostWeight, boxLength)
     val boxIds = solution.placement.map {
-      case (rectangle, Placing(box, coordinates)) => box.id
+      case (_, Placing(box, _)) => box.id
     }.toSeq.sorted
     val boxSkewedFillRates = boxIds.map { id =>
       val rectanglesInBox = solution.placement.collect {

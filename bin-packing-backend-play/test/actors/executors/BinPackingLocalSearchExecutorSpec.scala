@@ -45,7 +45,7 @@ class BinPackingLocalSearchExecutorSpec extends WordSpec with MockFactory {
               )).filter(solutionHandler.isFeasible)
             ).flatten
 
-            override def evaluate(solution: BinPackingSolution): BigDecimal = solution.placement.head match {
+            override def evaluate(solution: BinPackingSolution, step: Int): BigDecimal = solution.placement.head match {
               case (rectangle, Placing(box, Coordinates(x, y))) => -(x + y)
             }
           }
