@@ -7,6 +7,10 @@ class AlgorithmStrategies {
         name: "Greedy - Random Selection"
       },
       {
+        id: "greedy sizeOrdered",
+        name: "Greedy - Size-ordered"
+      },
+      {
         id: "localSearch geometryBased",
         name: "Local Search - Geometry-based"
       }
