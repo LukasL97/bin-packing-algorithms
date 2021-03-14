@@ -36,12 +36,14 @@ trait BinPackingSelectionHandler
     placementsPerBox: Map[Int, Map[Rectangle, Coordinates]]
   ): (Rectangle, Placing) = {
     val maxBoxId = placementsPerBox.keys.maxOption.getOrElse(0)
-    placementsPerBox
-      .foldLeft(Option.empty[(Rectangle, Placing)]) {
+    placementsPerBox.toSeq.sortBy {
+      case (boxId, _) => boxId
+    }.foldLeft(Option.empty[(Rectangle, Placing)]) {
         case (foundPlacing, (boxId, placement)) =>
           foundPlacing.orElse(
-            placeRectangleInBoxAtMostTopLeftPoint(rectangle, placement, considerRotation = true)
-              .map { case (rectangle, coordinates) => rectangle -> Placing(Box(boxId, boxLength), coordinates) }
+            placeRectangleInBoxAtMostTopLeftPoint(rectangle, placement, considerRotation = true).map {
+              case (rectangle, coordinates) => rectangle -> Placing(Box(boxId, boxLength), coordinates)
+            }
           )
       }
       .getOrElse(
