@@ -3,16 +3,20 @@ class AlgorithmStrategies {
   static getAll() {
     return [
       {
-        id: "greedy randomSelection",
-        name: "Greedy - Random Selection"
+        id: 'greedy randomSelection',
+        name: 'Greedy - Random Selection'
       },
       {
-        id: "greedy sizeOrdered",
-        name: "Greedy - Size-ordered"
+        id: 'greedy sizeOrdered',
+        name: 'Greedy - Size-ordered'
       },
       {
-        id: "localSearch geometryBased",
-        name: "Local Search - Geometry-based"
+        id: 'localSearch geometryBased',
+        name: 'Local Search - Geometry-based'
+      },
+      {
+        id: 'localSearch eventuallyFeasibleGeometryBased',
+        name: '[WiP] Local Search - Geometry-based (eventually feasible)'
       }
     ]
   }
