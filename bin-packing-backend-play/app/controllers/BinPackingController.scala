@@ -10,6 +10,7 @@ import controllers.exceptions.UnknownStrategyException
 import dao.BinPackingSolutionStepDAO
 import models.problem.binpacking.BinPacking
 import models.problem.binpacking.greedy.RandomSelectionBinPackingGreedy
+import models.problem.binpacking.greedy.SizeOrderedBinPackingGreedy
 import models.problem.binpacking.localsearch.GeometryBasedBinPacking
 import play.api.libs.json.JsValue
 import play.api.mvc._
@@ -101,6 +102,13 @@ object BinPackingProvider {
       )
     case "greedy randomSelection" =>
       new RandomSelectionBinPackingGreedy(
+        boxLength,
+        numRectangles,
+        rectangleWidthRange,
+        rectangleHeightRange
+      )
+    case "greedy sizeOrdered" =>
+      new SizeOrderedBinPackingGreedy(
         boxLength,
         numRectangles,
         rectangleWidthRange,
