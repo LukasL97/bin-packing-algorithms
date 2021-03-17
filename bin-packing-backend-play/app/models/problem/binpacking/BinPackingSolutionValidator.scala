@@ -69,7 +69,7 @@ trait BinPackingSolutionValidator {
     aLeftOfB || aRightOfB || aAboveB || aBelowB
   }
 
-  private def inBounds(rectangle: Rectangle, coordinates: Coordinates, boxLength: Int): Boolean = {
+  def inBounds(rectangle: Rectangle, coordinates: Coordinates, boxLength: Int): Boolean = {
     val inBoundsLeft = 0 <= coordinates.x
     val inBoundsRight = coordinates.x + rectangle.width <= boxLength
     val inBoundsTop = 0 <= coordinates.y

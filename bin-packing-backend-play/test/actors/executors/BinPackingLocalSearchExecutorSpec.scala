@@ -2,6 +2,8 @@ package actors.executors
 
 import actors.BinPackingSolutionStep
 import dao.BinPackingSolutionStepDAO
+import models.algorithm.OneDimensionalScore
+import models.algorithm.Score
 import models.problem.binpacking.localsearch.BinPackingLocalSearch
 import models.problem.binpacking.localsearch.BinPackingSolutionHandler
 import models.problem.binpacking.solution.BinPackingSolution
@@ -45,8 +47,8 @@ class BinPackingLocalSearchExecutorSpec extends WordSpec with MockFactory {
               )).filter(solutionHandler.isFeasible)
             ).flatten
 
-            override def evaluate(solution: BinPackingSolution, step: Int): BigDecimal = solution.placement.head match {
-              case (rectangle, Placing(box, Coordinates(x, y))) => -(x + y)
+            override def evaluate(solution: BinPackingSolution, step: Int): Score = solution.placement.head match {
+              case (rectangle, Placing(box, Coordinates(x, y))) => OneDimensionalScore(-(x + y))
             }
           }
         }

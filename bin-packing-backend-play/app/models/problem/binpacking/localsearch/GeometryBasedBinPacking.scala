@@ -1,5 +1,7 @@
 package models.problem.binpacking.localsearch
 
+import models.algorithm.OneDimensionalScore
+import models.algorithm.Score
 import models.problem.binpacking.localsearch.evaluation.BoxWeightedTopLeftFirstEvaluation
 import models.problem.binpacking.localsearch.neighborhood.BoxPullUpNeighborhood
 import models.problem.binpacking.localsearch.neighborhood.GeometricShiftNeighborhood
@@ -56,7 +58,7 @@ class GeometryBasedBinPackingSolutionHandler(
     solutionsWithBoxPullUp ++ solutionsWithUpShift ++ solutionsWithLeftShift
   }
 
-  override def evaluate(solution: BinPackingSolution, step: Int): BigDecimal = {
-    evaluate(solution)
+  override def evaluate(solution: BinPackingSolution, step: Int): Score = {
+    OneDimensionalScore(evaluate(solution))
   }
 }

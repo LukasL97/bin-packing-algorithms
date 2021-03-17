@@ -1,5 +1,8 @@
 package models.problem.binpacking.localsearch
+import models.algorithm.OneDimensionalScore
+import models.algorithm.Score
 import models.problem.binpacking.localsearch.evaluation.BoxWeightedTopLeftFirstEvaluation
+import models.problem.binpacking.localsearch.evaluation.OverlapPenalization
 import models.problem.binpacking.localsearch.neighborhood.Down
 import models.problem.binpacking.localsearch.neighborhood.GeometricShiftNeighborhood
 import models.problem.binpacking.localsearch.neighborhood.Left
@@ -11,9 +14,6 @@ import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.Rectangle
 import models.problem.binpacking.solution.SimpleBinPackingSolution
-import models.problem.binpacking.utils.PairBuildingUtil
-
-import java.math.MathContext
 
 class EventuallyFeasibleGeometryBasedBinPacking(
   override val boxLength: Int,
@@ -33,7 +33,8 @@ class EventuallyFeasibleGeometryBasedBinPacking(
 class EventuallyFeasibleGeometryBasedBinPackingSolutionHandler(
   val rectangles: Set[Rectangle],
   val boxLength: Int,
-) extends BinPackingSolutionHandler with GeometricShiftNeighborhood with BoxWeightedTopLeftFirstEvaluation {
+) extends BinPackingSolutionHandler with GeometricShiftNeighborhood with BoxWeightedTopLeftFirstEvaluation
+    with OverlapPenalization {
 
   override val startSolution: BinPackingSolution = SimpleBinPackingSolution(
     rectangles
@@ -42,55 +43,39 @@ class EventuallyFeasibleGeometryBasedBinPackingSolutionHandler(
   )
 
   override def getNeighborhood(solution: BinPackingSolution): Set[BinPackingSolution] = {
-    val solutionsWithLeftShift = createShiftedSolutions(solution, Left, 1, ensureFeasibility = false)
-    val solutionsWithRightShift = createShiftedSolutions(solution, Right, 1, ensureFeasibility = false)
-    val solutionsWithUpShift = createShiftedSolutions(solution, Up, 1, ensureFeasibility = false)
-    val solutionsWithDownShift = createShiftedSolutions(solution, Down, 1, ensureFeasibility = false)
+    val solutionsWithLeftShift = createShiftedSolutions(solution, Left, 1, allowOverlap = true)
+    val solutionsWithRightShift = createShiftedSolutions(solution, Right, 1, allowOverlap = true)
+    val solutionsWithUpShift = createShiftedSolutions(solution, Up, 1, allowOverlap = true)
+    val solutionsWithDownShift = createShiftedSolutions(solution, Down, 1, allowOverlap = true)
     solutionsWithLeftShift ++ solutionsWithRightShift ++ solutionsWithUpShift ++ solutionsWithDownShift
   }
 
-  private val infinity = BigDecimal(10).pow(1000)
-
-  private def maxAllowedOverlap(step: Int): Double = {
-    1 - step * 0.01
+  def maxAllowedOverlap(step: Int): Double = {
+    0
   }
 
-  private def overlap(placingA: (Rectangle, Coordinates), placingB: (Rectangle, Coordinates)): Double = {
-    val (rectangleA, coordinatesA) = placingA
-    val (rectangleB, coordinatesB) = placingB
-    val commonAreaTopLeft = Coordinates(
-      Math.max(coordinatesA.x, coordinatesB.x),
-      Math.max(coordinatesA.y, coordinatesB.y)
+  override def evaluate(solution: BinPackingSolution, step: Int): Score = {
+    val overlapPenalization = penalizeOverlap(solution, maxAllowedOverlap(step))
+    PrioritizedPenalizationScore(
+      OneDimensionalScore(evaluate(solution)),
+      OneDimensionalScore(overlapPenalization)
     )
-    val commonAreaBottomRight = Coordinates(
-      Math.max(coordinatesA.x + rectangleA.width, coordinatesB.x + rectangleB.width),
-      Math.max(coordinatesA.y + rectangleA.height, coordinatesB.y + rectangleB.height)
-    )
-    val commonAreaWidth = commonAreaBottomRight.x - commonAreaTopLeft.x
-    val commonAreaHeight = commonAreaBottomRight.y - commonAreaTopLeft.y
-    if (commonAreaWidth > 0 && commonAreaHeight > 0) {
-      (commonAreaWidth * commonAreaHeight).toDouble / Math.max(
-        rectangleA.width * rectangleA.height,
-        rectangleB.width * rectangleB.height
-      )
-    } else {
-      0.0
-    }
   }
 
-  override def evaluate(solution: BinPackingSolution, step: Int): BigDecimal = {
-    val maxPairwiseOverlap = solution.getPlacementsPerBox.values
-      .flatMap { placement =>
-        val placingPairs = PairBuildingUtil.buildPairs(placement)
-        placingPairs.map { case (placingA, placingB) => overlap(placingA, placingB)}
-      }
-      .max
-    if (maxPairwiseOverlap > maxAllowedOverlap(step)) {
-      infinity
-    } else {
-      val score = evaluate(solution)
-      assert(score > infinity)
-      score
+  override def stopOnStagnation(solution: BinPackingSolution): Boolean = {
+    isFeasible(solution)
+  }
+}
+
+case class PrioritizedPenalizationScore(
+  actualObjectiveScore: Score,
+  penalization: Score
+) extends Score {
+  override def compare(that: Score): Int = {
+    val other = that.asInstanceOf[PrioritizedPenalizationScore]
+    penalization.compareTo(other.penalization) match {
+      case 0 => actualObjectiveScore.compareTo(other.actualObjectiveScore)
+      case result => result
     }
   }
 }

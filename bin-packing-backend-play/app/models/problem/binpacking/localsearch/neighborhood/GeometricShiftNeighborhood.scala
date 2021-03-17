@@ -12,11 +12,11 @@ trait GeometricShiftNeighborhood extends BinPackingSolutionValidator {
     solution: BinPackingSolution,
     direction: Direction,
     stepSize: Int,
-    ensureFeasibility: Boolean
+    allowOverlap: Boolean
   ): Set[BinPackingSolution] = {
     solution.placement.flatMap {
       case (rectangle, placing) =>
-        shiftRectangleInSolution(solution, rectangle, placing, direction, stepSize, ensureFeasibility)
+        shiftRectangleInSolution(solution, rectangle, placing, direction, stepSize, allowOverlap)
     }.toSet
   }
 
@@ -33,12 +33,12 @@ trait GeometricShiftNeighborhood extends BinPackingSolutionValidator {
       var stepSize = 1
       var solutions: Seq[Option[BinPackingSolution]] =
         Seq(
-          shiftRectangleInSolution(originalSolution, rectangle, placing, direction, stepSize, ensureFeasibility = true)
+          shiftRectangleInSolution(originalSolution, rectangle, placing, direction, stepSize, allowOverlap = false)
         )
       while (solutions.last.isDefined) {
         stepSize += 1
         solutions = solutions.appended(
-          shiftRectangleInSolution(originalSolution, rectangle, placing, direction, stepSize, ensureFeasibility = true)
+          shiftRectangleInSolution(originalSolution, rectangle, placing, direction, stepSize, allowOverlap = false)
         )
       }
       solutions.flatten.lastOption
@@ -56,20 +56,20 @@ trait GeometricShiftNeighborhood extends BinPackingSolutionValidator {
     placing: Placing,
     direction: Direction,
     stepSize: Int,
-    ensureFeasibility: Boolean
+    allowOverlap: Boolean
   ): Option[BinPackingSolution] = {
     val newCoordinates = shift(placing.coordinates, direction, stepSize)
-    if (ensureFeasibility && !validateNewPlacingInSingleBox(
+    if ((allowOverlap && inBounds(rectangle, newCoordinates, placing.box.length)) || validateNewPlacingInSingleBox(
           rectangle,
           newCoordinates,
           solution.getPlacementInSingleBox(placing.box.id).removed(rectangle),
           placing.box.length
         )) {
-      Option.empty[BinPackingSolution]
-    } else {
       Option(
         solution.updated(rectangle, Placing(placing.box, newCoordinates))
       )
+    } else {
+      Option.empty[BinPackingSolution]
     }
   }
 
