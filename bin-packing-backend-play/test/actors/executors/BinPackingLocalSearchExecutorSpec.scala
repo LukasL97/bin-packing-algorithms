@@ -14,6 +14,8 @@ import models.problem.binpacking.solution.SimpleBinPackingSolution
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.WordSpec
 
+import scala.collection.View
+
 class BinPackingLocalSearchExecutorSpec extends WordSpec with MockFactory {
 
   private val dao = mock[BinPackingSolutionStepDAO]
@@ -39,13 +41,13 @@ class BinPackingLocalSearchExecutorSpec extends WordSpec with MockFactory {
               Map(rectangles.head -> Placing(box, Coordinates(0, 0)))
             )
 
-            override def getNeighborhood(solution: BinPackingSolution): Set[BinPackingSolution] = Set(
+            override def getNeighborhood(solution: BinPackingSolution): View[BinPackingSolution] = Set(
               Option(SimpleBinPackingSolution(
                 solution.placement.map {
                   case (rectangle, Placing(box, Coordinates(x, y))) => rectangle -> Placing(box, Coordinates(x + 1, y + 1))
                 }
               )).filter(solutionHandler.isFeasible)
-            ).flatten
+            ).flatten.view
 
             override def evaluate(solution: BinPackingSolution, step: Int): Score = solution.placement.head match {
               case (rectangle, Placing(box, Coordinates(x, y))) => OneDimensionalScore(-(x + y))

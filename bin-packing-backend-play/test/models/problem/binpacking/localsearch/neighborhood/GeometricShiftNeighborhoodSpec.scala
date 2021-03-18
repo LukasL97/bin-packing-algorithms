@@ -19,14 +19,14 @@ class GeometricShiftNeighborhoodSpec extends WordSpec with MustMatchers {
         val solution = SimpleBinPackingSolution(Map(
           Rectangle(1, 1, 1) -> Placing(Box(1, 5), Coordinates(2, 0))
         ))
-        neighborhood.createMaximallyShiftedSolutions(solution, Up) mustEqual Set.empty
+        neighborhood.createMaximallyShiftedSolutions(solution, Up).toSet mustEqual Set.empty
       }
 
       "given a solution where a shift to the box edge is possible" in {
         val solution = SimpleBinPackingSolution(Map(
           Rectangle(1, 1, 1) -> Placing(Box(1, 5), Coordinates(2, 3))
         ))
-        neighborhood.createMaximallyShiftedSolutions(solution, Up) mustEqual Set(
+        neighborhood.createMaximallyShiftedSolutions(solution, Up).toSet mustEqual Set(
           SimpleBinPackingSolution(Map(
             Rectangle(1, 1, 1) -> Placing(Box(1, 5), Coordinates(2, 0))
           ))
@@ -38,7 +38,7 @@ class GeometricShiftNeighborhoodSpec extends WordSpec with MustMatchers {
           Rectangle(1, 5, 1) -> Placing(Box(1, 5), Coordinates(0, 0)),
           Rectangle(2, 5, 1) -> Placing(Box(1, 5), Coordinates(0, 4))
         ))
-        neighborhood.createMaximallyShiftedSolutions(solution, Up) mustEqual Set(
+        neighborhood.createMaximallyShiftedSolutions(solution, Up).toSet mustEqual Set(
           SimpleBinPackingSolution(Map(
             Rectangle(1, 5, 1) -> Placing(Box(1, 5), Coordinates(0, 0)),
             Rectangle(2, 5, 1) -> Placing(Box(1, 5), Coordinates(0, 1))

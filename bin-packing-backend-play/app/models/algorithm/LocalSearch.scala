@@ -1,6 +1,7 @@
 package models.algorithm
 
 import scala.annotation.tailrec
+import scala.collection.View
 
 class LocalSearch[Solution](solutionHandler: SolutionHandler[Solution]) {
 
@@ -51,7 +52,7 @@ trait SolutionHandler[Solution] {
 
   val startSolution: Solution
 
-  def getNeighborhood(solution: Solution): Set[Solution]
+  def getNeighborhood(solution: Solution): View[Solution]
 
   def evaluate(solution: Solution, step: Int): Score
 

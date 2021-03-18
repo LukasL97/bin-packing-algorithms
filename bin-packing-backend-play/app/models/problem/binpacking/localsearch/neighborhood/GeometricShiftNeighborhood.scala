@@ -6,6 +6,8 @@ import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.Rectangle
 import models.problem.binpacking.solution.BinPackingSolution
 
+import scala.collection.View
+
 trait GeometricShiftNeighborhood extends BinPackingSolutionValidator {
 
   def createShiftedSolutions(
@@ -13,17 +15,17 @@ trait GeometricShiftNeighborhood extends BinPackingSolutionValidator {
     direction: Direction,
     stepSize: Int,
     allowOverlap: Boolean
-  ): Set[BinPackingSolution] = {
-    solution.placement.flatMap {
+  ): View[BinPackingSolution] = {
+    solution.placement.view.flatMap {
       case (rectangle, placing) =>
         shiftRectangleInSolution(solution, rectangle, placing, direction, stepSize, allowOverlap)
-    }.toSet
+    }
   }
 
   def createMaximallyShiftedSolutions(
     solution: BinPackingSolution,
     direction: Direction,
-  ): Set[BinPackingSolution] = {
+  ): View[BinPackingSolution] = {
 
     def shiftRectangleInSolutionUntilHittingBarrier(
       originalSolution: BinPackingSolution,
@@ -44,10 +46,10 @@ trait GeometricShiftNeighborhood extends BinPackingSolutionValidator {
       solutions.flatten.lastOption
     }
 
-    solution.placement.flatMap {
+    solution.placement.view.flatMap {
       case (rectangle, placing) =>
         shiftRectangleInSolutionUntilHittingBarrier(solution, rectangle, placing)
-    }.toSet
+    }
   }
 
   private def shiftRectangleInSolution(

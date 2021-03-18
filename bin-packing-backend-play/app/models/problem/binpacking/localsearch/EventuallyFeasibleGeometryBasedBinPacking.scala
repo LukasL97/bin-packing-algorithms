@@ -15,6 +15,8 @@ import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.Rectangle
 import models.problem.binpacking.solution.SimpleBinPackingSolution
 
+import scala.collection.View
+
 class EventuallyFeasibleGeometryBasedBinPacking(
   override val boxLength: Int,
   override val numRectangles: Int,
@@ -42,7 +44,7 @@ class EventuallyFeasibleGeometryBasedBinPackingSolutionHandler(
       .toMap
   )
 
-  override def getNeighborhood(solution: BinPackingSolution): Set[BinPackingSolution] = {
+  override def getNeighborhood(solution: BinPackingSolution): View[BinPackingSolution] = {
     val solutionsWithLeftShift = createShiftedSolutions(solution, Left, 1, allowOverlap = true)
     val solutionsWithRightShift = createShiftedSolutions(solution, Right, 1, allowOverlap = true)
     val solutionsWithUpShift = createShiftedSolutions(solution, Up, 1, allowOverlap = true)
