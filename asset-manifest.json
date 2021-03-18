@@ -1,20 +1,20 @@
 {
   "files": {
-    "main.css": "/bin-packing-algorithms/static/css/main.68533cb6.chunk.css",
-    "main.js": "/bin-packing-algorithms/static/js/main.f9082864.chunk.js",
-    "main.js.map": "/bin-packing-algorithms/static/js/main.f9082864.chunk.js.map",
+    "main.css": "/bin-packing-algorithms/static/css/main.296f16a8.chunk.css",
+    "main.js": "/bin-packing-algorithms/static/js/main.55a1d701.chunk.js",
+    "main.js.map": "/bin-packing-algorithms/static/js/main.55a1d701.chunk.js.map",
     "runtime-main.js": "/bin-packing-algorithms/static/js/runtime-main.ca473fe1.js",
     "runtime-main.js.map": "/bin-packing-algorithms/static/js/runtime-main.ca473fe1.js.map",
     "static/js/2.8d7b534a.chunk.js": "/bin-packing-algorithms/static/js/2.8d7b534a.chunk.js",
     "static/js/2.8d7b534a.chunk.js.map": "/bin-packing-algorithms/static/js/2.8d7b534a.chunk.js.map",
     "index.html": "/bin-packing-algorithms/index.html",
-    "static/css/main.68533cb6.chunk.css.map": "/bin-packing-algorithms/static/css/main.68533cb6.chunk.css.map",
+    "static/css/main.296f16a8.chunk.css.map": "/bin-packing-algorithms/static/css/main.296f16a8.chunk.css.map",
     "static/js/2.8d7b534a.chunk.js.LICENSE.txt": "/bin-packing-algorithms/static/js/2.8d7b534a.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.ca473fe1.js",
     "static/js/2.8d7b534a.chunk.js",
-    "static/css/main.68533cb6.chunk.css",
-    "static/js/main.f9082864.chunk.js"
+    "static/css/main.296f16a8.chunk.css",
+    "static/js/main.55a1d701.chunk.js"
   ]
 }
