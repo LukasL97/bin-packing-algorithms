@@ -30,7 +30,7 @@ class BinPackingSolutionStepDAO @Inject()(val db: MongoDatabase, implicit val ec
         )
       )
       .map(convertDocumentToSolutionStep)
-      .toFuture
+      .toFuture()
       .map(steps => steps.sortBy(_.step))
   }
 

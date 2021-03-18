@@ -57,7 +57,7 @@ class EventuallyFeasibleGeometryBasedBinPackingSolutionHandler(
   override def evaluate(solution: BinPackingSolution, step: Int): Score = {
     val overlapPenalization = penalizeOverlap(solution, maxAllowedOverlap(step))
     PrioritizedPenalizationScore(
-      OneDimensionalScore(evaluate(solution)),
+      evaluate(solution),
       OneDimensionalScore(overlapPenalization)
     )
   }
