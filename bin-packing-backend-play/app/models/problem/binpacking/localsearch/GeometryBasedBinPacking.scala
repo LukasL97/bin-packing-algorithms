@@ -2,16 +2,13 @@ package models.problem.binpacking.localsearch
 
 import models.algorithm.Score
 import models.problem.binpacking.localsearch.evaluation.BoxWeightedTopLeftFirstEvaluation
+import models.problem.binpacking.localsearch.initialization.GeometricStartSolution
 import models.problem.binpacking.localsearch.neighborhood.BoxPullUpNeighborhood
 import models.problem.binpacking.localsearch.neighborhood.GeometricShiftNeighborhood
 import models.problem.binpacking.localsearch.neighborhood.Left
 import models.problem.binpacking.localsearch.neighborhood.Up
 import models.problem.binpacking.solution.BinPackingSolution
-import models.problem.binpacking.solution.Box
-import models.problem.binpacking.solution.Coordinates
-import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.Rectangle
-import models.problem.binpacking.solution.SimpleBinPackingSolution
 
 import scala.collection.View
 
@@ -28,29 +25,12 @@ class GeometryBasedBinPacking(
 }
 
 class GeometryBasedBinPackingSolutionHandler(
-  val rectangles: Set[Rectangle],
-  val boxLength: Int,
+  override val rectangles: Set[Rectangle],
+  override val boxLength: Int,
 ) extends BinPackingSolutionHandler with BoxPullUpNeighborhood with GeometricShiftNeighborhood
-    with BoxWeightedTopLeftFirstEvaluation {
+    with BoxWeightedTopLeftFirstEvaluation with GeometricStartSolution {
 
-  override val startSolution: BinPackingSolution = {
-    val solution = SimpleBinPackingSolution(
-      rectangles
-        .map(
-          rectangle =>
-            rectangle -> Placing(
-              Box(rectangle.id, boxLength),
-              Coordinates(0, 0)
-          )
-        )
-        .toMap
-    )
-    if (isFeasible(solution)) {
-      solution
-    } else {
-      throw new RuntimeException("Created infeasible solution as starting solution")
-    }
-  }
+  override val startSolution: BinPackingSolution = triviallyFeasibleStartSolution
 
   override def getNeighborhood(solution: BinPackingSolution): View[BinPackingSolution] = {
     val solutionsWithBoxPullUp = createBoxPullUpNeighborhood(solution)
