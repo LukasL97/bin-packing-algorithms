@@ -16,7 +16,7 @@ class AlgorithmStrategies {
       },
       {
         id: 'localSearch eventuallyFeasibleGeometryBased',
-        name: '[WiP] Local Search - Geometry-based (eventually feasible)'
+        name: 'Local Search - Geometry-based (eventually feasible)'
       }
     ]
   }

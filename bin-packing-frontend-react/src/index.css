@@ -42,6 +42,7 @@
 
 .strategy-selector-form-row {
     margin-bottom: 10px;
+    width: 240px;
 }
 
 .strategy-selector-form-row select {
