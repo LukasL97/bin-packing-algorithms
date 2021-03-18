@@ -9,7 +9,8 @@ class Box extends Component {
 
   rectangleFillColorBase = '#D6E9FE'
   rectangleFillColorLatestUpdate = '#5995DA'
-  rectangleBorderColor = '#5995DA'
+  rectangleBorderColor = 'black'
+  rectangleOpacity = 0.7
 
   rectangleHighlightDuration = 10
   rectangleFillColormap = interpolate([this.rectangleFillColorBase, this.rectangleFillColorLatestUpdate])
@@ -36,11 +37,12 @@ class Box extends Component {
           height={unitToPixel(rectangle.height)}
           fill={self.rectangleFillColormap(colorProportion)}
           stroke={self.rectangleBorderColor}
+          opacity={self.rectangleOpacity}
         />
       )
     }
 
-    const rectangles = getRectangles().map((rectangle, index) => getRectShape(rectangle))
+    const rectangles = getRectangles().map(getRectShape)
 
     return (
       <div className="box" id={id}>
