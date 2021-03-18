@@ -12,22 +12,37 @@ trait GeometricStartSolution {
   val rectangles: Set[Rectangle]
   val boxLength: Int
 
+  private lazy val minRectangleWidth = rectangles.map(_.width).min
+  private lazy val minRectangleHeight = rectangles.map(_.height).min
+
   private lazy val maxRectangleWidth = rectangles.map(_.width).max
   private lazy val maxRectangleHeight = rectangles.map(_.height).max
 
-  private lazy val startCoordinates: Seq[Coordinates] = {
-    for {
-      x <- 0 to (boxLength - maxRectangleWidth) by maxRectangleWidth
-      y <- 0 to (boxLength - maxRectangleHeight) by maxRectangleHeight
-    } yield Coordinates(x, y)
+  def triviallyFeasibleStartSolution: BinPackingSolution = {
+    createStartSolution(getStartCoordinates(maxRectangleWidth, maxRectangleHeight))
   }
 
-  def triviallyFeasibleStartSolution: BinPackingSolution = {
+  def overconfidentStartSolution: BinPackingSolution = {
+    createStartSolution(
+      getStartCoordinates(
+        (maxRectangleWidth + minRectangleWidth) / 2,
+        (maxRectangleHeight + minRectangleHeight) / 2
+      )
+    )
+  }
+
+  private def getStartCoordinates(horizontalStep: Int, verticalStep: Int): Seq[Coordinates] =
+    for {
+      x <- 0 to (boxLength - maxRectangleWidth) by horizontalStep
+      y <- 0 to (boxLength - maxRectangleHeight) by verticalStep
+    } yield Coordinates(x, y)
+
+  private def createStartSolution(coordinates: Seq[Coordinates]): BinPackingSolution = {
     val placement = rectangles.zipWithIndex.map {
       case (rectangle, index) =>
         rectangle -> Placing(
-          Box(index / startCoordinates.size + 1, boxLength),
-          startCoordinates(index % startCoordinates.size)
+          Box(index / coordinates.size + 1, boxLength),
+          coordinates(index % coordinates.size)
         )
     }.toMap
     SimpleBinPackingSolution(placement)
