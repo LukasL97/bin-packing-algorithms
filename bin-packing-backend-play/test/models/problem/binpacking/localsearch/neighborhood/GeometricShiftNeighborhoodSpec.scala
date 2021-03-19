@@ -10,38 +10,68 @@ import org.scalatest.WordSpec
 
 class GeometricShiftNeighborhoodSpec extends WordSpec with MustMatchers {
 
-  private val neighborhood = new GeometricShiftNeighborhood {}
+  private val boxLength_ = 5
+
+  private val neighborhood = new GeometricShiftNeighborhood {
+    override val boxLength: Int = boxLength_
+  }
 
   "GeometricShiftNeighborhood" should {
+
     "create maximally shifted solutions correctly" when {
 
       "given a solution where no shift is possible" in {
         val solution = SimpleBinPackingSolution(Map(
-          Rectangle(1, 1, 1) -> Placing(Box(1, 5), Coordinates(2, 0))
+          Rectangle(1, 1, 1) -> Placing(Box(1, boxLength_), Coordinates(2, 0))
         ))
         neighborhood.createMaximallyShiftedSolutions(solution, Up).toSet mustEqual Set.empty
       }
 
       "given a solution where a shift to the box edge is possible" in {
         val solution = SimpleBinPackingSolution(Map(
-          Rectangle(1, 1, 1) -> Placing(Box(1, 5), Coordinates(2, 3))
+          Rectangle(1, 1, 1) -> Placing(Box(1, boxLength_), Coordinates(2, 3))
         ))
         neighborhood.createMaximallyShiftedSolutions(solution, Up).toSet mustEqual Set(
           SimpleBinPackingSolution(Map(
-            Rectangle(1, 1, 1) -> Placing(Box(1, 5), Coordinates(2, 0))
+            Rectangle(1, 1, 1) -> Placing(Box(1, boxLength_), Coordinates(2, 0))
           ))
         )
       }
 
       "given a solution where a shift to the edge of another rectangle is possible" in {
         val solution = SimpleBinPackingSolution(Map(
-          Rectangle(1, 5, 1) -> Placing(Box(1, 5), Coordinates(0, 0)),
-          Rectangle(2, 5, 1) -> Placing(Box(1, 5), Coordinates(0, 4))
+          Rectangle(1, 5, 1) -> Placing(Box(1, boxLength_), Coordinates(0, 0)),
+          Rectangle(2, 5, 1) -> Placing(Box(1, boxLength_), Coordinates(0, 4))
         ))
         neighborhood.createMaximallyShiftedSolutions(solution, Up).toSet mustEqual Set(
           SimpleBinPackingSolution(Map(
-            Rectangle(1, 5, 1) -> Placing(Box(1, 5), Coordinates(0, 0)),
-            Rectangle(2, 5, 1) -> Placing(Box(1, 5), Coordinates(0, 1))
+            Rectangle(1, 5, 1) -> Placing(Box(1, boxLength_), Coordinates(0, 0)),
+            Rectangle(2, 5, 1) -> Placing(Box(1, boxLength_), Coordinates(0, 1))
+          ))
+        )
+      }
+    }
+
+    "create maximally shifted solutions in entire box correctly" when {
+
+      "given a solution where no shift is possible" in {
+        val solution = SimpleBinPackingSolution(Map(
+          Rectangle(1, 1, 1) -> Placing(Box(1, boxLength_), Coordinates(2, 0))
+        ))
+        neighborhood.createEntireBoxMaximallyShiftedSolutions(solution, Up).toSet mustEqual Set.empty
+      }
+
+      "given a solution where multiple rectangle can be shifted" in {
+        val solution = SimpleBinPackingSolution(Map(
+          Rectangle(1, 1, 1) -> Placing(Box(1, boxLength_), Coordinates(2, 0)),
+          Rectangle(2, 2, 1) -> Placing(Box(1, boxLength_), Coordinates(3, 2)),
+          Rectangle(3, 1, 1) -> Placing(Box(1, boxLength_), Coordinates(4, 4))
+        ))
+        neighborhood.createEntireBoxMaximallyShiftedSolutions(solution, Up).toSet mustEqual Set(
+          SimpleBinPackingSolution(Map(
+            Rectangle(1, 1, 1) -> Placing(Box(1, boxLength_), Coordinates(2, 0)),
+            Rectangle(2, 2, 1) -> Placing(Box(1, boxLength_), Coordinates(3, 0)),
+            Rectangle(3, 1, 1) -> Placing(Box(1, boxLength_), Coordinates(4, 1))
           ))
         )
       }

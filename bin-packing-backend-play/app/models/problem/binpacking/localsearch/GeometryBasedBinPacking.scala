@@ -38,14 +38,16 @@ class GeometryBasedBinPackingSolutionHandler(
   override def getNeighborhood(solution: BinPackingSolution): View[BinPackingSolution] = {
     val solutionsWithCoarseMultipleBoxPullUp = createCoarseMultipleBoxPullUpNeighborhood(solution)
     val solutionsWithMergedBoxes = createBoxMergeNeighborhood(solution)
+    val solutionsWithEntireBoxUpShift = createEntireBoxMaximallyShiftedSolutions(solution, Up)
+    val solutionsWithEntireBoxLeftShift = createEntireBoxMaximallyShiftedSolutions(solution, Left)
     val solutionsWithBoxPullUp = createBoxPullUpNeighborhood(solution)
-    val solutionsWithUpShift = createMaximallyShiftedSolutions(solution, Up)
-    val solutionsWithLeftShift = createMaximallyShiftedSolutions(solution, Left)
+    //val solutionsWithSingleUpShift = createMaximallyShiftedSolutions(solution, Up)
+    //val solutionsWithSingleLeftShift = createMaximallyShiftedSolutions(solution, Left)
     solutionsWithMergedBoxes ++
       solutionsWithCoarseMultipleBoxPullUp ++
-      solutionsWithBoxPullUp ++
-      solutionsWithUpShift ++
-      solutionsWithLeftShift
+      solutionsWithEntireBoxUpShift ++
+      solutionsWithEntireBoxLeftShift ++
+      solutionsWithBoxPullUp
   }
 
   override def evaluate(solution: BinPackingSolution, step: Int): Score = {

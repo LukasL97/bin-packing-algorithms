@@ -1,14 +1,17 @@
 package models.problem.binpacking.localsearch.neighborhood
 
 import models.problem.binpacking.BinPackingSolutionValidator
+import models.problem.binpacking.solution.BinPackingSolution
+import models.problem.binpacking.solution.Box
 import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.Rectangle
-import models.problem.binpacking.solution.BinPackingSolution
 
 import scala.collection.View
 
 trait GeometricShiftNeighborhood extends BinPackingSolutionValidator {
+
+  val boxLength: Int
 
   def createShiftedSolutions(
     solution: BinPackingSolution,
@@ -24,32 +27,71 @@ trait GeometricShiftNeighborhood extends BinPackingSolutionValidator {
 
   def createMaximallyShiftedSolutions(
     solution: BinPackingSolution,
-    direction: Direction,
+    direction: Direction
   ): View[BinPackingSolution] = {
-
-    def shiftRectangleInSolutionUntilHittingBarrier(
-      originalSolution: BinPackingSolution,
-      rectangle: Rectangle,
-      placing: Placing
-    ): Option[BinPackingSolution] = {
-      var stepSize = 1
-      var solutions: Seq[Option[BinPackingSolution]] =
-        Seq(
-          shiftRectangleInSolution(originalSolution, rectangle, placing, direction, stepSize, allowOverlap = false)
-        )
-      while (solutions.last.isDefined) {
-        stepSize += 1
-        solutions = solutions.appended(
-          shiftRectangleInSolution(originalSolution, rectangle, placing, direction, stepSize, allowOverlap = false)
-        )
-      }
-      solutions.flatten.lastOption
-    }
-
     solution.placement.view.flatMap {
       case (rectangle, placing) =>
-        shiftRectangleInSolutionUntilHittingBarrier(solution, rectangle, placing)
+        shiftRectangleInSolutionUntilHittingBarrier(solution, rectangle, placing, direction)
     }
+  }
+
+  def createEntireBoxMaximallyShiftedSolutions(
+    solution: BinPackingSolution,
+    direction: Direction
+  ): View[BinPackingSolution] = {
+    solution.getPlacementsPerBox.view.flatMap {
+      case (boxId, placement) =>
+        val placementWithBox = placement.map {
+          case (rectangle, coordinates) => rectangle -> Placing(Box(boxId, boxLength), coordinates)
+        }
+        shiftAllRectanglesInBoxUntilHittingBarrier(solution, placementWithBox, direction)
+    }
+  }
+
+  private def shiftAllRectanglesInBoxUntilHittingBarrier(
+    originalSolution: BinPackingSolution,
+    boxPlacement: Map[Rectangle, Placing],
+    direction: Direction
+  ): Option[BinPackingSolution] = {
+    implicit val placementOrdering: Ordering[(Rectangle, Placing)] = {
+      (placingA: (Rectangle, Placing), placingB: (Rectangle, Placing)) =>
+        direction match {
+          case Left => placingA._2.coordinates.x - placingB._2.coordinates.x
+          case Right => placingB._2.coordinates.x - placingA._2.coordinates.x
+          case Up => placingA._2.coordinates.y - placingB._2.coordinates.y
+          case Down => placingB._2.coordinates.y - placingA._2.coordinates.y
+        }
+    }
+    val sortedPlacement = boxPlacement.toSeq.sorted
+    val updatedSolutionWithChangedFlag = sortedPlacement.foldLeft((originalSolution, false)) {
+      case ((solution, hasChanged), (rectangle, placing)) =>
+        val updatedSolution = shiftRectangleInSolutionUntilHittingBarrier(solution, rectangle, placing, direction)
+        (updatedSolution.getOrElse(solution), updatedSolution.isDefined)
+    }
+    updatedSolutionWithChangedFlag match {
+      case (_, false) => Option.empty[BinPackingSolution]
+      case (solution, true) => Option(solution)
+    }
+  }
+
+  private def shiftRectangleInSolutionUntilHittingBarrier(
+    originalSolution: BinPackingSolution,
+    rectangle: Rectangle,
+    placing: Placing,
+    direction: Direction
+  ): Option[BinPackingSolution] = {
+    var stepSize = 1
+    var solutions: Seq[Option[BinPackingSolution]] =
+      Seq(
+        shiftRectangleInSolution(originalSolution, rectangle, placing, direction, stepSize, allowOverlap = false)
+      )
+    while (solutions.last.isDefined) {
+      stepSize += 1
+      solutions = solutions.appended(
+        shiftRectangleInSolution(originalSolution, rectangle, placing, direction, stepSize, allowOverlap = false)
+      )
+    }
+    solutions.flatten.lastOption
   }
 
   private def shiftRectangleInSolution(
@@ -61,11 +103,11 @@ trait GeometricShiftNeighborhood extends BinPackingSolutionValidator {
     allowOverlap: Boolean
   ): Option[BinPackingSolution] = {
     val newCoordinates = shift(placing.coordinates, direction, stepSize)
-    if ((allowOverlap && inBounds(rectangle, newCoordinates, placing.box.length)) || validateNewPlacingInSingleBox(
+    if ((allowOverlap && inBounds(rectangle, newCoordinates, boxLength)) || validateNewPlacingInSingleBox(
           rectangle,
           newCoordinates,
           solution.getPlacementInSingleBox(placing.box.id).removed(rectangle),
-          placing.box.length
+          boxLength
         )) {
       Option(
         solution.updated(rectangle, Placing(placing.box, newCoordinates))
