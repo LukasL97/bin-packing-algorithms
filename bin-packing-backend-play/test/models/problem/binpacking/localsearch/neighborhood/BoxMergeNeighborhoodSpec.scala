@@ -10,9 +10,9 @@ import org.scalatest.WordSpec
 
 class BoxMergeNeighborhoodSpec extends WordSpec with MustMatchers {
 
-  private val boxLength_ = 10
+  private val boxLength = 10
 
-  private val rectangles_ = Seq(
+  private val rectangles = Seq(
     Rectangle(1, 5, 5),
     Rectangle(2, 4, 4),
     Rectangle(3, 5, 4),
@@ -22,38 +22,35 @@ class BoxMergeNeighborhoodSpec extends WordSpec with MustMatchers {
     Rectangle(7, 2, 1)
   )
 
-  private val generator = new BoxMergeNeighborhood {
-    override val rectangles: Set[Rectangle] = rectangles_.toSet
-    override val boxLength: Int = boxLength_
-  }
+  private val generator = new BoxMergeNeighborhood(rectangles.toSet, boxLength)
 
   "BoxMergeNeighborhood" should {
     "merge boxes correctly" when {
       "two of three boxes can be merged in a solution" in {
         val solution = SimpleBinPackingSolution(
           Map(
-            rectangles_.head -> Placing(Box(1, boxLength_), Coordinates(0, 0)),
-            rectangles_(1) -> Placing(Box(1, boxLength_), Coordinates(5, 0)),
-            rectangles_(2) -> Placing(Box(2, boxLength_), Coordinates(0, 0)),
-            rectangles_(3) -> Placing(Box(2, boxLength_), Coordinates(5, 0)),
-            rectangles_(4) -> Placing(Box(2, boxLength_), Coordinates(7, 7)),
-            rectangles_(5) -> Placing(Box(3, boxLength_), Coordinates(0, 0)),
-            rectangles_(6) -> Placing(Box(3, boxLength_), Coordinates(7, 7))
+            rectangles.head -> Placing(Box(1, boxLength), Coordinates(0, 0)),
+            rectangles(1) -> Placing(Box(1, boxLength), Coordinates(5, 0)),
+            rectangles(2) -> Placing(Box(2, boxLength), Coordinates(0, 0)),
+            rectangles(3) -> Placing(Box(2, boxLength), Coordinates(5, 0)),
+            rectangles(4) -> Placing(Box(2, boxLength), Coordinates(7, 7)),
+            rectangles(5) -> Placing(Box(3, boxLength), Coordinates(0, 0)),
+            rectangles(6) -> Placing(Box(3, boxLength), Coordinates(7, 7))
           )
         )
         val newSolution = generator.createBoxMergeNeighborhood(solution).head
         Seq(
-          rectangles_.head,
-          rectangles_(1),
-          rectangles_(5),
-          rectangles_(6)
+          rectangles.head,
+          rectangles(1),
+          rectangles(5),
+          rectangles(6)
         ).foreach {
           rectangle => newSolution.placement(rectangle).box.id mustEqual 1
         }
         Seq(
-          rectangles_(2),
-          rectangles_(3),
-          rectangles_(4)
+          rectangles(2),
+          rectangles(3),
+          rectangles(4)
         ).foreach {
           rectangle => newSolution.placement(rectangle).box.id mustEqual 2
         }

@@ -9,7 +9,9 @@ import models.problem.binpacking.solution.Rectangle
 
 import scala.collection.View
 
-trait CoarseMultipleBoxPullUpNeighborhood extends BinPackingTopLeftFirstPlacing {
+class CoarseMultipleBoxPullUpNeighborhood(
+  override val boxLength: Int
+) extends BinPackingTopLeftFirstPlacing {
 
   val granularity = 10
 

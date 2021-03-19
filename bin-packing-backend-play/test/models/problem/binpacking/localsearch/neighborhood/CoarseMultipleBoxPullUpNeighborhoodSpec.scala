@@ -10,21 +10,19 @@ import org.scalatest.WordSpec
 
 class CoarseMultipleBoxPullUpNeighborhoodSpec extends WordSpec with MustMatchers {
 
-  private val boxLength_ = 20
+  private val boxLength = 20
 
-  private val generator = new CoarseMultipleBoxPullUpNeighborhood {
-    override val boxLength: Int = boxLength_
-  }
+  private val generator = new CoarseMultipleBoxPullUpNeighborhood(boxLength)
 
   "CoarseMultipleBoxPullUpNeighborhood" should {
     "create neighboring solutions correctly" when {
       "given a solution that has one neighbor with pulled up rectangles" in {
         val solution = SimpleBinPackingSolution(
           Map(
-            Rectangle(1, 20, 17) -> Placing(Box(1, boxLength_), Coordinates(0, 0)),
-            Rectangle(2, 9, 2) -> Placing(Box(2, boxLength_), Coordinates(0, 0)),
-            Rectangle(3, 9, 2) -> Placing(Box(2, boxLength_), Coordinates(2, 0)),
-            Rectangle(4, 9, 2) -> Placing(Box(2, boxLength_), Coordinates(4, 0)),
+            Rectangle(1, 20, 17) -> Placing(Box(1, boxLength), Coordinates(0, 0)),
+            Rectangle(2, 9, 2) -> Placing(Box(2, boxLength), Coordinates(0, 0)),
+            Rectangle(3, 9, 2) -> Placing(Box(2, boxLength), Coordinates(2, 0)),
+            Rectangle(4, 9, 2) -> Placing(Box(2, boxLength), Coordinates(4, 0)),
           )
         )
         val neighborhood = generator.createCoarseMultipleBoxPullUpNeighborhood(solution).toSeq

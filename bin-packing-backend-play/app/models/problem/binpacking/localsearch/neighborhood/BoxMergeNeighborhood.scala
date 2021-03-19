@@ -9,10 +9,10 @@ import models.problem.binpacking.solution.Rectangle
 import scala.annotation.tailrec
 import scala.collection.View
 
-trait BoxMergeNeighborhood {
-
-  val rectangles: Set[Rectangle]
+class BoxMergeNeighborhood(
+  val rectangles: Set[Rectangle],
   val boxLength: Int
+) {
 
   private lazy val maxRectangleWidth = rectangles.map(_.width).max
   private lazy val maxRectangleHeight = rectangles.map(_.height).max

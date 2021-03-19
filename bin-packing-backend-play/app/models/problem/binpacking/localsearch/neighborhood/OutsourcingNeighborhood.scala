@@ -7,9 +7,9 @@ import models.problem.binpacking.solution.Placing
 
 import scala.collection.View
 
-trait OutsourcingNeighborhood {
-
+class OutsourcingNeighborhood(
   val boxLength: Int
+) {
 
   def createOutsourcingNeighborhood(solution: BinPackingSolution): View[BinPackingSolution] = {
     val boxIds = solution.placement.values.map(_.box.id)

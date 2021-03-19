@@ -9,9 +9,9 @@ import models.problem.binpacking.solution.Rectangle
 
 import scala.collection.View
 
-trait GeometricShiftNeighborhood extends BinPackingSolutionValidator {
-
+class GeometricShiftNeighborhood(
   val boxLength: Int
+) extends BinPackingSolutionValidator {
 
   def createShiftedSolutions(
     solution: BinPackingSolution,

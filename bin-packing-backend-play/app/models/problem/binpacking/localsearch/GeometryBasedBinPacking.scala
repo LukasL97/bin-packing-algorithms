@@ -29,20 +29,24 @@ class GeometryBasedBinPacking(
 class GeometryBasedBinPackingSolutionHandler(
   override val rectangles: Set[Rectangle],
   override val boxLength: Int,
-) extends BinPackingSolutionHandler with BoxPullUpNeighborhood with GeometricShiftNeighborhood
-    with BoxMergeNeighborhood with CoarseMultipleBoxPullUpNeighborhood with BoxWeightedTopLeftFirstEvaluation
-    with GeometricStartSolution {
+) extends BinPackingSolutionHandler with BoxWeightedTopLeftFirstEvaluation with GeometricStartSolution {
 
   override val startSolution: BinPackingSolution = triviallyFeasibleStartSolution
 
+  private val boxPullUpNeighborhood = new BoxPullUpNeighborhood(boxLength)
+  private val geometricShiftNeighborhood = new GeometricShiftNeighborhood(boxLength)
+  private val boxMergeNeighborhood = new BoxMergeNeighborhood(rectangles, boxLength)
+  private val coarseMultipleBoxPullUpNeighborhood = new CoarseMultipleBoxPullUpNeighborhood(boxLength)
+
   override def getNeighborhood(solution: BinPackingSolution): View[BinPackingSolution] = {
-    val solutionsWithCoarseMultipleBoxPullUp = createCoarseMultipleBoxPullUpNeighborhood(solution)
-    val solutionsWithMergedBoxes = createBoxMergeNeighborhood(solution)
-    val solutionsWithEntireBoxUpShift = createEntireBoxMaximallyShiftedSolutions(solution, Up)
-    val solutionsWithEntireBoxLeftShift = createEntireBoxMaximallyShiftedSolutions(solution, Left)
-    val solutionsWithBoxPullUp = createBoxPullUpNeighborhood(solution)
-    //val solutionsWithSingleUpShift = createMaximallyShiftedSolutions(solution, Up)
-    //val solutionsWithSingleLeftShift = createMaximallyShiftedSolutions(solution, Left)
+    val solutionsWithCoarseMultipleBoxPullUp =
+      coarseMultipleBoxPullUpNeighborhood.createCoarseMultipleBoxPullUpNeighborhood(solution)
+    val solutionsWithMergedBoxes = boxMergeNeighborhood.createBoxMergeNeighborhood(solution)
+    val solutionsWithEntireBoxUpShift =
+      geometricShiftNeighborhood.createEntireBoxMaximallyShiftedSolutions(solution, Up)
+    val solutionsWithEntireBoxLeftShift =
+      geometricShiftNeighborhood.createEntireBoxMaximallyShiftedSolutions(solution, Left)
+    val solutionsWithBoxPullUp = boxPullUpNeighborhood.createBoxPullUpNeighborhood(solution)
     solutionsWithMergedBoxes ++
       solutionsWithCoarseMultipleBoxPullUp ++
       solutionsWithEntireBoxUpShift ++

@@ -7,7 +7,9 @@ import models.problem.binpacking.solution.BinPackingSolution
 
 import scala.collection.View
 
-trait BoxPullUpNeighborhood extends BinPackingTopLeftFirstPlacing {
+class BoxPullUpNeighborhood(
+  override val boxLength: Int
+) extends BinPackingTopLeftFirstPlacing {
 
   def createBoxPullUpNeighborhood(solution: BinPackingSolution): View[BinPackingSolution] = {
     solution.placement.view.collect {
