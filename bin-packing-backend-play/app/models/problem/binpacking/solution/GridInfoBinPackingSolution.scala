@@ -26,8 +26,8 @@ case class GridInfoBinPackingSolution(
     GridInfoBinPackingSolution(updatedPlacement, updatedGrids, boxLength, tileLength)
   }
 
-  override def updated(placement: Map[Rectangle, Placing]): GridInfoBinPackingSolution = {
-    throw new NotImplementedError(s"Implementation of updated(placement) missing for ${getClass.getSimpleName}")
+  override def reset(placement: Map[Rectangle, Placing]): GridInfoBinPackingSolution = {
+    throw new NotImplementedError(s"Implementation of reset(placement) missing for ${getClass.getSimpleName}")
   }
 }
 

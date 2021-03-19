@@ -24,7 +24,7 @@ trait BoxPullUpNeighborhood extends BinPackingTopLeftFirstPlacing {
     skippedBoxIds match {
       case Seq() => solution
       case Seq(skippedBoxId) =>
-        solution.updated(
+        solution.reset(
           solution.placement.map {
             case (rectangle, Placing(box, coordinates)) if box.id <= skippedBoxId =>
               rectangle -> Placing(box, coordinates)

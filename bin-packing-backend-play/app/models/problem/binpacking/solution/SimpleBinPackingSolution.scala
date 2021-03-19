@@ -12,7 +12,8 @@ case class SimpleBinPackingSolution(
     )
   }
 
-  override def updated(placement: Map[Rectangle, Placing]): SimpleBinPackingSolution = {
+  override def reset(placement: Map[Rectangle, Placing]): SimpleBinPackingSolution = {
     SimpleBinPackingSolution(placement)
   }
+
 }
