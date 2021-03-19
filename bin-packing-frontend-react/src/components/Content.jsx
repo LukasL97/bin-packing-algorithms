@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import AlgorithmInputForm from './Input/AlgorithmInput/AlgorithmInputForm'
 import AlgorithmDisplay from './AlgorithmDisplay'
 import VisualizationConfigForm from './Input/VisualizationConfig/VisualizationConfigForm'
+import AlgorithmProgressChart from './AlgorithmProgressChart'
 
 
 class Content extends Component {
@@ -12,7 +13,8 @@ class Content extends Component {
       getRectanglesLastUpdate,
       start,
       visualizationIterationPeriodDefault,
-      updateVisualizationIterationPeriod
+      updateVisualizationIterationPeriod,
+      getProgress
     } = this.props
 
     return (
@@ -23,6 +25,7 @@ class Content extends Component {
             visualizationIterationPeriodDefault={visualizationIterationPeriodDefault}
             updateVisualizationIterationPeriod={updateVisualizationIterationPeriod}
           />
+          <AlgorithmProgressChart getProgress={getProgress}/>
         </div>
         <AlgorithmDisplay
           getCurrentSolutionStep={getCurrentSolutionStep}

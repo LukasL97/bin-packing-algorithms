@@ -1,8 +1,8 @@
 import React, {Component} from 'react'
-import Header from "./Header";
-import Content from "./Content";
-import BackendClient from "../client/BackendClient";
-import SolutionStepUtil from "../utils/SolutionStepUtil";
+import Header from './Header'
+import Content from './Content'
+import BackendClient from '../client/BackendClient'
+import SolutionStepUtil from '../utils/SolutionStepUtil'
 
 class App extends Component {
 
@@ -14,7 +14,7 @@ class App extends Component {
 
   state = {
     running: false,
-    runId: "",
+    runId: '',
     fetchBlocked: false,
     solutionStepQueue: [],
     rectanglesLastUpdate: {}
@@ -22,6 +22,17 @@ class App extends Component {
 
   getCurrentSolutionStep = () => this.state.solutionStepQueue[0]
   getRectanglesLastUpdate = () => this.state.rectanglesLastUpdate
+
+  getProgress = () => {
+    const fetched = last(this.state.solutionStepQueue)?.step
+    const visualized = this.state.solutionStepQueue[0]?.step
+    const finished = last(this.state.solutionStepQueue)?.finished
+    return {
+      fetched: fetched !== undefined ? fetched : 0,
+      visualized: visualized !== undefined ? visualized : 0,
+      finished: finished !== undefined ? finished : false
+    }
+  }
 
   start = (
     strategy,
@@ -150,6 +161,7 @@ class App extends Component {
           start={this.start}
           visualizationIterationPeriodDefault={this.visualizationIterationPeriodDefault}
           updateVisualizationIterationPeriod={this.updateRemoveFirstSolutionStepFromQueueInterval.bind(this)}
+          getProgress={this.getProgress}
         />
       </div>
     )

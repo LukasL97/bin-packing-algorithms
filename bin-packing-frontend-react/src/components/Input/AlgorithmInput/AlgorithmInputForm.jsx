@@ -50,7 +50,7 @@ class AlgorithmInputForm extends Component {
   render() {
 
     return (
-      <div className="input-form">
+      <div className="input-container-element input-form">
         <h3>Algorithm Input</h3>
         <form>
           <StrategySelectorFormRow onChange={this.handleTextualInputChange('strategy').bind(this)}/>

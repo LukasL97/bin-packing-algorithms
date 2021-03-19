@@ -20,7 +20,7 @@ class VisualizationConfigForm extends Component {
 
   render() {
     return (
-      <div className="visualization-config-form">
+      <div className="input-container-element visualization-config-form">
         <h3>Visualization Config</h3>
         <form>
           <NumericalInputFormRow
