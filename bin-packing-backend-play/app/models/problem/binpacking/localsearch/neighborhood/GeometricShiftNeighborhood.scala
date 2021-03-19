@@ -66,7 +66,7 @@ trait GeometricShiftNeighborhood extends BinPackingSolutionValidator {
     val updatedSolutionWithChangedFlag = sortedPlacement.foldLeft((originalSolution, false)) {
       case ((solution, hasChanged), (rectangle, placing)) =>
         val updatedSolution = shiftRectangleInSolutionUntilHittingBarrier(solution, rectangle, placing, direction)
-        (updatedSolution.getOrElse(solution), updatedSolution.isDefined)
+        (updatedSolution.getOrElse(solution), hasChanged || updatedSolution.isDefined)
     }
     updatedSolutionWithChangedFlag match {
       case (_, false) => Option.empty[BinPackingSolution]
