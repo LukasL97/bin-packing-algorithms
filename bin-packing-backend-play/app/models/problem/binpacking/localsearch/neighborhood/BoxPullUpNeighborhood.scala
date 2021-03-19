@@ -15,25 +15,7 @@ trait BoxPullUpNeighborhood extends BinPackingTopLeftFirstPlacing {
         placeRectangleInBoxAtMostTopLeftPoint(rectangle, solution.getPlacementsPerBox(id - 1), considerRotation = true).map {
           case (rectangle, coordinates) => solution.updated(rectangle, Placing(Box(id - 1, length), coordinates))
         }
-    }.flatten.map(shiftUpSolution)
-  }
-
-  private def shiftUpSolution(solution: BinPackingSolution): BinPackingSolution = {
-    val usedBoxIds = solution.placement.values.map(_.box.id).toSet
-    val skippedBoxIds = (1 to usedBoxIds.max).filter(!usedBoxIds.contains(_))
-    skippedBoxIds match {
-      case Seq() => solution
-      case Seq(skippedBoxId) =>
-        solution.reset(
-          solution.placement.map {
-            case (rectangle, Placing(box, coordinates)) if box.id <= skippedBoxId =>
-              rectangle -> Placing(box, coordinates)
-            case (rectangle, Placing(box, coordinates)) if box.id > skippedBoxId =>
-              rectangle -> Placing(box.copy(id = box.id - 1), coordinates)
-          }
-        )
-      case ids if ids.size > 1 => throw new RuntimeException("More than 1 box emptied in one neighborhood step")
-    }
+    }.flatten.map(_.squashed)
   }
 
 }

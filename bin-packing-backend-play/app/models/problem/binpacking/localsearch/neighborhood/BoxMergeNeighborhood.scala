@@ -40,7 +40,7 @@ trait BoxMergeNeighborhood {
           case (rectangle, coordinates) => rectangle -> Placing(Box(mergedBoxId, boxLength), coordinates)
         }
         .toMap
-      val mergedBoxSolution = solution.updated(mergedBoxPlacement).squash
+      val mergedBoxSolution = solution.updated(mergedBoxPlacement).squashed
       Seq(mergedBoxSolution).view
     }
   }

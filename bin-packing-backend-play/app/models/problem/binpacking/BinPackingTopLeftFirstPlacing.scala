@@ -7,6 +7,9 @@ trait BinPackingTopLeftFirstPlacing extends BinPackingSolutionValidator {
 
   val boxLength: Int
 
+  lazy val horizontalStepSize: Int = 1
+  lazy val verticalStepSize: Int = 1
+
   def placeRectangleInBoxAtMostTopLeftPoint(
     rectangle: Rectangle,
     placement: Map[Rectangle, Coordinates],
@@ -35,8 +38,12 @@ trait BinPackingTopLeftFirstPlacing extends BinPackingSolutionValidator {
     }
   }
 
-  private lazy val coordinatesInTopLeftFirstOrder = (0 until boxLength)
-    .flatMap(x => (0 until boxLength).map(y => Coordinates(x, y)))
-    .sorted
+  private lazy val coordinatesInTopLeftFirstOrder = {
+    val coordinates = for {
+      x <- (0 until boxLength).by(horizontalStepSize)
+      y <- (0 until boxLength).by(verticalStepSize)
+    } yield Coordinates(x, y)
+    coordinates.sorted
+  }
 
 }

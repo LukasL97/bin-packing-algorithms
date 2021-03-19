@@ -5,6 +5,7 @@ import models.problem.binpacking.localsearch.evaluation.BoxWeightedTopLeftFirstE
 import models.problem.binpacking.localsearch.initialization.GeometricStartSolution
 import models.problem.binpacking.localsearch.neighborhood.BoxMergeNeighborhood
 import models.problem.binpacking.localsearch.neighborhood.BoxPullUpNeighborhood
+import models.problem.binpacking.localsearch.neighborhood.CoarseMultipleBoxPullUpNeighborhood
 import models.problem.binpacking.localsearch.neighborhood.GeometricShiftNeighborhood
 import models.problem.binpacking.localsearch.neighborhood.Left
 import models.problem.binpacking.localsearch.neighborhood.Up
@@ -29,16 +30,19 @@ class GeometryBasedBinPackingSolutionHandler(
   override val rectangles: Set[Rectangle],
   override val boxLength: Int,
 ) extends BinPackingSolutionHandler with BoxPullUpNeighborhood with GeometricShiftNeighborhood
-    with BoxMergeNeighborhood with BoxWeightedTopLeftFirstEvaluation with GeometricStartSolution {
+    with BoxMergeNeighborhood with CoarseMultipleBoxPullUpNeighborhood with BoxWeightedTopLeftFirstEvaluation
+    with GeometricStartSolution {
 
   override val startSolution: BinPackingSolution = triviallyFeasibleStartSolution
 
   override def getNeighborhood(solution: BinPackingSolution): View[BinPackingSolution] = {
+    val solutionsWithCoarseMultipleBoxPullUp = createCoarseMultipleBoxPullUpNeighborhood(solution)
     val solutionsWithMergedBoxes = createBoxMergeNeighborhood(solution)
     val solutionsWithBoxPullUp = createBoxPullUpNeighborhood(solution)
     val solutionsWithUpShift = createMaximallyShiftedSolutions(solution, Up)
     val solutionsWithLeftShift = createMaximallyShiftedSolutions(solution, Left)
     solutionsWithMergedBoxes ++
+      solutionsWithCoarseMultipleBoxPullUp ++
       solutionsWithBoxPullUp ++
       solutionsWithUpShift ++
       solutionsWithLeftShift

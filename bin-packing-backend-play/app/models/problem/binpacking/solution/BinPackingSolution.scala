@@ -13,7 +13,7 @@ trait BinPackingSolution {
 
   def reset(placement: Map[Rectangle, Placing]): BinPackingSolution
 
-  def squash: BinPackingSolution = {
+  def squashed: BinPackingSolution = {
     val boxIds = placement.values.map(_.box.id).toSeq.distinct.sorted
     val boxIdSquashMapping = boxIds.zip(1 to boxIds.size).toMap
     reset(
