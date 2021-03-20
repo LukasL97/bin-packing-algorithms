@@ -1,6 +1,7 @@
 package dao
 
 import actors.BinPackingSolutionStep
+import metrics.Metrics
 import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.model.Filters._
 import org.mongodb.scala.Completed
@@ -12,12 +13,14 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-class BinPackingSolutionStepDAO @Inject()(val db: MongoDatabase, implicit val ec: ExecutionContext) {
+class BinPackingSolutionStepDAO @Inject()(val db: MongoDatabase, implicit val ec: ExecutionContext) extends Metrics {
 
   private lazy val collection = db.getCollection[BsonDocument]("BinPackingSolutionSteps")
 
   def dumpSolutionStep(solutionStep: BinPackingSolutionStep): Future[Completed] = {
-    collection.insertOne(convertSolutionStepToDocument(solutionStep)).toFuture()
+    withTimer("dump-solution-step", "runId" -> solutionStep.runId) {
+      collection.insertOne(convertSolutionStepToDocument(solutionStep)).toFuture()
+    }
   }
 
   def getSolutionStepsInStepRange(runId: String, stepMin: Int, stepMax: Int): Future[Seq[BinPackingSolutionStep]] = {

@@ -40,7 +40,7 @@ object SerializationUtil {
       override def timezone: TimeZone = DefaultFormats.lossless.dateFormat.timezone
     }
     override val typeHints: TypeHints = hints
-    override val strictOptionParsing: Boolean = true
+    override val strictOptionParsing: Boolean = false
   }
 
 }

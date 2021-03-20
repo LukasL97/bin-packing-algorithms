@@ -2,26 +2,29 @@ package actors.executors
 
 import actors.BinPackingSolutionStep
 import dao.BinPackingSolutionStepDAO
+import metrics.Metrics
 import models.problem.binpacking.localsearch.BinPackingLocalSearch
 import models.problem.binpacking.solution.BinPackingSolution
 import play.api.Logging
 
 class BinPackingLocalSearchExecutor(dao: BinPackingSolutionStepDAO)
-    extends BinPackingExecutor[BinPackingLocalSearch] with Logging {
+    extends BinPackingExecutor[BinPackingLocalSearch] with Logging with Metrics {
 
   // TODO: proper configuration
   val maxIterations = 1000
 
   override def execute(runId: String, binPacking: BinPackingLocalSearch): Unit = {
-    logger.info(s"Starting ${getClass.getSimpleName} for runId $runId")
-    dao.dumpSolutionStep(
-      BinPackingSolutionStep.startStep(
-        runId,
-        binPacking.solutionHandler.startSolution
+    withContext("runId" -> runId) {
+      logger.info(s"Starting ${getClass.getSimpleName} for runId $runId")
+      dao.dumpSolutionStep(
+        BinPackingSolutionStep.startStep(
+          runId,
+          binPacking.solutionHandler.startSolution
+        )
       )
-    )
-    binPacking.localSearch.run(maxIterations, dumpSolutionStep(runId))
-    logger.info(s"Finished ${getClass.getSimpleName} for runId $runId")
+      binPacking.localSearch.run(maxIterations, dumpSolutionStep(runId))
+      logger.info(s"Finished ${getClass.getSimpleName} for runId $runId")
+    }
   }
 
   private def dumpSolutionStep(

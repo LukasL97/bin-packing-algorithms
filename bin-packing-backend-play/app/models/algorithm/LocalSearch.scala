@@ -1,32 +1,16 @@
 package models.algorithm
 
+import metrics.Metrics
 import play.api.Logging
 
 import scala.annotation.tailrec
 import scala.collection.View
 
-class LocalSearch[Solution](solutionHandler: SolutionHandler[Solution]) extends Logging {
+class LocalSearch[Solution](solutionHandler: SolutionHandler[Solution]) extends Logging with Metrics {
 
   sealed trait StepResult
   case class Ongoing(solution: Solution) extends StepResult
   case class Finished(solution: Solution) extends StepResult
-
-  private def step(currentSolution: Solution, stepNumber: Int): StepResult = {
-    val currentSolutionResult = solutionHandler.evaluate(currentSolution, stepNumber)
-    val neighborhood = solutionHandler.getNeighborhood(currentSolution)
-    neighborhood.find(solutionHandler.evaluate(_, stepNumber) < currentSolutionResult) match {
-      case Some(solution) => Ongoing(solution)
-      case None => stagnation(currentSolution)
-    }
-  }
-
-  private def stagnation(solution: Solution): StepResult = {
-    if (solutionHandler.stopOnStagnation(solution)) {
-      Finished(solution)
-    } else {
-      Ongoing(solution)
-    }
-  }
 
   def run(maxSteps: Int, afterStep: (Solution, Int, Boolean) => Unit): Solution = {
     @tailrec
@@ -47,6 +31,25 @@ class LocalSearch[Solution](solutionHandler: SolutionHandler[Solution]) extends 
     }
 
     runRecursively(solutionHandler.startSolution, 1)
+  }
+
+  private def step(currentSolution: Solution, step: Int): StepResult = {
+    withTimer("local-search-run-step", "step" -> step.toString) {
+      val currentSolutionResult = solutionHandler.evaluate(currentSolution, step)
+      val neighborhood = solutionHandler.getNeighborhood(currentSolution)
+      neighborhood.find(solutionHandler.evaluate(_, step) < currentSolutionResult) match {
+        case Some(solution) => Ongoing(solution)
+        case None => stagnation(currentSolution)
+      }
+    }
+  }
+
+  private def stagnation(solution: Solution): StepResult = {
+    if (solutionHandler.stopOnStagnation(solution)) {
+      Finished(solution)
+    } else {
+      Ongoing(solution)
+    }
   }
 
 }
