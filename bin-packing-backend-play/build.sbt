@@ -23,6 +23,7 @@ libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0
 libraryDependencies += "org.scalamock" %% "scalamock" % "4.4.0" % Test
 libraryDependencies += "org.mongodb.scala" %% "mongo-scala-driver" % "2.9.0"
 libraryDependencies += "org.json4s" %% "json4s-native" % "3.7.0-M8"
+libraryDependencies += "io.dropwizard.metrics" % "metrics-core" % "4.1.0"
 
 herokuAppName in Compile := "bin-packing-backend"
 

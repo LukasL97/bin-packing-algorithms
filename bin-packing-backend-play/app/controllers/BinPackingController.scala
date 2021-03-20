@@ -24,6 +24,7 @@ import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
+
 @Singleton
 class BinPackingController @Inject()(
   val controllerComponents: ControllerComponents,

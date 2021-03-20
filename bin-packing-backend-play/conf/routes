@@ -5,3 +5,6 @@
 
 PUT     /binPacking/start           controllers.BinPackingController.start()
 GET     /binPacking/steps           controllers.BinPackingController.getSteps(runId, minStep, maxStep)
+
+GET     /metrics                    controllers.MetricsController.get()
+

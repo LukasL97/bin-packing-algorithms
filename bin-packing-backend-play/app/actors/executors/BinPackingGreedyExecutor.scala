@@ -18,6 +18,7 @@ class BinPackingGreedyExecutor(dao: BinPackingSolutionStepDAO)
       )
     )
     binPacking.greedy.run(dumpSolutionStep(runId))
+    logger.info(s"Finished ${getClass.getSimpleName} for runId $runId")
   }
 
   private def dumpSolutionStep(

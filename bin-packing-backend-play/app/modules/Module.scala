@@ -1,3 +1,5 @@
+package modules
+
 import actors.BinPackingActor
 import com.google.inject.AbstractModule
 import org.mongodb.scala.MongoClient
