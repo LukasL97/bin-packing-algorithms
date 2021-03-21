@@ -1,7 +1,9 @@
 package actors.executors
 
 import actors.BinPackingSolutionStep
-import dao.BinPackingSolutionStepDAO
+import akka.actor.ActorSystem
+import akka.testkit.TestKit
+import akka.testkit.TestProbe
 import models.problem.binpacking.greedy.BinPackingGreedy
 import models.problem.binpacking.greedy.BinPackingSelectionHandler
 import models.problem.binpacking.solution.Box
@@ -10,9 +12,12 @@ import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.Rectangle
 import models.problem.binpacking.solution.SimpleBinPackingSolution
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.WordSpec
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.WordSpecLike
 
-class BinPackingGreedyExecutorSpec extends WordSpec with MockFactory {
+class BinPackingGreedyExecutorSpec
+    extends TestKit(ActorSystem("BinPackingGreedyExecutorSpec")) with WordSpecLike with MockFactory
+    with BeforeAndAfterAll {
 
   private class BinPackingGreedyImpl(
     override val boxLength: Int,
@@ -32,8 +37,14 @@ class BinPackingGreedyExecutorSpec extends WordSpec with MockFactory {
     }
   }
 
-  private val dao = mock[BinPackingSolutionStepDAO]
-  private val executor = new BinPackingGreedyExecutor(dao)
+  private val probe = TestProbe()
+  private val dumper = probe.ref
+
+  private val executor = new BinPackingGreedyExecutor(dumper)
+
+  override def afterAll(): Unit = {
+    TestKit.shutdownActorSystem(system)
+  }
 
   "BinPackingGreedyExecutor" should {
     "dump intermediate solution steps correctly" when {
@@ -54,78 +65,67 @@ class BinPackingGreedyExecutorSpec extends WordSpec with MockFactory {
           rectanglesHeightRange
         )
 
-        (dao.dumpSolutionStep _)
-          .expects(
-            BinPackingSolutionStep(
-              runId,
-              0,
-              SimpleBinPackingSolution(
-                Map()
-              )
-            )
-          )
-          .returns(null)
-        (dao.dumpSolutionStep _)
-          .expects(
-            BinPackingSolutionStep(
-              runId,
-              1,
-              SimpleBinPackingSolution(
-                Map(
-                  binPacking.rectangles.toSeq(0) -> Placing(box, Coordinates(0, 0))
-                )
-              )
-            )
-          )
-          .returns(null)
-        (dao.dumpSolutionStep _)
-          .expects(
-            BinPackingSolutionStep(
-              runId,
-              2,
-              SimpleBinPackingSolution(
-                Map(
-                  binPacking.rectangles.toSeq(0) -> Placing(box, Coordinates(0, 0)),
-                  binPacking.rectangles.toSeq(1) -> Placing(box, Coordinates(0, 2))
-                )
-              )
-            )
-          )
-          .returns(null)
-        (dao.dumpSolutionStep _)
-          .expects(
-            BinPackingSolutionStep(
-              runId,
-              3,
-              SimpleBinPackingSolution(
-                Map(
-                  binPacking.rectangles.toSeq(0) -> Placing(box, Coordinates(0, 0)),
-                  binPacking.rectangles.toSeq(1) -> Placing(box, Coordinates(0, 2)),
-                  binPacking.rectangles.toSeq(2) -> Placing(box, Coordinates(3, 0))
-                )
-              )
-            )
-          )
-          .returns(null)
-        (dao.dumpSolutionStep _)
-          .expects(
-            BinPackingSolutionStep(
-              runId,
-              4,
-              SimpleBinPackingSolution(
-                Map(
-                  binPacking.rectangles.toSeq(0) -> Placing(box, Coordinates(0, 0)),
-                  binPacking.rectangles.toSeq(1) -> Placing(box, Coordinates(0, 2)),
-                  binPacking.rectangles.toSeq(2) -> Placing(box, Coordinates(3, 0))
-                )
-              ),
-              finished = true
-            )
-          )
-          .returns(null)
-
         executor.execute(runId, binPacking)
 
+        probe.expectMsg(
+          BinPackingSolutionStep(
+            runId,
+            0,
+            SimpleBinPackingSolution(
+              Map()
+            )
+          )
+        )
+        probe.expectMsg(
+          BinPackingSolutionStep(
+            runId,
+            1,
+            SimpleBinPackingSolution(
+              Map(
+                binPacking.rectangles.toSeq.head -> Placing(box, Coordinates(0, 0))
+              )
+            )
+          )
+        )
+        probe.expectMsg(
+          BinPackingSolutionStep(
+            runId,
+            2,
+            SimpleBinPackingSolution(
+              Map(
+                binPacking.rectangles.toSeq.head -> Placing(box, Coordinates(0, 0)),
+                binPacking.rectangles.toSeq(1) -> Placing(box, Coordinates(0, 2))
+              )
+            )
+          )
+        )
+        probe.expectMsg(
+          BinPackingSolutionStep(
+            runId,
+            3,
+            SimpleBinPackingSolution(
+              Map(
+                binPacking.rectangles.toSeq.head -> Placing(box, Coordinates(0, 0)),
+                binPacking.rectangles.toSeq(1) -> Placing(box, Coordinates(0, 2)),
+                binPacking.rectangles.toSeq(2) -> Placing(box, Coordinates(3, 0))
+              )
+            )
+          )
+        )
+        probe.expectMsg(
+          BinPackingSolutionStep(
+            runId,
+            4,
+            SimpleBinPackingSolution(
+              Map(
+                binPacking.rectangles.toSeq.head -> Placing(box, Coordinates(0, 0)),
+                binPacking.rectangles.toSeq(1) -> Placing(box, Coordinates(0, 2)),
+                binPacking.rectangles.toSeq(2) -> Placing(box, Coordinates(3, 0))
+              )
+            ),
+            finished = true
+          )
+        )
       }
     }
   }

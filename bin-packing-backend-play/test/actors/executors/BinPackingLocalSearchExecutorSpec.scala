@@ -1,7 +1,9 @@
 package actors.executors
 
 import actors.BinPackingSolutionStep
-import dao.BinPackingSolutionStepDAO
+import akka.actor.ActorSystem
+import akka.testkit.TestKit
+import akka.testkit.TestProbe
 import models.algorithm.OneDimensionalScore
 import models.algorithm.Score
 import models.problem.binpacking.localsearch.BinPackingLocalSearch
@@ -12,15 +14,23 @@ import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.SimpleBinPackingSolution
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.WordSpec
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.WordSpecLike
 
 import scala.collection.View
 
-class BinPackingLocalSearchExecutorSpec extends WordSpec with MockFactory {
+class BinPackingLocalSearchExecutorSpec
+    extends TestKit(ActorSystem("BinPackingLocalSearchExecutorSpec")) with WordSpecLike with MockFactory
+    with BeforeAndAfterAll {
 
-  private val dao = mock[BinPackingSolutionStepDAO]
+  private val probe = TestProbe()
+  private val dumper = probe.ref
 
-  private val executor = new BinPackingLocalSearchExecutor(dao)
+  private val executor = new BinPackingLocalSearchExecutor(dumper)
+
+  override def afterAll(): Unit = {
+    TestKit.shutdownActorSystem(system)
+  }
 
   "BinPackingLocalSearchExecutor" should {
     "dump intermediate solution steps correctly" when {
@@ -41,43 +51,63 @@ class BinPackingLocalSearchExecutorSpec extends WordSpec with MockFactory {
               Map(rectangles.head -> Placing(box, Coordinates(0, 0)))
             )
 
-            override def getNeighborhood(solution: BinPackingSolution): View[BinPackingSolution] = Set(
-              Option(SimpleBinPackingSolution(
-                solution.placement.map {
-                  case (rectangle, Placing(box, Coordinates(x, y))) => rectangle -> Placing(box, Coordinates(x + 1, y + 1))
-                }
-              )).filter(solutionHandler.isFeasible)
-            ).flatten.view
+            override def getNeighborhood(solution: BinPackingSolution): View[BinPackingSolution] =
+              Set(
+                Option(
+                  SimpleBinPackingSolution(
+                    solution.placement.map {
+                      case (rectangle, Placing(box, Coordinates(x, y))) =>
+                        rectangle -> Placing(box, Coordinates(x + 1, y + 1))
+                    }
+                  )
+                ).filter(solutionHandler.isFeasible)
+              ).flatten.view
 
             override def evaluate(solution: BinPackingSolution, step: Int): Score = solution.placement.head match {
-              case (rectangle, Placing(box, Coordinates(x, y))) => OneDimensionalScore(-(x + y))
+              case (_, Placing(_, Coordinates(x, y))) => OneDimensionalScore(-(x + y))
             }
           }
         }
 
-        (dao.dumpSolutionStep _)
-          .expects(BinPackingSolutionStep(runId, 0, solution = SimpleBinPackingSolution(
-            Map(binPacking.rectangles.head -> Placing(box, Coordinates(0, 0)))
-          )))
-          .returns(null)
-        (dao.dumpSolutionStep _)
-          .expects(BinPackingSolutionStep(runId, 1, solution = SimpleBinPackingSolution(
-            Map(binPacking.rectangles.head -> Placing(box, Coordinates(1, 1)))
-          )))
-          .returns(null)
-        (dao.dumpSolutionStep _)
-          .expects(BinPackingSolutionStep(runId, 2, solution = SimpleBinPackingSolution(
-            Map(binPacking.rectangles.head -> Placing(box, Coordinates(2, 2)))
-          )))
-          .returns(null)
-        (dao.dumpSolutionStep _)
-          .expects(BinPackingSolutionStep(runId, 3, solution = SimpleBinPackingSolution(
-            Map(binPacking.rectangles.head -> Placing(box, Coordinates(2, 2)))
-          ), finished = true))
-          .returns(null)
-
         executor.execute(runId, binPacking)
 
+        probe.expectMsg(
+          BinPackingSolutionStep(
+            runId,
+            0,
+            solution = SimpleBinPackingSolution(
+              Map(binPacking.rectangles.head -> Placing(box, Coordinates(0, 0)))
+            )
+          )
+        )
+        probe.expectMsg(
+          BinPackingSolutionStep(
+            runId,
+            1,
+            solution = SimpleBinPackingSolution(
+              Map(binPacking.rectangles.head -> Placing(box, Coordinates(1, 1)))
+            )
+          )
+        )
+        probe.expectMsg(
+          BinPackingSolutionStep(
+            runId,
+            2,
+            solution = SimpleBinPackingSolution(
+              Map(binPacking.rectangles.head -> Placing(box, Coordinates(2, 2)))
+            )
+          )
+        )
+        probe.expectMsg(
+          BinPackingSolutionStep(
+            runId,
+            3,
+            solution = SimpleBinPackingSolution(
+              Map(binPacking.rectangles.head -> Placing(box, Coordinates(2, 2)))
+            ),
+            finished = true
+          )
+        )
       }
     }
   }
