@@ -1,5 +1,6 @@
 package models.problem.binpacking.localsearch.neighborhood
 
+import metrics.Metrics
 import models.problem.binpacking.BinPackingTopLeftFirstPlacing
 import models.problem.binpacking.solution.Box
 import models.problem.binpacking.solution.Placing
@@ -9,15 +10,22 @@ import scala.collection.View
 
 class BoxPullUpNeighborhood(
   override val boxLength: Int
-) extends BinPackingTopLeftFirstPlacing {
+) extends BinPackingTopLeftFirstPlacing with Metrics {
 
   def createBoxPullUpNeighborhood(solution: BinPackingSolution): View[BinPackingSolution] = {
     solution.placement.view.collect {
       case (rectangle, Placing(Box(id, length), _)) if id > 1 =>
-        placeRectangleInBoxAtMostTopLeftPoint(rectangle, solution.getPlacementsPerBox(id - 1), considerRotation = true).map {
-          case (rectangle, coordinates) => solution.updated(rectangle, Placing(Box(id - 1, length), coordinates))
+        withTimer("box-pull-up-neighborhood") {
+          placeRectangleInBoxAtMostTopLeftPoint(
+            rectangle,
+            solution.getPlacementsPerBox(id - 1),
+            considerRotation = true
+          ).map {
+            case (rectangle, coordinates) =>
+              solution.updated(rectangle, Placing(Box(id - 1, length), coordinates)).squashed
+          }
         }
-    }.flatten.map(_.squashed)
+    }.flatten
   }
 
 }

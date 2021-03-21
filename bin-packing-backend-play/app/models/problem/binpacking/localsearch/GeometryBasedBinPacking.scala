@@ -1,5 +1,6 @@
 package models.problem.binpacking.localsearch
 
+import metrics.Metrics
 import models.algorithm.Score
 import models.problem.binpacking.localsearch.evaluation.BoxWeightedTopLeftFirstEvaluation
 import models.problem.binpacking.localsearch.initialization.GeometricStartSolution
@@ -29,7 +30,7 @@ class GeometryBasedBinPacking(
 class GeometryBasedBinPackingSolutionHandler(
   override val rectangles: Set[Rectangle],
   override val boxLength: Int,
-) extends BinPackingSolutionHandler with BoxWeightedTopLeftFirstEvaluation with GeometricStartSolution {
+) extends BinPackingSolutionHandler with BoxWeightedTopLeftFirstEvaluation with GeometricStartSolution with Metrics {
 
   override val startSolution: BinPackingSolution = triviallyFeasibleStartSolution
 
@@ -54,7 +55,7 @@ class GeometryBasedBinPackingSolutionHandler(
       solutionsWithBoxPullUp
   }
 
-  override def evaluate(solution: BinPackingSolution, step: Int): Score = {
+  override def evaluate(solution: BinPackingSolution, step: Int): Score = withTimer("ls-geometry-evaluate") {
     evaluate(solution)
   }
 }

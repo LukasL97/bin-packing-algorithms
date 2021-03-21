@@ -1,12 +1,11 @@
 package models.algorithm
 
 import metrics.Metrics
-import play.api.Logging
 
 import scala.annotation.tailrec
 import scala.collection.View
 
-class LocalSearch[Solution](solutionHandler: SolutionHandler[Solution]) extends Logging with Metrics {
+class LocalSearch[Solution](solutionHandler: SolutionHandler[Solution]) extends Metrics {
 
   sealed trait StepResult
   case class Ongoing(solution: Solution) extends StepResult
@@ -15,7 +14,6 @@ class LocalSearch[Solution](solutionHandler: SolutionHandler[Solution]) extends 
   def run(maxSteps: Int, afterStep: (Solution, Int, Boolean) => Unit): Solution = {
     @tailrec
     def runRecursively(currentSolution: Solution, currentStep: Int): Solution = {
-      logger.trace(s"Local Search step $currentStep")
       if (currentStep <= maxSteps) {
         step(currentSolution, currentStep) match {
           case Ongoing(solution) =>

@@ -1,5 +1,6 @@
 package models.problem.binpacking.localsearch.neighborhood
 
+import metrics.Metrics
 import models.problem.binpacking.solution.BinPackingSolution
 import models.problem.binpacking.solution.Box
 import models.problem.binpacking.solution.Coordinates
@@ -12,36 +13,38 @@ import scala.collection.View
 class BoxMergeNeighborhood(
   val rectangles: Set[Rectangle],
   val boxLength: Int
-) {
+) extends Metrics {
 
   private lazy val maxRectangleWidth = rectangles.map(_.width).max
   private lazy val maxRectangleHeight = rectangles.map(_.height).max
 
   def createBoxMergeNeighborhood(solution: BinPackingSolution): View[BinPackingSolution] = {
-    val sortedRectangleGroups = solution.placement.groupBy {
-      case (_, placing) => placing.box.id
-    }.map {
-      case (boxId, placement) => boxId -> placement.keys
-    }.toSeq.sortBy {
-      case (_, rectangles) => rectangles.size
-    }
-    val coordinates = getCoordinates
-    val mergeableRectangleGroups = collectRectanglesUntilBoxFull(sortedRectangleGroups, coordinates.size)
-    if (mergeableRectangleGroups.length <= 1) {
-      Seq.empty[BinPackingSolution].view
-    } else {
-      val (boxIds, rectangleGroups) = mergeableRectangleGroups.unzip
-      val mergedBoxId = boxIds.min
-      val mergedBoxRectangles = rectangleGroups.flatten
-      assert(mergedBoxRectangles.size <= coordinates.size)
-      val mergedBoxPlacement = mergedBoxRectangles
-        .zip(coordinates)
-        .map {
-          case (rectangle, coordinates) => rectangle -> Placing(Box(mergedBoxId, boxLength), coordinates)
-        }
-        .toMap
-      val mergedBoxSolution = solution.updated(mergedBoxPlacement).squashed
-      Seq(mergedBoxSolution).view
+    withTimer("box-merge-neighborhood") {
+      val sortedRectangleGroups = solution.placement.groupBy {
+        case (_, placing) => placing.box.id
+      }.map {
+        case (boxId, placement) => boxId -> placement.keys
+      }.toSeq.sortBy {
+        case (_, rectangles) => rectangles.size
+      }
+      val coordinates = getCoordinates
+      val mergeableRectangleGroups = collectRectanglesUntilBoxFull(sortedRectangleGroups, coordinates.size)
+      if (mergeableRectangleGroups.length <= 1) {
+        Seq.empty[BinPackingSolution].view
+      } else {
+        val (boxIds, rectangleGroups) = mergeableRectangleGroups.unzip
+        val mergedBoxId = boxIds.min
+        val mergedBoxRectangles = rectangleGroups.flatten
+        assert(mergedBoxRectangles.size <= coordinates.size)
+        val mergedBoxPlacement = mergedBoxRectangles
+          .zip(coordinates)
+          .map {
+            case (rectangle, coordinates) => rectangle -> Placing(Box(mergedBoxId, boxLength), coordinates)
+          }
+          .toMap
+        val mergedBoxSolution = solution.updated(mergedBoxPlacement).squashed
+        Seq(mergedBoxSolution).view
+      }
     }
   }
 

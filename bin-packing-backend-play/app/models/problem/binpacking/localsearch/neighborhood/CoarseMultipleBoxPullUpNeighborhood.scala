@@ -1,5 +1,6 @@
 package models.problem.binpacking.localsearch.neighborhood
 
+import metrics.Metrics
 import models.problem.binpacking.BinPackingTopLeftFirstPlacing
 import models.problem.binpacking.solution.BinPackingSolution
 import models.problem.binpacking.solution.Box
@@ -11,7 +12,7 @@ import scala.collection.View
 
 class CoarseMultipleBoxPullUpNeighborhood(
   override val boxLength: Int
-) extends BinPackingTopLeftFirstPlacing {
+) extends BinPackingTopLeftFirstPlacing with Metrics {
 
   val granularity = 10
 
@@ -23,7 +24,7 @@ class CoarseMultipleBoxPullUpNeighborhood(
     placementsPerBox.filter {
       case (boxId, _) => boxId > 1
     }.view.map {
-      case (boxId, placement) =>
+      case (boxId, placement) => withTimer("coarse-multiple-box-pull-up-neighborhood") {
         val updatedPlacings = placeRectanglesInBoxAtMostTopLeftPointUntilFull(
           placement.keys.toSeq,
           placementsPerBox(boxId - 1)
@@ -31,6 +32,7 @@ class CoarseMultipleBoxPullUpNeighborhood(
           case (rectangle, coordinates) => rectangle -> Placing(Box(boxId - 1, boxLength), coordinates)
         }.toMap
         solution.updated(updatedPlacings).squashed
+      }
     }
   }
 

@@ -1,5 +1,6 @@
 package models.problem.binpacking.localsearch.neighborhood
 
+import metrics.Metrics
 import models.problem.binpacking.BinPackingSolutionValidator
 import models.problem.binpacking.solution.BinPackingSolution
 import models.problem.binpacking.solution.Box
@@ -11,7 +12,7 @@ import scala.collection.View
 
 class GeometricShiftNeighborhood(
   val boxLength: Int
-) extends BinPackingSolutionValidator {
+) extends BinPackingSolutionValidator with Metrics {
 
   def createShiftedSolutions(
     solution: BinPackingSolution,
@@ -40,11 +41,12 @@ class GeometricShiftNeighborhood(
     direction: Direction
   ): View[BinPackingSolution] = {
     solution.getPlacementsPerBox.view.flatMap {
-      case (boxId, placement) =>
+      case (boxId, placement) => withTimer("entire-box-maximally-shifted-neighborhood") {
         val placementWithBox = placement.map {
           case (rectangle, coordinates) => rectangle -> Placing(Box(boxId, boxLength), coordinates)
         }
         shiftAllRectanglesInBoxUntilHittingBarrier(solution, placementWithBox, direction)
+      }
     }
   }
 
