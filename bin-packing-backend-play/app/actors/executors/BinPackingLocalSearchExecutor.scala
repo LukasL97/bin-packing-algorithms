@@ -1,13 +1,14 @@
 package actors.executors
 
 import actors.BinPackingSolutionStep
-import dao.BinPackingSolutionStepDAO
+import akka.actor.ActorRef
+import akka.actor.ActorRef.noSender
 import metrics.Metrics
 import models.problem.binpacking.localsearch.BinPackingLocalSearch
 import models.problem.binpacking.solution.BinPackingSolution
 import play.api.Logging
 
-class BinPackingLocalSearchExecutor(dao: BinPackingSolutionStepDAO)
+class BinPackingLocalSearchExecutor(dumper: ActorRef)
     extends BinPackingExecutor[BinPackingLocalSearch] with Logging with Metrics {
 
   // TODO: proper configuration
@@ -17,11 +18,12 @@ class BinPackingLocalSearchExecutor(dao: BinPackingSolutionStepDAO)
     withContext("runId" -> runId) {
       withTimer("local-search-run") {
         logger.info(s"Starting ${getClass.getSimpleName} for runId $runId")
-        dao.dumpSolutionStep(
+        dumper.tell(
           BinPackingSolutionStep.startStep(
             runId,
             binPacking.solutionHandler.startSolution
-          )
+          ),
+          noSender
         )
         binPacking.localSearch.run(maxIterations, dumpSolutionStep(runId))
         logger.info(s"Finished ${getClass.getSimpleName} for runId $runId")
@@ -32,13 +34,14 @@ class BinPackingLocalSearchExecutor(dao: BinPackingSolutionStepDAO)
   private def dumpSolutionStep(
     runId: String
   )(solution: BinPackingSolution, step: Int, finished: Boolean): Unit = {
-    dao.dumpSolutionStep(
+    dumper.tell(
       BinPackingSolutionStep(
         runId,
         step,
         solution,
         finished || (step == maxIterations)
-      )
+      ),
+      noSender
     )
   }
 }

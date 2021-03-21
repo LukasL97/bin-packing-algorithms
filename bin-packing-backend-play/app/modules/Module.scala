@@ -1,6 +1,7 @@
 package modules
 
 import actors.BinPackingActor
+import actors.SolutionStepDumper
 import com.google.inject.AbstractModule
 import org.mongodb.scala.MongoClient
 import org.mongodb.scala.MongoDatabase
@@ -11,6 +12,7 @@ class Module extends AbstractModule with AkkaGuiceSupport {
   override def configure(): Unit = {
     bind(classOf[MongoDatabase]).toInstance(getDB)
     bindActorFactory[BinPackingActor, BinPackingActor.Factory]
+    bindActorFactory[SolutionStepDumper, SolutionStepDumper.Factory]
   }
 
   private def getDB: MongoDatabase = {
