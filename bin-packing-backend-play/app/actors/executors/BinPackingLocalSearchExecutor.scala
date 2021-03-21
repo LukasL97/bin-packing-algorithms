@@ -15,15 +15,17 @@ class BinPackingLocalSearchExecutor(dao: BinPackingSolutionStepDAO)
 
   override def execute(runId: String, binPacking: BinPackingLocalSearch): Unit = {
     withContext("runId" -> runId) {
-      logger.info(s"Starting ${getClass.getSimpleName} for runId $runId")
-      dao.dumpSolutionStep(
-        BinPackingSolutionStep.startStep(
-          runId,
-          binPacking.solutionHandler.startSolution
+      withTimer("local-search-run") {
+        logger.info(s"Starting ${getClass.getSimpleName} for runId $runId")
+        dao.dumpSolutionStep(
+          BinPackingSolutionStep.startStep(
+            runId,
+            binPacking.solutionHandler.startSolution
+          )
         )
-      )
-      binPacking.localSearch.run(maxIterations, dumpSolutionStep(runId))
-      logger.info(s"Finished ${getClass.getSimpleName} for runId $runId")
+        binPacking.localSearch.run(maxIterations, dumpSolutionStep(runId))
+        logger.info(s"Finished ${getClass.getSimpleName} for runId $runId")
+      }
     }
   }
 

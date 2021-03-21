@@ -12,6 +12,15 @@ def query_metrics(endpoint, body):
         raise RuntimeError('Got response with status %d: %s' % (response.status_code, response.content))
 
 
+def get_run_name(algorithm):
+    if algorithm.startswith('greedy'):
+        return 'greedy-run'
+    elif algorithm.startswith('ls'):
+        return 'local-search-run'
+    else:
+        raise RuntimeError('Run name unknown for algorithm %s' % algorithm)
+
+
 def get_run_step_name(algorithm):
     if algorithm.startswith('greedy'):
         return 'greedy-run-step'
@@ -71,8 +80,8 @@ def analyze_step_durations(run_id, algorithm, endpoint):
     print('Step durations sum: %r ms' % (sum([time for (step, time) in step_durations])))
 
 
-def analyze_timer(name, runId, endpoint):
-    query = build_query_body(name, runId)
+def analyze_timer(name, run_id, endpoint):
+    query = build_query_body(name, run_id)
     metric = query_metrics(endpoint, query)[0]
     return metric['result']['count'], metric['result']['mean'] / 1000000
 
@@ -90,6 +99,13 @@ def analyze_local_search_geometry_based(run_id, endpoint):
         print('%s: count: %d, mean: %r ms, sum: %r ms' % (timer, count, time, count * time))
 
 
+def analyze_run_time(run_id, algorithm, endpoint):
+    run_name = get_run_name(algorithm)
+    query = build_query_body(run_name, run_id)
+    metric = query_metrics(endpoint, query)[0]
+    print('Overall run duration: %r ms' % (metric['result']['mean'] / 1000000))
+
+
 if __name__ == '__main__':
     algorithms = [
         'greedy_random',
@@ -103,7 +119,11 @@ if __name__ == '__main__':
     parser.add_argument('--endpoint', type=str, default='http://localhost:9000/metrics')
     args = parser.parse_args()
 
+    try:
+        analyze_run_time(args.runId, args.algorithm, args.endpoint)
+    except:
+        print('Unable to retrieve overall runtime. Should the run be finished already?')
     analyze_step_durations(args.runId, args.algorithm, args.endpoint)
 
-    if (args.algorithm == 'ls_geometry'):
+    if args.algorithm == 'ls_geometry':
         analyze_local_search_geometry_based(args.runId, args.endpoint)

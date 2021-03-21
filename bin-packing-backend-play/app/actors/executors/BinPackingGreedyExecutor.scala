@@ -12,15 +12,17 @@ class BinPackingGreedyExecutor(dao: BinPackingSolutionStepDAO)
 
   override def execute(runId: String, binPacking: BinPackingGreedy): Unit = {
     withContext("runId" -> runId) {
-      logger.info(s"Starting ${getClass.getSimpleName} for runId $runId")
-      dao.dumpSolutionStep(
-        BinPackingSolutionStep.startStep(
-          runId,
-          binPacking.selectionHandler.startSolution
+      withTimer("greedy-run") {
+        logger.info(s"Starting ${getClass.getSimpleName} for runId $runId")
+        dao.dumpSolutionStep(
+          BinPackingSolutionStep.startStep(
+            runId,
+            binPacking.selectionHandler.startSolution
+          )
         )
-      )
-      binPacking.greedy.run(dumpSolutionStep(runId))
-      logger.info(s"Finished ${getClass.getSimpleName} for runId $runId")
+        binPacking.greedy.run(dumpSolutionStep(runId))
+        logger.info(s"Finished ${getClass.getSimpleName} for runId $runId")
+      }
     }
   }
 
