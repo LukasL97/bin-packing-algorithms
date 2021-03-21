@@ -66,7 +66,7 @@ trait SolutionHandler[Solution] {
 trait Score extends Ordered[Score]
 
 case class OneDimensionalScore(
-  value: BigDecimal
+  value: Double
 ) extends Score {
   override def compare(that: Score): Int = value.compare(that.asInstanceOf[OneDimensionalScore].value)
 }

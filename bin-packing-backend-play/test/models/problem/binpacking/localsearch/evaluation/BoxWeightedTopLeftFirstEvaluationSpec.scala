@@ -15,6 +15,8 @@ class BoxWeightedTopLeftFirstEvaluationSpec extends WordSpec with MustMatchers {
     override val boxLength: Int = boxLength_
   }
 
+  private val epsilon = 10e-4
+
   "BoxWeightedTopLeftFirstEvaluation" should {
 
     "build linear point cost function whose point costs sum up to 1 for all points in a box" when {
@@ -22,12 +24,12 @@ class BoxWeightedTopLeftFirstEvaluationSpec extends WordSpec with MustMatchers {
         val minimalCostWeight = 0.9
         val linearPointCostFunction = evaluator.buildLinearPointCostFunction(minimalCostWeight, boxLength_)
         val boxPoints = (0 until boxLength_).flatMap(x => (0 until boxLength_).map(y => (x, y)))
-        val boxPointCosts = boxPoints.map { case (x, y) => linearPointCostFunction(Coordinates(x, y)) }
+        val boxPointCosts = boxPoints.map { case (x, y) => linearPointCostFunction(x + y) }
         boxPointCosts.foreach { cost =>
-          cost must be > BigDecimal(0.0)
-          cost must be < BigDecimal(1.0)
+          cost must be > 0.0
+          cost must be < 1.0
         }
-        boxPointCosts.sum mustEqual BigDecimal(1.0)
+        boxPointCosts.sum must equal(1.0 +- epsilon)
       }
     }
 
@@ -35,11 +37,11 @@ class BoxWeightedTopLeftFirstEvaluationSpec extends WordSpec with MustMatchers {
       val pointCostFunction = evaluator.buildLinearPointCostFunction(0.9, boxLength_)
 
       "given a rectangle filling the entire box" in {
-        evaluator.calculateRectangleCost(pointCostFunction, Rectangle(0, boxLength_, boxLength_), Coordinates(0, 0)) mustEqual 1.0
+        evaluator.calculateRectangleCost(pointCostFunction, Rectangle(0, boxLength_, boxLength_), Coordinates(0, 0)) must equal(1.0 +- epsilon)
       }
 
       "given a rectangle with size 0" in {
-        evaluator.calculateRectangleCost(pointCostFunction, Rectangle(0, 0, 0), Coordinates(0, 0)) mustEqual 0.0
+        evaluator.calculateRectangleCost(pointCostFunction, Rectangle(0, 0, 0), Coordinates(0, 0)) must equal(0.0 +- epsilon)
       }
 
       "given rectangles in all 4 corners of the box" in {
@@ -63,12 +65,35 @@ class BoxWeightedTopLeftFirstEvaluationSpec extends WordSpec with MustMatchers {
           Rectangle(3, boxLength_ / 2, boxLength_ / 2),
           Coordinates(boxLength_ / 2, boxLength_ / 2)
         )
-        val epsilon = 10e-6
-        topRightCost must equal(BigDecimal(0.25) +- epsilon)
-        bottomLeftCost must equal(BigDecimal(0.25) +- epsilon)
-        topLeftCost must be < BigDecimal(0.25)
-        bottomRightCost must be > BigDecimal(0.25)
-        topLeftCost + bottomRightCost mustEqual (BigDecimal(0.5) +- epsilon)
+        topRightCost must equal(0.25 +- epsilon)
+        bottomLeftCost must equal(0.25 +- epsilon)
+        topLeftCost must be < 0.25
+        bottomRightCost must be > 0.25
+        topLeftCost + bottomRightCost mustEqual (0.5 +- epsilon)
+      }
+
+      "given a non-square rectangle" in {
+        val rectangle = Rectangle(1, 3, 4)
+        val coordinates = Coordinates(2, 4)
+        val rectanglePoints = Seq(
+          Coordinates(2, 4),
+          Coordinates(2, 5),
+          Coordinates(2, 6),
+          Coordinates(2, 7),
+          Coordinates(3, 4),
+          Coordinates(3, 5),
+          Coordinates(3, 6),
+          Coordinates(3, 7),
+          Coordinates(4, 4),
+          Coordinates(4, 5),
+          Coordinates(4, 6),
+          Coordinates(4, 7),
+        )
+        evaluator.calculateRectangleCost(
+          pointCostFunction,
+          rectangle,
+          coordinates
+        ) must equal(rectanglePoints.map(c => pointCostFunction(c.x + c.y)).sum +- epsilon)
       }
     }
 

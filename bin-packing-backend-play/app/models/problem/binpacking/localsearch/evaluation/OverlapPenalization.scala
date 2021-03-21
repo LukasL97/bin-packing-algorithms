@@ -40,7 +40,7 @@ trait OverlapPenalization {
     Seq(leftDistance, rightDistance, topDistance, bottomDistance).min
   }
 
-  def penalizeOverlap(solution: BinPackingSolution, maxAllowedOverlap: Double): BigDecimal = {
+  def penalizeOverlap(solution: BinPackingSolution, maxAllowedOverlap: Double): Double = {
     val placingPairsExceedingAllowedOverlap = solution.getPlacementsPerBox.values.flatMap { placement =>
       val placingPairs = PairBuildingUtil.buildPairs(placement)
       placingPairs.filter { case (placingA, placingB) => overlap(placingA, placingB) > maxAllowedOverlap }
