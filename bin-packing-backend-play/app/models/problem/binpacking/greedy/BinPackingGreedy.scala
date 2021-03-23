@@ -41,8 +41,12 @@ trait BinPackingSelectionHandler
     }.foldLeft(Option.empty[(Rectangle, Placing)]) {
         case (foundPlacing, (boxId, placement)) =>
           foundPlacing.orElse(
-            placeRectangleInBoxAtMostTopLeftPoint(rectangle, placement, considerRotation = true).map {
-              case (rectangle, coordinates) => rectangle -> Placing(Box(boxId, boxLength), coordinates)
+            if (boxIsFull(placement)) {
+              Option.empty[(Rectangle, Placing)]
+            } else {
+              placeRectangleInBoxAtMostTopLeftPoint(rectangle, placement, considerRotation = true).map {
+                case (rectangle, coordinates) => rectangle -> Placing(Box(boxId, boxLength), coordinates)
+              }
             }
           )
       }
@@ -52,6 +56,12 @@ trait BinPackingSelectionHandler
           Coordinates(0, 0)
         )
       )
+  }
+
+  private def boxIsFull(placement: Map[Rectangle, Coordinates]): Boolean = {
+    val rectangleArea = placement.keys.toSeq.map(rectangle => rectangle.width * rectangle.height).sum
+    val boxArea = boxLength * boxLength
+    rectangleArea == boxArea
   }
 
 }
