@@ -4,6 +4,8 @@ case class SimpleBinPackingSolution(
   override val placement: Map[Rectangle, Placing]
 ) extends BinPackingSolution {
 
+  override def asSimpleSolution: SimpleBinPackingSolution = this
+
   override def updated(rectangle: Rectangle, placing: Placing): SimpleBinPackingSolution = {
     SimpleBinPackingSolution(
       placement.filterNot {

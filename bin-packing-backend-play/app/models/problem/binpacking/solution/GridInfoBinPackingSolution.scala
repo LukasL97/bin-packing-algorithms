@@ -7,6 +7,8 @@ case class GridInfoBinPackingSolution(
   override val tileLength: Int
 ) extends BinPackingSolution with GridInfo {
 
+  override def asSimpleSolution: SimpleBinPackingSolution = SimpleBinPackingSolution(placement)
+
   override def updated(rectangle: Rectangle, placing: Placing): GridInfoBinPackingSolution = {
     val rectanglePlacingToOverride = placement.collectFirst {
       case (oldRectangle, oldPlacing) if oldRectangle.id == rectangle.id => oldRectangle -> oldPlacing

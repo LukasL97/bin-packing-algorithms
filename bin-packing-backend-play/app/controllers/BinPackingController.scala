@@ -76,7 +76,7 @@ class BinPackingActorStarter @Inject()(
     )
     val startSolution = binPacking.startSolution
     actor.tell((runId, binPacking), noSender)
-    BinPackingSolutionStep.startStep(runId, startSolution)
+    BinPackingSolutionStep.startStep(runId, startSolution.asSimpleSolution)
   }
 
   private def createActor(runId: String): ActorRef = system.actorOf(

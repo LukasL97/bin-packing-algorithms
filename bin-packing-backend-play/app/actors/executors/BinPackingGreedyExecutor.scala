@@ -18,7 +18,7 @@ class BinPackingGreedyExecutor(dumper: ActorRef)
         dumper.tell(
           BinPackingSolutionStep.startStep(
             runId,
-            binPacking.selectionHandler.startSolution
+            binPacking.selectionHandler.startSolution.asSimpleSolution
           ),
           noSender
         )
@@ -35,7 +35,7 @@ class BinPackingGreedyExecutor(dumper: ActorRef)
       BinPackingSolutionStep(
         runId,
         step,
-        solution,
+        solution.asSimpleSolution,
         finished
       ),
       noSender

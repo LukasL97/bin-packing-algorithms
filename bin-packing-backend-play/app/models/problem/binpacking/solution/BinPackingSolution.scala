@@ -3,6 +3,8 @@ package models.problem.binpacking.solution
 trait BinPackingSolution {
   val placement: Map[Rectangle, Placing]
 
+  def asSimpleSolution: SimpleBinPackingSolution
+
   def updated(rectangle: Rectangle, placing: Placing): BinPackingSolution
 
   def updated(placement: Map[Rectangle, Placing]): BinPackingSolution = {
