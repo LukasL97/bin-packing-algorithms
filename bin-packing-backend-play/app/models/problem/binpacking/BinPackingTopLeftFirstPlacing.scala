@@ -13,10 +13,12 @@ trait BinPackingTopLeftFirstPlacing extends BinPackingSolutionValidator {
   def placeRectangleInBoxAtMostTopLeftPoint(
     rectangle: Rectangle,
     placement: Map[Rectangle, Coordinates],
-    considerRotation: Boolean
+    considerRotation: Boolean,
+    candidateCoordinates: Option[Seq[Coordinates]] = None
   ): Option[(Rectangle, Coordinates)] = {
+    val candidates = candidateCoordinates.getOrElse(coordinatesInTopLeftFirstOrder)
     val rotatedRectangle = rectangle.rotated
-    coordinatesInTopLeftFirstOrder.collectFirst {
+    candidates.collectFirst {
       case coordinates if isPlaceable(rectangle, coordinates, placement) => rectangle -> coordinates
       case coordinates if considerRotation && isPlaceable(rotatedRectangle, coordinates, placement) =>
         rotatedRectangle -> coordinates
