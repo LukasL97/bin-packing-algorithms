@@ -16,11 +16,10 @@ class BinPackingGreedyExecutor[A <: BinPackingSolution](dumper: ActorRef)
     withContext("runId" -> runId) {
       withTimer("greedy-run") {
         logger.info(s"Starting ${getClass.getSimpleName} for runId $runId")
-        val x = binPacking.selectionHandler.startSolution
         dumper.tell(
           BinPackingSolutionStep.startStep(
             runId,
-            binPacking.selectionHandler.startSolution.asSimpleSolution
+            binPacking.selectionHandler.startSolution
           ),
           noSender
         )
@@ -37,7 +36,7 @@ class BinPackingGreedyExecutor[A <: BinPackingSolution](dumper: ActorRef)
       BinPackingSolutionStep(
         runId,
         step,
-        solution.asSimpleSolution,
+        solution,
         finished
       ),
       noSender

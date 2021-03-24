@@ -21,7 +21,7 @@ class BinPackingLocalSearchExecutor(dumper: ActorRef)
         dumper.tell(
           BinPackingSolutionStep.startStep(
             runId,
-            binPacking.solutionHandler.startSolution.asSimpleSolution
+            binPacking.solutionHandler.startSolution
           ),
           noSender
         )
@@ -38,7 +38,7 @@ class BinPackingLocalSearchExecutor(dumper: ActorRef)
       BinPackingSolutionStep(
         runId,
         step,
-        solution.asSimpleSolution,
+        solution,
         finished || (step == maxIterations)
       ),
       noSender
