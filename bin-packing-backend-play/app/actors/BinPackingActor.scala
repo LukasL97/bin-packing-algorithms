@@ -7,8 +7,11 @@ import akka.actor.ActorRef
 import akka.actor.ActorSystem
 import akka.actor.Props
 import com.google.inject.Inject
-import models.problem.binpacking.greedy.BinPackingGreedy
+import models.problem.binpacking.greedy.basic.BasicBinPackingGreedy
+import models.problem.binpacking.greedy.candidatesupported.CandidateSupportedBinPackingGreedy
 import models.problem.binpacking.localsearch.BinPackingLocalSearch
+import models.problem.binpacking.solution.SimpleBinPackingSolution
+import models.problem.binpacking.solution.TopLeftFirstBinPackingSolution
 
 object BinPackingActor {
   trait Factory {
@@ -26,9 +29,13 @@ class BinPackingActor @Inject()(
       val dumper = createSolutionStepDumper(runId)
       val executor = new BinPackingLocalSearchExecutor(dumper)
       executor.execute(runId, binPacking)
-    case (runId: String, binPacking: BinPackingGreedy) =>
+    case (runId: String, binPacking: BasicBinPackingGreedy) =>
       val dumper = createSolutionStepDumper(runId)
-      val executor = new BinPackingGreedyExecutor(dumper)
+      val executor = new BinPackingGreedyExecutor[SimpleBinPackingSolution](dumper)
+      executor.execute(runId, binPacking)
+    case (runId: String, binPacking: CandidateSupportedBinPackingGreedy) =>
+      val dumper = createSolutionStepDumper(runId)
+      val executor = new BinPackingGreedyExecutor[TopLeftFirstBinPackingSolution](dumper)
       executor.execute(runId, binPacking)
   }
 

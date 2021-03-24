@@ -6,6 +6,8 @@ import akka.testkit.TestKit
 import akka.testkit.TestProbe
 import models.problem.binpacking.greedy.BinPackingGreedy
 import models.problem.binpacking.greedy.BinPackingSelectionHandler
+import models.problem.binpacking.greedy.basic.BasicBinPackingGreedy
+import models.problem.binpacking.greedy.basic.BasicBinPackingSelectionHandler
 import models.problem.binpacking.solution.Box
 import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
@@ -24,14 +26,14 @@ class BinPackingGreedyExecutorSpec
     override val numRectangles: Int,
     override val rectangleWidthRange: (Int, Int),
     override val rectangleHeightRange: (Int, Int)
-  ) extends BinPackingGreedy {
+  ) extends BasicBinPackingGreedy {
     override val selectionHandler = new BinPackingSelectionHandlerImpl(boxLength, rectangles)
   }
 
   private class BinPackingSelectionHandlerImpl(
     override val boxLength: Int,
     override val candidates: Iterable[Rectangle]
-  ) extends BinPackingSelectionHandler {
+  ) extends BasicBinPackingSelectionHandler {
     override def selectNextCandidate(candidates: Iterable[Rectangle]): (Rectangle, Iterable[Rectangle]) = {
       (candidates.head, candidates.tail)
     }
@@ -40,7 +42,7 @@ class BinPackingGreedyExecutorSpec
   private val probe = TestProbe()
   private val dumper = probe.ref
 
-  private val executor = new BinPackingGreedyExecutor(dumper)
+  private val executor = new BinPackingGreedyExecutor[SimpleBinPackingSolution](dumper)
 
   override def afterAll(): Unit = {
     TestKit.shutdownActorSystem(system)

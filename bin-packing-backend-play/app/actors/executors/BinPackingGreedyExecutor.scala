@@ -5,16 +5,18 @@ import akka.actor.ActorRef
 import akka.actor.ActorRef.noSender
 import metrics.Metrics
 import models.problem.binpacking.greedy.BinPackingGreedy
+import models.problem.binpacking.greedy.basic.BasicBinPackingGreedy
 import models.problem.binpacking.solution.BinPackingSolution
 import play.api.Logging
 
-class BinPackingGreedyExecutor(dumper: ActorRef)
-    extends BinPackingExecutor[BinPackingGreedy] with Logging with Metrics {
+class BinPackingGreedyExecutor[A <: BinPackingSolution](dumper: ActorRef)
+    extends BinPackingExecutor[BinPackingGreedy[A]] with Logging with Metrics {
 
-  override def execute(runId: String, binPacking: BinPackingGreedy): Unit = {
+  override def execute(runId: String, binPacking: BinPackingGreedy[A]): Unit = {
     withContext("runId" -> runId) {
       withTimer("greedy-run") {
         logger.info(s"Starting ${getClass.getSimpleName} for runId $runId")
+        val x = binPacking.selectionHandler.startSolution
         dumper.tell(
           BinPackingSolutionStep.startStep(
             runId,
