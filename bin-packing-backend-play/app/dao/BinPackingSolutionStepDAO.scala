@@ -38,11 +38,15 @@ class BinPackingSolutionStepDAO @Inject()(val db: MongoDatabase, implicit val ec
   }
 
   def convertSolutionStepToDocument(solutionStep: BinPackingSolutionStep): BsonDocument = {
-    BsonDocument(SerializationUtil.toJsonString(solutionStep))
+    withTimer("convert-solution-step-to-document", "runId" -> solutionStep.runId) {
+      BsonSerializationUtil.solutionStepToDocument(solutionStep)
+    }
   }
 
   def convertDocumentToSolutionStep(document: BsonDocument): BinPackingSolutionStep = {
-    SerializationUtil.fromJsonString[BinPackingSolutionStep](document.toJson)
+    withTimer("convert-document-to-solution-step") {
+      SerializationUtil.fromJsonString[BinPackingSolutionStep](document.toJson)
+    }
   }
 
 }
