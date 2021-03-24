@@ -2,17 +2,19 @@ package models.problem.binpacking.solution
 
 import models.problem.binpacking.BinPackingTopLeftFirstPlacing
 
+import scala.collection.SortedSet
+
 object TopLeftFirstBinPackingSolution {
   def apply(boxLength: Int): TopLeftFirstBinPackingSolution = new TopLeftFirstBinPackingSolution(
     Map.empty[Rectangle, Placing],
-    Map.empty[Int, Seq[TopLeftCandidate]],
+    Map.empty[Int, SortedSet[Coordinates]],
     boxLength
   )
 }
 
 case class TopLeftFirstBinPackingSolution(
   override val placement: Map[Rectangle, Placing],
-  override val topLeftCandidates: Map[Int, Seq[TopLeftCandidate]],
+  override val topLeftCandidates: Map[Int, SortedSet[Coordinates]],
   override val boxLength: Int
 ) extends BinPackingSolution with TopLeftCandidates with BinPackingTopLeftFirstPlacing {
 
@@ -36,7 +38,7 @@ case class TopLeftFirstBinPackingSolution(
               rectangle,
               placement,
               considerRotation = true,
-              candidateCoordinates = Option(topLeftCandidates(boxId).map(_.coordinates))
+              candidateCoordinates = Option(topLeftCandidates(boxId).toSeq)
             ).map {
               case (rectangle, coordinates) => rectangle -> Placing(Box(boxId, boxLength), coordinates)
             }
@@ -51,10 +53,8 @@ case class TopLeftFirstBinPackingSolution(
     val updatedPlacement = placement.updated(placedRectangle, placing)
     val rectangleTopRight = Coordinates(placing.coordinates.x + placedRectangle.width, placing.coordinates.y)
     val rectangleBottomLeft = Coordinates(placing.coordinates.x, placing.coordinates.y + placedRectangle.height)
-    val updatedCandidates: Map[Int, Seq[TopLeftCandidate]] = if (placing.box.id > maxBoxId) {
-      val newBoxCandidates = Seq(rectangleBottomLeft, rectangleTopRight)
-        .sortBy(c => c.x + c.y)
-        .map(coordinates => TopLeftCandidate(coordinates, Set(coordinates)))
+    val updatedCandidates: Map[Int, SortedSet[Coordinates]] = if (placing.box.id > maxBoxId) {
+      val newBoxCandidates = SortedSet(rectangleBottomLeft, rectangleTopRight)
       topLeftCandidates.updated(placing.box.id, newBoxCandidates)
     } else {
       topLeftCandidates.updated(
@@ -79,61 +79,85 @@ case class TopLeftFirstBinPackingSolution(
     rectangleTopLeft: Coordinates,
     rectangleTopRight: Coordinates,
     rectangleBottomLeft: Coordinates,
-    candidates: Seq[TopLeftCandidate],
+    candidates: SortedSet[Coordinates],
     oldPlacement: Map[Rectangle, Coordinates]
-  ): Seq[TopLeftCandidate] = {
-    println(s"BOTTOMLEFT: $rectangleBottomLeft")
-    println(s"TOPRIGHT: $rectangleTopRight")
-    val candidatesWithPlacedCoordinatesRemoved = candidates.filterNot(_.coordinates == rectangleTopLeft)
-    assert(candidatesWithPlacedCoordinatesRemoved.size == candidates.size - 1)
-    val candidatesWithCoveredCoordinatesLifted = liftCandidatesCoveredByNewRectangle(
+  ): SortedSet[Coordinates] = {
+    val candidatesWithShadowedCandidatesLifted = liftCandidatesShadowedByNewRectangleLeftEdge(
+      rectangleTopLeft,
+      rectangleBottomLeft,
+      rectangleTopRight.x,
+      liftCandidatesShadowedByNewRectangleTopEdge(
+        rectangleTopLeft,
+        rectangleTopRight,
+        rectangleBottomLeft.y,
+        candidates,
+        oldPlacement
+      ),
+      oldPlacement
+    )
+    val candidatesWithCoveredCoordinatesDropped = dropCandidatesCoveredByNewRectangle(
       rectangleTopLeft,
       rectangleTopRight,
       rectangleBottomLeft,
-      candidatesWithPlacedCoordinatesRemoved
+      candidatesWithShadowedCandidatesLifted
     )
     val newCandidates = Seq(
       getNewCandidateFromRectangleTopRight(rectangleTopRight, oldPlacement),
       getNewCandidateFromRectangleBottomLeft(rectangleBottomLeft, oldPlacement)
     ).flatten
-    newCandidates.foldLeft(candidatesWithCoveredCoordinatesLifted) {
-      case (updatesCandidates, newCandidate) => sortInCandidate(updatesCandidates, newCandidate)
-    }
+    candidatesWithCoveredCoordinatesDropped ++ newCandidates
   }
 
-  private def liftCandidatesCoveredByNewRectangle(
+  private def liftCandidatesShadowedByNewRectangleLeftEdge(
+    rectangleTopLeft: Coordinates,
+    rectangleBottomLeft: Coordinates,
+    rectangleRightX: Int,
+    candidates: SortedSet[Coordinates],
+    placement: Map[Rectangle, Coordinates]
+  ): SortedSet[Coordinates] = {
+    val rectangleLeftEdge = VerticalEdge(rectangleTopLeft.x, rectangleTopLeft.y, rectangleBottomLeft.y)
+    val liftedCandidates = candidates.collect {
+      case Coordinates(x, y)
+          if x <= rectangleLeftEdge.x && rectangleLeftEdge.top <= y && y < rectangleLeftEdge.bottom =>
+        Coordinates(rectangleRightX, y)
+    }
+    candidates ++ liftedCandidates.filterNot(isInSomeLeftEdge(_, placement))
+  }
+
+  private def liftCandidatesShadowedByNewRectangleTopEdge(
+    rectangleTopLeft: Coordinates,
+    rectangleTopRight: Coordinates,
+    rectangleBottomY: Int,
+    candidates: SortedSet[Coordinates],
+    placement: Map[Rectangle, Coordinates]
+  ): SortedSet[Coordinates] = {
+    val rectangleTopEdge = HorizontalEdge(rectangleTopLeft.y, rectangleTopLeft.x, rectangleTopRight.x)
+    val liftedCandidates = candidates.collect {
+      case Coordinates(x, y) if y <= rectangleTopEdge.y && rectangleTopEdge.left <= x && x < rectangleTopEdge.right =>
+        Coordinates(x, rectangleBottomY)
+    }
+    candidates ++ liftedCandidates.filterNot(isInSomeTopEdge(_, placement))
+  }
+
+  private def dropCandidatesCoveredByNewRectangle(
     rectangleTopLeft: Coordinates,
     rectangleTopRight: Coordinates,
     rectangleBottomLeft: Coordinates,
-    candidates: Seq[TopLeftCandidate]
-  ): Seq[TopLeftCandidate] = {
+    candidates: SortedSet[Coordinates]
+  ): SortedSet[Coordinates] = {
     val rectangleTopEdge = HorizontalEdge(rectangleTopLeft.y, rectangleTopLeft.x, rectangleTopRight.x)
     val rectangleLeftEdge = VerticalEdge(rectangleTopLeft.x, rectangleTopLeft.y, rectangleBottomLeft.y)
-    val (liftedCandidates, unchangedCandidates) = candidates.map {
-      case candidate if rectangleTopEdge.containsInner(candidate.coordinates) =>
-        LiftedCandidate(
-          TopLeftCandidate(Coordinates(candidate.coordinates.x, rectangleLeftEdge.bottom), candidate.producers)
-        )
-      case candidate if rectangleLeftEdge.containsInner(candidate.coordinates) =>
-        LiftedCandidate(
-          TopLeftCandidate(Coordinates(rectangleTopEdge.right, candidate.coordinates.y), candidate.producers)
-        )
-      case coordinates => UnchangedCandidate(coordinates)
-    }.partition(_.isInstanceOf[LiftedCandidate])
-    liftedCandidates.map(_.candidate).foldLeft(unchangedCandidates.map(_.candidate)) {
-      case (updatedCandidates, liftedCandidate) => sortInCandidate(updatedCandidates, liftedCandidate)
-    }
+    candidates.filterNot(
+      candidate => rectangleTopEdge.containsNotRight(candidate) || rectangleLeftEdge.containsNotBottom(candidate)
+    )
   }
 
   protected[solution] def getNewCandidateFromRectangleTopRight(
     rectangleTopRight: Coordinates,
     placement: Map[Rectangle, Coordinates]
-  ): Option[TopLeftCandidate] = {
-    val leftEdges = placement.toSeq.map {
-      case (rectangle, coordinates) => getLeftEdge(rectangle, coordinates)
-    }.appended(boxRightBorder)
-    if (leftEdges.exists(_.containsNotBottom(rectangleTopRight))) {
-      Option.empty[TopLeftCandidate]
+  ): Option[Coordinates] = {
+    if (rectangleTopRight.x == boxLength || isInSomeLeftEdge(rectangleTopRight, placement)) {
+      Option.empty[Coordinates]
     } else {
       val bottomEdges = placement.toSeq.map {
         case (rectangle, coordinates) => getBottomEdge(rectangle, coordinates)
@@ -144,19 +168,16 @@ case class TopLeftFirstBinPackingSolution(
         )
         .map(_.y)
         .max
-      Option(TopLeftCandidate(Coordinates(rectangleTopRight.x, topRightNewCandidateY), Set(rectangleTopRight)))
+      Option(Coordinates(rectangleTopRight.x, topRightNewCandidateY))
     }
   }
 
   protected[solution] def getNewCandidateFromRectangleBottomLeft(
     rectangleBottomLeft: Coordinates,
     placement: Map[Rectangle, Coordinates]
-  ): Option[TopLeftCandidate] = {
-    val topEdges = placement.toSeq.map {
-      case (rectangle, coordinates) => getTopEdge(rectangle, coordinates)
-    }.appended(boxBottomBorder)
-    if (topEdges.exists(_.containsNotRight(rectangleBottomLeft))) {
-      Option.empty[TopLeftCandidate]
+  ): Option[Coordinates] = {
+    if (rectangleBottomLeft.y == boxLength || isInSomeTopEdge(rectangleBottomLeft, placement)) {
+      Option.empty[Coordinates]
     } else {
       val rightEdges = placement.toSeq.map {
         case (rectangle, coordinates) => getRightEdge(rectangle, coordinates)
@@ -168,29 +189,22 @@ case class TopLeftFirstBinPackingSolution(
         )
         .map(_.x)
         .max
-      Option(TopLeftCandidate(Coordinates(bottomLeftNewCandidateX, rectangleBottomLeft.y), Set(rectangleBottomLeft)))
+      Option(Coordinates(bottomLeftNewCandidateX, rectangleBottomLeft.y))
     }
   }
 
-  protected[solution] def sortInCandidate(
-    orderedCandidates: Seq[TopLeftCandidate],
-    newCandidate: TopLeftCandidate
-  ): Seq[TopLeftCandidate] = {
-    if (orderedCandidates.contains(newCandidate)) {
-      orderedCandidates
-    } else {
-      val index =
-        orderedCandidates.indexWhere(
-          candidate =>
-            candidate.coordinates.x + candidate.coordinates.y >= newCandidate.coordinates.x + newCandidate.coordinates.y
-        )
-      if (index == -1) {
-        orderedCandidates.appended(newCandidate)
-      } else {
-        orderedCandidates.slice(0, index).appended(newCandidate) ++ orderedCandidates
-          .slice(index, orderedCandidates.size)
-      }
-    }
+  private def isInSomeLeftEdge(point: Coordinates, placement: Map[Rectangle, Coordinates]): Boolean = {
+    val leftEdges = placement.toSeq.map {
+      case (rectangle, coordinates) => getLeftEdge(rectangle, coordinates)
+    }.appended(boxRightBorder)
+    leftEdges.exists(_.containsNotBottom(point))
+  }
+
+  private def isInSomeTopEdge(point: Coordinates, placement: Map[Rectangle, Coordinates]): Boolean = {
+    val topEdges = placement.toSeq.map {
+      case (rectangle, coordinates) => getTopEdge(rectangle, coordinates)
+    }.appended(boxBottomBorder)
+    topEdges.exists(_.containsNotRight(point))
   }
 
   private def getLeftEdge(rectangle: Rectangle, coordinates: Coordinates): VerticalEdge = VerticalEdge(
@@ -225,13 +239,8 @@ case class TopLeftFirstBinPackingSolution(
 }
 
 trait TopLeftCandidates {
-  val topLeftCandidates: Map[Int, Seq[TopLeftCandidate]]
+  val topLeftCandidates: Map[Int, SortedSet[Coordinates]]
 }
-
-case class TopLeftCandidate(
-  coordinates: Coordinates,
-  producers: Set[Coordinates]
-)
 
 private sealed trait Edge {
   def contains(point: Coordinates): Boolean
@@ -249,9 +258,3 @@ private case class HorizontalEdge(y: Int, left: Int, right: Int) extends Edge {
   override def containsInner(point: Coordinates): Boolean = point.y == y && left < point.x && point.x < right
   def containsNotRight(point: Coordinates): Boolean = point.y == y && left <= point.x && point.x < right
 }
-
-private sealed trait CandidateLiftingResult {
-  val candidate: TopLeftCandidate
-}
-private case class LiftedCandidate(candidate: TopLeftCandidate) extends CandidateLiftingResult
-private case class UnchangedCandidate(candidate: TopLeftCandidate) extends CandidateLiftingResult

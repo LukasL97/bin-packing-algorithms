@@ -2,8 +2,9 @@ package models.problem.binpacking
 
 import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Rectangle
+import models.problem.binpacking.utils.TopLeftFirstCoordinateOrdering
 
-trait BinPackingTopLeftFirstPlacing extends BinPackingSolutionValidator {
+trait BinPackingTopLeftFirstPlacing extends BinPackingSolutionValidator with TopLeftFirstCoordinateOrdering {
 
   val boxLength: Int
 
@@ -31,13 +32,6 @@ trait BinPackingTopLeftFirstPlacing extends BinPackingSolutionValidator {
     placement: Map[Rectangle, Coordinates]
   ): Boolean = {
     validateNewPlacingInSingleBox(rectangle, coordinates, placement, boxLength)
-  }
-
-  private implicit val topLeftFirstOrdering: Ordering[Coordinates] = (left: Coordinates, right: Coordinates) => {
-    (left.x + left.y) - (right.x + right.y) match {
-      case 0 => left.x - right.x
-      case other => other
-    }
   }
 
   private lazy val coordinatesInTopLeftFirstOrder = {

@@ -1,38 +1,21 @@
 package models.problem.binpacking.solution
 
+import models.problem.binpacking.BinPackingSolutionValidator
+import models.problem.binpacking.BinPackingTopLeftFirstPlacing
+import models.problem.binpacking.utils.RectanglesGenerator
+import models.problem.binpacking.utils.TopLeftFirstCoordinateOrdering
 import org.scalatest.MustMatchers
 import org.scalatest.WordSpec
 
-class TopLeftFirstBinPackingSolutionSpec extends WordSpec with MustMatchers {
+import scala.collection.SortedSet
+
+class TopLeftFirstBinPackingSolutionSpec
+    extends WordSpec with MustMatchers with TopLeftFirstCoordinateOrdering with RectanglesGenerator
+    with BinPackingSolutionValidator {
 
   private val boxLength = 10
 
   "TopLeftFirstBinPackingSolution" should {
-
-    "sort in new candidate" when {
-      val solution = TopLeftFirstBinPackingSolution(boxLength)
-      val candidates = Seq(
-        TopLeftCandidate(Coordinates(2, 3), Set()),
-        TopLeftCandidate(Coordinates(1, 6), Set())
-      )
-
-      "given a candidate smaller than all existing ones" in {
-        val newCandidate = TopLeftCandidate(Coordinates(1, 1), Set())
-        solution.sortInCandidate(candidates, newCandidate) mustEqual Seq(newCandidate) ++ candidates
-      }
-      "given a candidates larger than all existing ones" in {
-        val newCandidate = TopLeftCandidate(Coordinates(6, 3), Set())
-        solution.sortInCandidate(candidates, newCandidate) mustEqual candidates ++ Seq(newCandidate)
-      }
-      "given a candidates between existing candidates" in {
-        val newCandidate = TopLeftCandidate(Coordinates(4, 2), Set())
-        solution.sortInCandidate(candidates, newCandidate) mustEqual Seq(
-          candidates.head,
-          newCandidate,
-          candidates.last
-        )
-      }
-    }
 
     "get new candidate from rectangle bottom left" when {
       val solution = TopLeftFirstBinPackingSolution(boxLength)
@@ -45,7 +28,7 @@ class TopLeftFirstBinPackingSolutionSpec extends WordSpec with MustMatchers {
           Rectangle(3, 2, 6) -> Coordinates(8, 0)
         )
         solution.getNewCandidateFromRectangleBottomLeft(rectangleBottomLeft, placement) mustBe Option(
-          TopLeftCandidate(Coordinates(0, 4), Set(rectangleBottomLeft))
+          Coordinates(0, 4)
         )
       }
       "the nearest right edge is from some other rectangle" in {
@@ -56,7 +39,7 @@ class TopLeftFirstBinPackingSolutionSpec extends WordSpec with MustMatchers {
           Rectangle(3, 2, 6) -> Coordinates(8, 0)
         )
         solution.getNewCandidateFromRectangleBottomLeft(rectangleBottomLeft, placement) mustBe Option(
-          TopLeftCandidate(Coordinates(2, 4), Set(rectangleBottomLeft))
+          Coordinates(2, 4)
         )
       }
       "the nearest right edge contains the rectangle bottom left" in {
@@ -67,7 +50,7 @@ class TopLeftFirstBinPackingSolutionSpec extends WordSpec with MustMatchers {
           Rectangle(3, 2, 6) -> Coordinates(8, 0)
         )
         solution.getNewCandidateFromRectangleBottomLeft(rectangleBottomLeft, placement) mustBe Option(
-          TopLeftCandidate(rectangleBottomLeft, Set(rectangleBottomLeft))
+          rectangleBottomLeft
         )
       }
       "a right edge contains the rectangle bottom left but not in the inside" in {
@@ -78,7 +61,7 @@ class TopLeftFirstBinPackingSolutionSpec extends WordSpec with MustMatchers {
           Rectangle(3, 2, 6) -> Coordinates(8, 0)
         )
         solution.getNewCandidateFromRectangleBottomLeft(rectangleBottomLeft, placement) mustBe Option(
-          TopLeftCandidate(Coordinates(2, 4), Set(rectangleBottomLeft))
+          Coordinates(2, 4)
         )
       }
     }
@@ -92,7 +75,7 @@ class TopLeftFirstBinPackingSolutionSpec extends WordSpec with MustMatchers {
           Rectangle(1, 2, 2) -> Coordinates(0, 0)
         )
         solution.getNewCandidateFromRectangleTopRight(rectangleTopRight, placement) mustBe Option(
-          TopLeftCandidate(rectangleTopRight, Set(rectangleTopRight))
+          rectangleTopRight
         )
       }
       "the nearest bottom edge is from some other rectangle" in {
@@ -103,7 +86,7 @@ class TopLeftFirstBinPackingSolutionSpec extends WordSpec with MustMatchers {
           Rectangle(3, 2, 2) -> Coordinates(0, 4)
         )
         solution.getNewCandidateFromRectangleTopRight(rectangleTopRight, placement) mustBe Option(
-          TopLeftCandidate(Coordinates(4, 2), Set(rectangleTopRight))
+          Coordinates(4, 2)
         )
       }
     }
@@ -117,9 +100,9 @@ class TopLeftFirstBinPackingSolutionSpec extends WordSpec with MustMatchers {
             rectangle -> Placing(Box(1, boxLength), Coordinates(0, 0))
           ),
           Map(
-            1 -> Seq(
-              TopLeftCandidate(Coordinates(3, 0), Set(Coordinates(3, 0))),
-              TopLeftCandidate(Coordinates(0, 4), Set(Coordinates(0, 4)))
+            1 -> SortedSet(
+              Coordinates(3, 0),
+              Coordinates(0, 4)
             )
           ),
           boxLength
@@ -131,10 +114,10 @@ class TopLeftFirstBinPackingSolutionSpec extends WordSpec with MustMatchers {
           Rectangle(2, 3, 5) -> Placing(Box(1, boxLength), Coordinates(0, 2))
         )
         val candidates = Map(
-          1 -> Seq(
-            TopLeftCandidate(Coordinates(3, 2), Set(Coordinates(3, 2))),
-            TopLeftCandidate(Coordinates(6, 0), Set(Coordinates(6, 0))),
-            TopLeftCandidate(Coordinates(0, 7), Set(Coordinates(0, 7)))
+          1 -> SortedSet(
+            Coordinates(3, 2),
+            Coordinates(6, 0),
+            Coordinates(0, 7)
           )
         )
         val solution = TopLeftFirstBinPackingSolution(placement, candidates, boxLength)
@@ -142,11 +125,13 @@ class TopLeftFirstBinPackingSolutionSpec extends WordSpec with MustMatchers {
         solution.placeTopLeftFirst(rectangle) mustEqual TopLeftFirstBinPackingSolution(
           placement.updated(rectangle, Placing(Box(1, boxLength), Coordinates(3, 2))),
           Map(
-            1 -> Seq(
-              TopLeftCandidate(Coordinates(3, 3), Set(Coordinates(3, 3))),
-              TopLeftCandidate(Coordinates(6, 0), Set(Coordinates(6, 0))),
-              TopLeftCandidate(Coordinates(0, 7), Set(Coordinates(0, 7))),
-              TopLeftCandidate(Coordinates(8, 0), Set(Coordinates(8, 2)))
+            1 -> SortedSet(
+              Coordinates(3, 3),
+              Coordinates(6, 0),
+              Coordinates(0, 7),
+              Coordinates(8, 0),
+              Coordinates(6, 3),
+              Coordinates(8, 2)
             )
           ),
           boxLength
@@ -158,10 +143,10 @@ class TopLeftFirstBinPackingSolutionSpec extends WordSpec with MustMatchers {
           Rectangle(2, 2, 1) -> Placing(Box(1, boxLength), Coordinates(0, 1))
         )
         val candidates = Map(
-          1 -> Seq(
-            TopLeftCandidate(Coordinates(1, 0), Set(Coordinates(1, 0))),
-            TopLeftCandidate(Coordinates(2, 0), Set(Coordinates(2, 1))),
-            TopLeftCandidate(Coordinates(0, 2), Set(Coordinates(0, 2)))
+          1 -> SortedSet(
+            Coordinates(1, 0),
+            Coordinates(2, 0),
+            Coordinates(0, 2)
           )
         )
         val solution = TopLeftFirstBinPackingSolution(placement, candidates, boxLength)
@@ -169,16 +154,86 @@ class TopLeftFirstBinPackingSolutionSpec extends WordSpec with MustMatchers {
         solution.placeTopLeftFirst(rectangle) mustEqual TopLeftFirstBinPackingSolution(
           placement.updated(rectangle, Placing(Box(1, boxLength), Coordinates(1, 0))),
           Map(
-            1 -> Seq(
-              TopLeftCandidate(Coordinates(0, 2), Set(Coordinates(0, 2))),
-              TopLeftCandidate(Coordinates(3, 0), Set(Coordinates(3, 0))),
-              TopLeftCandidate(Coordinates(2, 1), Set(Coordinates(2, 1)))
+            1 -> SortedSet(
+              Coordinates(0, 2),
+              Coordinates(3, 0),
+              Coordinates(2, 1)
             )
           ),
           boxLength
         )
       }
     }
+
+    "place rectangles identically to an algorithm that goes through all coordinates" when {
+      "given some random rectangles" in withRectangles(100, (1, 4), (1, 4)) { rectangles =>
+        val solution = TopLeftFirstBinPackingSolution(boxLength)
+        val referenceSolution = SimpleBinPackingSolution(Map())
+        val referenceAlgorithm = new AllCandidatesTopLeftFirstPlacingAlgorithm(boxLength)
+        rectangles.foldLeft((solution, referenceSolution)) {
+          case ((solution, referenceSolution), rectangle) =>
+            val newSolution = solution.placeTopLeftFirst(rectangle)
+            val newReferenceSolution = referenceAlgorithm.placeTopLeftFirst(rectangle, referenceSolution)
+            newSolution.placement mustEqual newReferenceSolution.placement
+            (newSolution, newReferenceSolution)
+        }
+      }
+    }
+
+    "only maintain candidates that actually allow a minimal rectangle to be placed there" when {
+      "given some random rectangles" in withRectangles(100, (1, 4), (1, 4)) { rectangles =>
+        val solution = TopLeftFirstBinPackingSolution(boxLength)
+        val minimalRectangle = Rectangle(1337, 1, 1)
+        rectangles.foldLeft(solution) {
+          case (solution, rectangle) =>
+            val newSolution = solution.placeTopLeftFirst(rectangle)
+            newSolution.getPlacementsPerBox.foreach {
+              case (boxId, placement) =>
+                newSolution
+                  .topLeftCandidates(boxId)
+                  .foreach(
+                    candidate =>
+                      validateNewPlacingInSingleBox(minimalRectangle, candidate, placement, boxLength) mustBe true
+                  )
+            }
+            newSolution
+        }
+      }
+    }
+  }
+
+}
+
+private class AllCandidatesTopLeftFirstPlacingAlgorithm(
+  override val boxLength: Int
+) extends BinPackingTopLeftFirstPlacing {
+
+  def placeTopLeftFirst(rectangle: Rectangle, solution: SimpleBinPackingSolution): SimpleBinPackingSolution = {
+    val (placedRectangle, placing) = placeRectangleInFirstPossiblePosition(rectangle, solution.getPlacementsPerBox)
+    solution.updated(placedRectangle, placing)
+  }
+
+  private def placeRectangleInFirstPossiblePosition(
+    rectangle: Rectangle,
+    placementsPerBox: Map[Int, Map[Rectangle, Coordinates]]
+  ): (Rectangle, Placing) = {
+    val maxBoxId = placementsPerBox.keys.maxOption.getOrElse(0)
+    placementsPerBox.toSeq.sortBy {
+      case (boxId, _) => boxId
+    }.foldLeft(Option.empty[(Rectangle, Placing)]) {
+        case (foundPlacing, (boxId, placement)) =>
+          foundPlacing.orElse(
+            placeRectangleInBoxAtMostTopLeftPoint(rectangle, placement, considerRotation = true).map {
+              case (rectangle, coordinates) => rectangle -> Placing(Box(boxId, boxLength), coordinates)
+            }
+          )
+      }
+      .getOrElse(
+        rectangle -> Placing(
+          Box(maxBoxId + 1, boxLength),
+          Coordinates(0, 0)
+        )
+      )
   }
 
 }
