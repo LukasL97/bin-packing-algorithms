@@ -11,6 +11,14 @@ class AlgorithmStrategies {
         name: 'Greedy - Size-ordered'
       },
       {
+        id: 'greedy2 randomSelection',
+        name: 'Quick Greedy - Random Selection'
+      },
+      {
+        id: 'greedy2 sizeOrdered',
+        name: 'Quick Greedy - Size-ordered'
+      },
+      {
         id: 'localSearch geometryBased',
         name: 'Local Search - Geometry-based'
       },
