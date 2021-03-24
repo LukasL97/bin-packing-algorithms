@@ -9,8 +9,14 @@ import akka.actor.Props
 import controllers.exceptions.UnknownStrategyException
 import dao.BinPackingSolutionStepDAO
 import models.problem.binpacking.BinPacking
-import models.problem.binpacking.greedy.RandomSelectionBinPackingGreedy
-import models.problem.binpacking.greedy.SizeOrderedBinPackingGreedy
+import models.problem.binpacking.greedy.basic.RandomSelectionBinPackingGreedy
+import models.problem.binpacking.greedy.basic.SizeOrderedBinPackingGreedy
+import models.problem.binpacking.greedy.candidatesupported.{
+  RandomSelectionBinPackingGreedy => QuickRandomSelectionBinPackingGreedy
+}
+import models.problem.binpacking.greedy.candidatesupported.{
+  SizeOrderedBinPackingGreedy => QuickSizeOrderedBinPackingGreedy
+}
 import models.problem.binpacking.localsearch.EventuallyFeasibleGeometryBasedBinPacking
 import models.problem.binpacking.localsearch.GeometryBasedBinPacking
 import play.api.libs.json.JsValue
@@ -118,6 +124,20 @@ object BinPackingProvider {
       )
     case "greedy sizeOrdered" =>
       new SizeOrderedBinPackingGreedy(
+        boxLength,
+        numRectangles,
+        rectangleWidthRange,
+        rectangleHeightRange
+      )
+    case "greedy2 randomSelection" =>
+      new QuickRandomSelectionBinPackingGreedy(
+        boxLength,
+        numRectangles,
+        rectangleWidthRange,
+        rectangleHeightRange
+      )
+    case "greedy2 sizeOrdered" =>
+      new QuickSizeOrderedBinPackingGreedy(
         boxLength,
         numRectangles,
         rectangleWidthRange,
