@@ -6,6 +6,8 @@ import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.Rectangle
 import models.problem.binpacking.solution.SimpleBinPackingSolution
+import models.problem.binpacking.solution.TopLeftFirstBinPackingSolution
+import models.problem.binpacking.utils.TopLeftFirstCoordinateOrdering
 import org.json4s
 import org.json4s.Formats
 import org.json4s.JsonAST.JArray
@@ -14,44 +16,77 @@ import org.json4s.JsonAST.JObject
 import org.json4s.JsonAST.JValue
 import org.json4s.ShortTypeHints
 
-object BinPackingSolutionSerializationUtil {
+import scala.collection.SortedSet
+
+object BinPackingSolutionSerializationUtil extends TopLeftFirstCoordinateOrdering {
 
   implicit val formats: Formats = SerializationUtil.defaultFormats(
-    new ShortTypeHints(List(classOf[SimpleBinPackingSolution])) {
+    new ShortTypeHints(List(classOf[SimpleBinPackingSolution], classOf[TopLeftFirstBinPackingSolution])) {
 
       override def serialize: PartialFunction[Any, json4s.JObject] = {
-        case solution: SimpleBinPackingSolution => solutionToJObject(solution)
+        case solution: SimpleBinPackingSolution => simpleSolutionToJObject(solution)
+        case solution: TopLeftFirstBinPackingSolution => topLeftFirstSolutionToJObject(solution)
       }
 
       override def deserialize: PartialFunction[(String, json4s.JObject), Any] = {
-        case ("SimpleBinPackingSolution", jObject) => jObjectToSolution(jObject)
+        case ("SimpleBinPackingSolution", jObject) => jObjectToSimpleSolution(jObject)
+        case ("TopLeftFirstBinPackingSolution", jObject) => jObjectToTopLeftFirstSolution(jObject)
       }
     }
   )
 
-  private def solutionToJObject(solution: BinPackingSolution): JObject = JObject(
-    "placement" -> JArray(
-      solution.placement.toSeq.map {
-        case (rectangle, Placing(box, Coordinates(x, y))) =>
-          SerializationUtil.toJson(
-            Map(
-              "rectangle" -> SerializationUtil.toJson(rectangle),
-              "box" -> SerializationUtil.toJson(box),
-              "coordinates" -> Map(
-                "x" -> x,
-                "y" -> y
-              )
-            )
+  private def simpleSolutionToJObject(solution: BinPackingSolution): JObject = JObject(
+    "placement" -> placementToJObject(solution.placement)
+  )
+
+  private def topLeftFirstSolutionToJObject(solution: TopLeftFirstBinPackingSolution): JObject = JObject(
+    "placement" -> placementToJObject(solution.placement),
+    "topLeftCandidates" -> topLeftCandidatesToJObject(solution.topLeftCandidates),
+    "boxLength" -> JInt(solution.boxLength)
+  )
+
+  private def placementToJObject(placement: Map[Rectangle, Placing]): JArray = JArray(
+    placement.toSeq.map {
+      case (rectangle, Placing(box, coordinates)) =>
+        SerializationUtil.toJson(
+          Map(
+            "rectangle" -> SerializationUtil.toJson(rectangle),
+            "box" -> SerializationUtil.toJson(box),
+            "coordinates" -> SerializationUtil.toJson(coordinates)
           )
-      }.toList
-    )
+        )
+    }.toList
+  )
+
+  private def topLeftCandidatesToJObject(topLeftCandidates: Map[Int, SortedSet[Coordinates]]): JArray = JArray(
+    topLeftCandidates.toSeq.map {
+      case (boxId, candidates) =>
+        SerializationUtil.toJson(
+          Map(
+            "boxId" -> boxId,
+            "candidates" -> SerializationUtil.toJson(candidates)
+          )
+        )
+    }.toList
   )
 
   private def getFieldValue(jObject: JObject, key: String): JValue = {
     jObject.obj.collect { case (key_, value) if key_ == key => value }.head
   }
 
-  private def jObjectToSolution(jObject: JObject): SimpleBinPackingSolution = SimpleBinPackingSolution(
+  private def jObjectToSimpleSolution(jObject: JObject): SimpleBinPackingSolution = SimpleBinPackingSolution(
+    placementFromJObject(jObject)
+  )
+
+  private def jObjectToTopLeftFirstSolution(jObject: JObject): TopLeftFirstBinPackingSolution = {
+    TopLeftFirstBinPackingSolution(
+      placementFromJObject(jObject),
+      topLeftCandidatesFromJObject(jObject),
+      getFieldValue(jObject, "boxLength").asInstanceOf[JInt].num.toInt
+    )
+  }
+
+  private def placementFromJObject(jObject: JObject): Map[Rectangle, Placing] = {
     getFieldValue(jObject, "placement")
       .asInstanceOf[JArray]
       .arr
@@ -59,12 +94,29 @@ object BinPackingSolutionSerializationUtil {
       .map { placing =>
         val rectangle = SerializationUtil.fromJson[Rectangle](getFieldValue(placing, "rectangle"))
         val box = SerializationUtil.fromJson[Box](getFieldValue(placing, "box"))
-        val coordinates = getFieldValue(placing, "coordinates").asInstanceOf[JObject]
-        val x = getFieldValue(coordinates, "x").asInstanceOf[JInt].num.toInt
-        val y = getFieldValue(coordinates, "y").asInstanceOf[JInt].num.toInt
-        rectangle -> Placing(box, Coordinates(x, y))
+        val coordinates = SerializationUtil.fromJson[Coordinates](getFieldValue(placing, "coordinates"))
+        rectangle -> Placing(box, coordinates)
       }
       .toMap
-  )
+  }
+
+  private def topLeftCandidatesFromJObject(jObject: JObject): Map[Int, SortedSet[Coordinates]] = {
+    getFieldValue(jObject, "topLeftCandidates")
+      .asInstanceOf[JArray]
+      .arr
+      .map(_.asInstanceOf[JObject])
+      .map { boxCandidates =>
+        val boxId = getFieldValue(boxCandidates, "boxId").asInstanceOf[JInt].num.toInt
+        val candidates = getFieldValue(boxCandidates, "candidates")
+          .asInstanceOf[JArray]
+          .arr
+          .map(_.asInstanceOf[JObject])
+          .map { candidate =>
+            SerializationUtil.fromJson[Coordinates](candidate)
+          }
+        boxId -> SortedSet.from(candidates)
+      }
+      .toMap
+  }
 
 }

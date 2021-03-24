@@ -1,13 +1,17 @@
 package dao
 
 import actors.BinPackingSolutionStep
+import models.problem.binpacking.solution.BinPackingSolution
 import models.problem.binpacking.solution.Box
 import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.Rectangle
 import models.problem.binpacking.solution.SimpleBinPackingSolution
+import models.problem.binpacking.solution.TopLeftFirstBinPackingSolution
 import org.mongodb.scala.bson.BsonArray
 import org.mongodb.scala.bson.BsonDocument
+
+import scala.collection.SortedSet
 
 object BsonSerializationUtil {
 
@@ -15,15 +19,29 @@ object BsonSerializationUtil {
     BsonDocument(
       "runId" -> solutionStep.runId,
       "step" -> solutionStep.step,
-      "solution" -> simpleSolutionToDocument(solutionStep.solution),
+      "solution" -> solutionToDocument(solutionStep.solution),
       "finished" -> solutionStep.finished
     )
+  }
+
+  private def solutionToDocument(solution: BinPackingSolution): BsonDocument = solution match {
+    case solution: SimpleBinPackingSolution => simpleSolutionToDocument(solution)
+    case solution: TopLeftFirstBinPackingSolution => topLeftFirstSolutionToDocument(solution)
   }
 
   private def simpleSolutionToDocument(solution: SimpleBinPackingSolution): BsonDocument = {
     BsonDocument(
       "jsonClass" -> "SimpleBinPackingSolution",
       "placement" -> placementToDocument(solution.placement)
+    )
+  }
+
+  private def topLeftFirstSolutionToDocument(solution: TopLeftFirstBinPackingSolution): BsonDocument = {
+    BsonDocument(
+      "jsonClass" -> "TopLeftFirstBinPackingSolution",
+      "placement" -> placementToDocument(solution.placement),
+      "topLeftCandidates" -> topLeftCandidatesToDocument(solution.topLeftCandidates),
+      "boxLength" -> solution.boxLength
     )
   }
 
@@ -35,6 +53,20 @@ object BsonSerializationUtil {
             "rectangle" -> rectangleToDocument(rectangle),
             "box" -> boxToDocument(box),
             "coordinates" -> coordinatesToDocument(coordinates)
+          )
+      }
+    )
+  }
+
+  def topLeftCandidatesToDocument(topLeftCandidates: Map[Int, SortedSet[Coordinates]]): BsonArray = {
+    BsonArray.fromIterable(
+      topLeftCandidates.toSeq.map {
+        case (boxId, candidates) =>
+          BsonDocument(
+            "boxId" -> boxId,
+            "candidates" -> BsonArray.fromIterable(
+              candidates.toSeq.map(coordinatesToDocument)
+            )
           )
       }
     )
