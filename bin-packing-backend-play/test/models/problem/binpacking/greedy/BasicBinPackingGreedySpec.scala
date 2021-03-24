@@ -1,6 +1,7 @@
 package models.problem.binpacking.greedy
 
-import models.problem.binpacking.solution.BinPackingSolution
+import models.problem.binpacking.greedy.basic.BasicBinPackingGreedy
+import models.problem.binpacking.greedy.basic.BasicBinPackingSelectionHandler
 import models.problem.binpacking.solution.Box
 import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
@@ -9,9 +10,9 @@ import models.problem.binpacking.solution.SimpleBinPackingSolution
 import org.scalatest.MustMatchers
 import org.scalatest.WordSpec
 
-class BinPackingGreedySpec extends WordSpec with MustMatchers {
+class BasicBinPackingGreedySpec extends WordSpec with MustMatchers {
 
-  "BinPackingGreedy" should {
+  "BasicBinPackingGreedy" should {
     "place rectangles in separate boxes in the given candidate order" when {
       "given a selection strategy with sequential candidate selection and one box per rectangle placing strategy" in {
 
@@ -36,11 +37,11 @@ private class BinPackingGreedyImpl(
   override val numRectangles: Int = 4,
   override val rectangleWidthRange: (Int, Int) = (3, 3),
   override val rectangleHeightRange: (Int, Int) = (3, 3)
-) extends BinPackingGreedy {
+) extends BasicBinPackingGreedy {
 
   val orderedRectangles: Seq[Rectangle] = rectangles.toSeq.sortBy(_.id)
 
-  override val selectionHandler: BinPackingSelectionHandler = new BinPackingSelectionHandlerImpl(
+  override val selectionHandler: BasicBinPackingSelectionHandler = new BinPackingSelectionHandlerImpl(
     boxLength,
     orderedRectangles
   )
@@ -49,7 +50,7 @@ private class BinPackingGreedyImpl(
 private class BinPackingSelectionHandlerImpl(
   override val boxLength: Int,
   override val candidates: Iterable[Rectangle]
-) extends BinPackingSelectionHandler {
+) extends BasicBinPackingSelectionHandler {
 
   override def selectNextCandidate(candidates: Iterable[Rectangle]): (Rectangle, Iterable[Rectangle]) = {
     (candidates.head, candidates.tail)
@@ -57,8 +58,8 @@ private class BinPackingSelectionHandlerImpl(
 
   override def placeCandidateInSolution(
     candidate: Rectangle,
-    solution: BinPackingSolution
-  ): BinPackingSolution = {
+    solution: SimpleBinPackingSolution
+  ): SimpleBinPackingSolution = {
     val maxBoxId = solution.placement.values.map(_.box.id).maxOption.getOrElse(0)
     SimpleBinPackingSolution(
       solution.placement + (candidate -> Placing(Box(maxBoxId + 1, boxLength), Coordinates(0, 0)))

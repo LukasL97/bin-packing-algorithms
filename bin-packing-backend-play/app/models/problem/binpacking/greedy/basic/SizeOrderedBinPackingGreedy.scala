@@ -1,4 +1,5 @@
-package models.problem.binpacking.greedy
+package models.problem.binpacking.greedy.basic
+
 import models.problem.binpacking.solution.Rectangle
 
 class SizeOrderedBinPackingGreedy(
@@ -6,9 +7,9 @@ class SizeOrderedBinPackingGreedy(
   override val numRectangles: Int,
   override val rectangleWidthRange: (Int, Int),
   override val rectangleHeightRange: (Int, Int)
-) extends BinPackingGreedy {
+) extends BasicBinPackingGreedy {
 
-  override val selectionHandler: BinPackingSelectionHandler = new SizeOrderedBinPackingSelectionHandler(
+  override val selectionHandler: BasicBinPackingSelectionHandler = new SizeOrderedBinPackingSelectionHandler(
     boxLength,
     rectangles
   )
@@ -20,7 +21,7 @@ class SizeOrderedBinPackingGreedy(
 class SizeOrderedBinPackingSelectionHandler(
   override val boxLength: Int,
   override val candidates: Iterable[Rectangle]
-) extends BinPackingSelectionHandler {
+) extends BasicBinPackingSelectionHandler {
 
   private implicit val sizeOrdering: Ordering[Rectangle] = new Ordering[Rectangle] {
     private def size(rectangle: Rectangle): Int = rectangle.width * rectangle.height

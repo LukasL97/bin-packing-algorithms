@@ -1,4 +1,4 @@
-package models.problem.binpacking.greedy
+package models.problem.binpacking.greedy.basic
 
 import models.problem.binpacking.solution.Rectangle
 
@@ -7,9 +7,9 @@ class RandomSelectionBinPackingGreedy(
   override val numRectangles: Int,
   override val rectangleWidthRange: (Int, Int),
   override val rectangleHeightRange: (Int, Int)
-) extends BinPackingGreedy {
+) extends BasicBinPackingGreedy {
 
-  override val selectionHandler: BinPackingSelectionHandler =
+  override val selectionHandler: BasicBinPackingSelectionHandler =
     new RandomSelectionBinPackingSelectionHandler(
       boxLength,
       rectangles
@@ -19,7 +19,7 @@ class RandomSelectionBinPackingGreedy(
 class RandomSelectionBinPackingSelectionHandler(
   override val boxLength: Int,
   override val candidates: Iterable[Rectangle]
-) extends BinPackingSelectionHandler {
+) extends BasicBinPackingSelectionHandler {
 
   override def selectNextCandidate(candidates: Iterable[Rectangle]): (Rectangle, Iterable[Rectangle]) = {
     (candidates.head, candidates.tail)

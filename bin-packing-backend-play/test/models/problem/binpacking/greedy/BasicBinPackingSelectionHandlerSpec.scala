@@ -1,5 +1,6 @@
 package models.problem.binpacking.greedy
 
+import models.problem.binpacking.greedy.basic.BasicBinPackingSelectionHandler
 import models.problem.binpacking.solution.Box
 import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
@@ -8,12 +9,12 @@ import models.problem.binpacking.solution.SimpleBinPackingSolution
 import org.scalatest.MustMatchers
 import org.scalatest.WordSpec
 
-class BinPackingSelectionHandlerSpec extends WordSpec with MustMatchers {
+class BasicBinPackingSelectionHandlerSpec extends WordSpec with MustMatchers {
 
   private class BinPackingSelectionHandlerImpl(
     override val boxLength: Int,
     override val candidates: Iterable[Rectangle]
-  ) extends BinPackingSelectionHandler {
+  ) extends BasicBinPackingSelectionHandler {
     override def selectNextCandidate(candidates: Iterable[Rectangle]): (Rectangle, Iterable[Rectangle]) = {
       (candidates.head, candidates.tail)
     }
