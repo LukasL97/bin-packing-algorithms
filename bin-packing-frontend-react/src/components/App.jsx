@@ -16,17 +16,18 @@ class App extends Component {
     running: false,
     runId: '',
     fetchBlocked: false,
-    solutionStepQueue: [],
-    rectanglesLastUpdate: {}
+    rectanglesLastUpdate: {},
+    solutionSteps: [],
+    currentStepIndex: 0
   }
 
-  getCurrentSolutionStep = () => this.state.solutionStepQueue[0]
+  getCurrentSolutionStep = () => this.state.solutionSteps[this.state.currentStepIndex]
   getRectanglesLastUpdate = () => this.state.rectanglesLastUpdate
 
   getProgress = () => {
-    const fetched = last(this.state.solutionStepQueue)?.step
-    const visualized = this.state.solutionStepQueue[0]?.step
-    const finished = last(this.state.solutionStepQueue)?.finished
+    const fetched = last(this.state.solutionSteps)?.step
+    const visualized = this.state.currentStepIndex
+    const finished = last(this.state.solutionSteps)?.finished
     return {
       fetched: fetched !== undefined ? fetched : 0,
       visualized: visualized !== undefined ? visualized : 0,
@@ -57,8 +58,9 @@ class App extends Component {
         ...oldState,
         running: true,
         runId: startSolutionStep.data.runId,
-        solutionStepQueue: [startSolutionStep.data],
-        rectanglesLastUpdate: {}
+        rectanglesLastUpdate: {},
+        solutionSteps: [startSolutionStep.data],
+        currentStepIndex: 0
       }))
     })
   }
@@ -72,7 +74,7 @@ class App extends Component {
 
   fetchSolutionSteps = () => {
     this.blockFetch() // block fetching until fetched data is retrieved via the api and stored in the queue
-    const lastLoadedStep = last(this.state.solutionStepQueue).step
+    const lastLoadedStep = last(this.state.solutionSteps).step
     this.backendClient.fetchSolutionSteps(
       this.state.runId,
       lastLoadedStep + 1,
@@ -84,10 +86,10 @@ class App extends Component {
         ...oldState,
         running: !finished,
         fetchBlocked: false,
-        solutionStepQueue: [
-          ...this.state.solutionStepQueue,
+        solutionSteps: [
+          ...this.state.solutionSteps,
           ...solutionSteps.data
-        ]
+        ],
       }))
     })
   }
@@ -108,25 +110,24 @@ class App extends Component {
     }).filter(id => id !== null)
   }
 
-  removeFirstSolutionStepFromQueue = () => {
-    if (this.state.solutionStepQueue.length > 1) {
-      const oldSolutionStep = this.state.solutionStepQueue[0]
-      const newSolutionStepQueue = this.state.solutionStepQueue.slice(1)
-      const newSolutionStep = newSolutionStepQueue[0]
+  moveCurrentStepIndex = (index) => {
+    if (index >= 0 && this.state.solutionSteps.length > index) {
+      const oldSolutionStep = this.state.solutionSteps[this.state.currentStepIndex]
+      const newSolutionStep = this.state.solutionSteps[index]
       const newRectanglesLastUpdate = {...this.state.rectanglesLastUpdate}
       this.getUpdatedRectangleIdsInNewStep(oldSolutionStep, newSolutionStep).forEach(id => newRectanglesLastUpdate[id] = newSolutionStep.step)
       this.setState(oldState => ({
         ...oldState,
-        solutionStepQueue: newSolutionStepQueue,
+        currentStepIndex: index,
         rectanglesLastUpdate: newRectanglesLastUpdate
       }))
     }
   }
 
-  updateRemoveFirstSolutionStepFromQueueInterval(visualizationIterationPeriod) {
-    clearInterval(this.removeFirstSolutionStepFromQueueInterval)
-    this.removeFirstSolutionStepFromQueueInterval = setInterval(
-      this.removeFirstSolutionStepFromQueue,
+  updateMoveCurrentStepIndexInterval(visualizationIterationPeriod) {
+    clearInterval(this.moveCurrentStepIndexInterval)
+    this.moveCurrentStepIndexInterval = setInterval(
+      () => this.moveCurrentStepIndex(this.state.currentStepIndex + 1),
       visualizationIterationPeriod
     )
   }
@@ -140,15 +141,15 @@ class App extends Component {
       },
       this.fetchSolutionStepsPeriod
     )
-    this.removeFirstSolutionStepFromQueueInterval = setInterval(
-      this.removeFirstSolutionStepFromQueue,
+    this.moveCurrentStepIndexInterval = setInterval(
+      () => this.moveCurrentStepIndex(this.state.currentStepIndex + 1),
       this.visualizationIterationPeriodDefault
     )
   }
 
   componentWillUnmount() {
     clearInterval(this.fetchSolutionStepsInterval)
-    clearInterval(this.removeFirstSolutionStepFromQueueInterval)
+    clearInterval(this.moveCurrentStepIndexInterval)
   }
 
   render() {
@@ -160,7 +161,7 @@ class App extends Component {
           getRectanglesLastUpdate={this.getRectanglesLastUpdate}
           start={this.start}
           visualizationIterationPeriodDefault={this.visualizationIterationPeriodDefault}
-          updateVisualizationIterationPeriod={this.updateRemoveFirstSolutionStepFromQueueInterval.bind(this)}
+          updateVisualizationIterationPeriod={this.updateMoveCurrentStepIndexInterval.bind(this)}
           getProgress={this.getProgress}
         />
       </div>
