@@ -21,7 +21,10 @@ class CoarseMultipleBoxPullUpNeighborhood(
 
   def createCoarseMultipleBoxPullUpNeighborhood(solution: BinPackingSolution): View[BinPackingSolution] = {
     val placementsPerBox = solution.getPlacementsPerBox
-    placementsPerBox.filter {
+    val placementsPerBoxInDescendingOrder = placementsPerBox.toSeq.sortBy {
+      case (boxId, _) => boxId
+    }.reverse
+    placementsPerBoxInDescendingOrder.filter {
       case (boxId, _) => boxId > 1
     }.view.map {
       case (boxId, placement) => withTimer("coarse-multiple-box-pull-up-neighborhood") {
