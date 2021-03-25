@@ -14,6 +14,8 @@ class Content extends Component {
       start,
       visualizationIterationPeriodDefault,
       updateVisualizationIterationPeriod,
+      toggleAutomaticVisualization,
+      getAutomaticVisualization,
       getProgress
     } = this.props
 
@@ -24,6 +26,8 @@ class Content extends Component {
           <VisualizationConfigForm
             visualizationIterationPeriodDefault={visualizationIterationPeriodDefault}
             updateVisualizationIterationPeriod={updateVisualizationIterationPeriod}
+            toggleAutomaticVisualization={toggleAutomaticVisualization}
+            getAutomaticVisualization={getAutomaticVisualization}
           />
           <AlgorithmProgressChart getProgress={getProgress}/>
         </div>

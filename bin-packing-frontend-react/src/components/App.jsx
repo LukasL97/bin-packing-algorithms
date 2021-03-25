@@ -18,7 +18,8 @@ class App extends Component {
     fetchBlocked: false,
     rectanglesLastUpdate: {},
     solutionSteps: [],
-    currentStepIndex: 0
+    currentStepIndex: 0,
+    automaticVisualization: true
   }
 
   getCurrentSolutionStep = () => this.state.solutionSteps[this.state.currentStepIndex]
@@ -89,7 +90,7 @@ class App extends Component {
         solutionSteps: [
           ...this.state.solutionSteps,
           ...solutionSteps.data
-        ],
+        ]
       }))
     })
   }
@@ -127,10 +128,23 @@ class App extends Component {
   updateMoveCurrentStepIndexInterval(visualizationIterationPeriod) {
     clearInterval(this.moveCurrentStepIndexInterval)
     this.moveCurrentStepIndexInterval = setInterval(
-      () => this.moveCurrentStepIndex(this.state.currentStepIndex + 1),
+      () => {
+        if (this.state.automaticVisualization) {
+          this.moveCurrentStepIndex(this.state.currentStepIndex + 1)
+        }
+      },
       visualizationIterationPeriod
     )
   }
+
+  toggleAutomaticVisualization(active) {
+    this.setState(oldState => ({
+      ...oldState,
+      automaticVisualization: active
+    }))
+  }
+
+  getAutomaticVisualization = () => this.state.automaticVisualization
 
   componentDidMount() {
     this.fetchSolutionStepsInterval = setInterval(
@@ -142,7 +156,11 @@ class App extends Component {
       this.fetchSolutionStepsPeriod
     )
     this.moveCurrentStepIndexInterval = setInterval(
-      () => this.moveCurrentStepIndex(this.state.currentStepIndex + 1),
+      () => {
+        if (this.state.automaticVisualization) {
+          this.moveCurrentStepIndex(this.state.currentStepIndex + 1)
+        }
+      },
       this.visualizationIterationPeriodDefault
     )
   }
@@ -162,6 +180,8 @@ class App extends Component {
           start={this.start}
           visualizationIterationPeriodDefault={this.visualizationIterationPeriodDefault}
           updateVisualizationIterationPeriod={this.updateMoveCurrentStepIndexInterval.bind(this)}
+          toggleAutomaticVisualization={this.toggleAutomaticVisualization.bind(this)}
+          getAutomaticVisualization={this.getAutomaticVisualization.bind(this)}
           getProgress={this.getProgress}
         />
       </div>
