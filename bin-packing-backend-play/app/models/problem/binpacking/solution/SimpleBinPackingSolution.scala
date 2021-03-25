@@ -18,4 +18,13 @@ case class SimpleBinPackingSolution(
     SimpleBinPackingSolution(placement)
   }
 
+  override def reorderBoxes(boxIdOrder: Seq[Int]): SimpleBinPackingSolution = {
+    val boxIdMapping = boxIdOrder.zip(1 to boxIdOrder.size).toMap
+    SimpleBinPackingSolution(
+      placement.map {
+        case (rectangle, Placing(Box(id, length), coordinates)) =>
+          rectangle -> Placing(Box(boxIdMapping(id), length), coordinates)
+      }
+    )
+  }
 }

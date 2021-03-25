@@ -31,6 +31,8 @@ case class GridInfoBinPackingSolution(
   override def reset(placement: Map[Rectangle, Placing]): GridInfoBinPackingSolution = {
     throw new NotImplementedError(s"Implementation of reset(placement) missing for ${getClass.getSimpleName}")
   }
+
+  override def reorderBoxes(boxIdOrder: Seq[Int]): BinPackingSolution = throw new NotImplementedError
 }
 
 trait GridInfo {

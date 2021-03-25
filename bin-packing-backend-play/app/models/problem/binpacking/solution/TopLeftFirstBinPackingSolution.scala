@@ -24,6 +24,8 @@ case class TopLeftFirstBinPackingSolution(
 
   override def reset(placement: Map[Rectangle, Placing]): BinPackingSolution = throw new NotImplementedError
 
+  override def reorderBoxes(boxIdOrder: Seq[Int]): BinPackingSolution = throw new NotImplementedError
+
   def placeTopLeftFirst(rectangle: Rectangle): TopLeftFirstBinPackingSolution = {
     val placementsPerBox = getPlacementsPerBox
     val sortedPlacementsPerBox = placementsPerBox.toSeq.sortBy {
@@ -230,7 +232,6 @@ case class TopLeftFirstBinPackingSolution(
     coordinates.x,
     coordinates.x + rectangle.width
   )
-
   private val boxLeftBorder = VerticalEdge(0, 0, boxLength)
   private val boxRightBorder = VerticalEdge(boxLength, 0, boxLength)
   private val boxTopBorder = HorizontalEdge(0, 0, boxLength)
