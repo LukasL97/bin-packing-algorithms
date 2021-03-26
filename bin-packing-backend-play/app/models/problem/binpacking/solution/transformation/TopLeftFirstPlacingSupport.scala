@@ -11,7 +11,10 @@ import scala.collection.SortedSet
 
 trait TopLeftFirstPlacingSupport[A <: TopLeftFirstPlacingSupport[A]]
     extends BinPackingSolution with BinPackingTopLeftFirstPlacing {
+
   def placeTopLeftFirst(rectangle: Rectangle): A
+
+  def placeTopLeftFirstInSpecificBox(rectangle: Rectangle, boxId: Int): Option[A]
 
   protected def findRectanglePlacing(
     rectangle: Rectangle,
@@ -42,5 +45,19 @@ trait TopLeftFirstPlacingSupport[A <: TopLeftFirstPlacingSupport[A]]
           Coordinates(0, 0)
         )
       )
+  }
+
+  protected def findRectanglePlacingInSpecificBox(
+    rectangle: Rectangle,
+    boxId: Int,
+    candidateCoordinates: Option[SortedSet[Coordinates]] = None
+  ): Option[(Rectangle, Coordinates)] = {
+    val placementInBox = getPlacementInSingleBox(boxId)
+    placeRectangleInBoxAtMostTopLeftPoint(
+      rectangle,
+      placementInBox,
+      considerRotation = true,
+      candidateCoordinates = candidateCoordinates.map(_.toSeq)
+    )
   }
 }

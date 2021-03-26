@@ -165,6 +165,77 @@ class TopLeftFirstBinPackingSolutionSpec
       }
     }
 
+    "place a rectangle with top left first strategy in a specific box" when {
+      "the rectangle fits into the box" in {
+        val boxId = 1
+        val placement = Map(
+          Rectangle(1, 6, 2) -> Placing(Box(boxId, boxLength), Coordinates(0, 0)),
+          Rectangle(2, 3, 5) -> Placing(Box(boxId, boxLength), Coordinates(0, 2))
+        )
+        val candidates = Map(
+          boxId -> SortedSet(
+            Coordinates(3, 2),
+            Coordinates(6, 0),
+            Coordinates(0, 7)
+          )
+        )
+        val solution = TopLeftFirstBinPackingSolution(placement, candidates, boxLength)
+        val rectangle = Rectangle(3, 5, 1)
+        solution.placeTopLeftFirstInSpecificBox(rectangle, boxId) mustEqual Option(
+          TopLeftFirstBinPackingSolution(
+            placement.updated(rectangle, Placing(Box(boxId, boxLength), Coordinates(3, 2))),
+            Map(
+              boxId -> SortedSet(
+                Coordinates(3, 3),
+                Coordinates(6, 0),
+                Coordinates(0, 7),
+                Coordinates(8, 0),
+                Coordinates(6, 3),
+                Coordinates(8, 2)
+              )
+            ),
+            boxLength
+          )
+        )
+      }
+      "the rectangle does not fit into the box" in {
+        val boxId = 1
+        val solution = TopLeftFirstBinPackingSolution(
+          Map(
+            Rectangle(1, boxLength, boxLength) -> Placing(Box(boxId, boxLength), Coordinates(0, 0))
+          ),
+          Map(boxId -> SortedSet.empty),
+          boxLength
+        )
+        val rectangle = Rectangle(2, 1, 1)
+        solution.placeTopLeftFirstInSpecificBox(rectangle, boxId) must be(None)
+      }
+      "the rectangle is placed into an empty box" in {
+        val boxId = 2
+        val solution = TopLeftFirstBinPackingSolution(
+          Map(
+            Rectangle(1, boxLength, boxLength) -> Placing(Box(1, boxLength), Coordinates(0, 0))
+          ),
+          Map(1 -> SortedSet.empty),
+          boxLength
+        )
+        val rectangle = Rectangle(2, 1, 1)
+        solution.placeTopLeftFirstInSpecificBox(rectangle, boxId) mustEqual Option(
+          TopLeftFirstBinPackingSolution(
+            Map(
+              Rectangle(1, boxLength, boxLength) -> Placing(Box(1, boxLength), Coordinates(0, 0)),
+              rectangle -> Placing(Box(boxId, boxLength), Coordinates(0, 0))
+            ),
+            Map(
+              1 -> SortedSet.empty,
+              boxId -> SortedSet(Coordinates(0, 1), Coordinates(1, 0))
+            ),
+            boxLength
+          )
+        )
+      }
+    }
+
     "place rectangles identically to an algorithm that goes through all coordinates" when {
       "given some random rectangles" in withRectangles(100, (1, 4), (1, 4)) { rectangles =>
         val solution = TopLeftFirstBinPackingSolution(boxLength)

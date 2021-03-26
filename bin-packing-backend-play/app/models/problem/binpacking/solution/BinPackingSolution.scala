@@ -16,7 +16,7 @@ trait BinPackingSolution {
   }
 
   def getPlacementInSingleBox(boxId: Int): Map[Rectangle, Coordinates] = {
-    getPlacementsPerBox(boxId)
+    getPlacementsPerBox.getOrElse(boxId, Map.empty[Rectangle, Coordinates])
   }
 }
 

@@ -6,8 +6,7 @@ import models.problem.binpacking.solution.transformation.TopLeftFirstPlacingSupp
 
 import scala.collection.SortedSet
 
-object TopLeftFirstBinPackingSolution
-    extends EmptySolutionInitializer[TopLeftFirstBinPackingSolution] {
+object TopLeftFirstBinPackingSolution extends EmptySolutionInitializer[TopLeftFirstBinPackingSolution] {
 
   override def apply(boxLength: Int): TopLeftFirstBinPackingSolution = new TopLeftFirstBinPackingSolution(
     Map.empty[Rectangle, Placing],
@@ -26,20 +25,50 @@ case class TopLeftFirstBinPackingSolution(
 
   override def asSimpleSolution: SimpleBinPackingSolution = SimpleBinPackingSolution(placement)
 
-  def placeTopLeftFirst(rectangle: Rectangle): TopLeftFirstBinPackingSolution = {
-    val placementsPerBox = getPlacementsPerBox
-    val maxBoxId = placementsPerBox.keys.maxOption.getOrElse(0)
+  override def placeTopLeftFirst(rectangle: Rectangle): TopLeftFirstBinPackingSolution = {
     val (placedRectangle, placing) = findRectanglePlacing(rectangle, Option(topLeftCandidates))
     val updatedPlacement = placement.updated(placedRectangle, placing)
-    val rectangleTopRight = Coordinates(placing.coordinates.x + placedRectangle.width, placing.coordinates.y)
-    val rectangleBottomLeft = Coordinates(placing.coordinates.x, placing.coordinates.y + placedRectangle.height)
-    val updatedCandidates: Map[Int, SortedSet[Coordinates]] = if (placing.box.id > maxBoxId) {
+    val updatedCandidates = updateCandidates(placedRectangle, placing)
+    TopLeftFirstBinPackingSolution(
+      updatedPlacement,
+      updatedCandidates,
+      boxLength
+    )
+  }
+
+  override def placeTopLeftFirstInSpecificBox(
+    rectangle: Rectangle,
+    boxId: Int
+  ): Option[TopLeftFirstBinPackingSolution] = {
+    findRectanglePlacingInSpecificBox(rectangle, boxId, topLeftCandidates.get(boxId)).map {
+      case (placedRectangle, coordinates) =>
+        val placing = Placing(Box(boxId, boxLength), coordinates)
+        val updatedPlacement = placement.updated(placedRectangle, placing)
+        val updatedCandidates = updateCandidates(placedRectangle, placing)
+        TopLeftFirstBinPackingSolution(
+          updatedPlacement,
+          updatedCandidates,
+          boxLength
+        )
+    }
+  }
+
+  private def updateCandidates(
+    rectangle: Rectangle,
+    placing: Placing
+  ): Map[Int, SortedSet[Coordinates]] = {
+    val placementsPerBox = getPlacementsPerBox
+    val maxBoxId = placementsPerBox.keys.maxOption.getOrElse(0)
+    val updatedPlacement = placement.updated(rectangle, placing)
+    val rectangleTopRight = Coordinates(placing.coordinates.x + rectangle.width, placing.coordinates.y)
+    val rectangleBottomLeft = Coordinates(placing.coordinates.x, placing.coordinates.y + rectangle.height)
+    if (placing.box.id > maxBoxId) {
       val newBoxCandidates = SortedSet(rectangleBottomLeft, rectangleTopRight)
       topLeftCandidates.updated(placing.box.id, newBoxCandidates)
     } else {
       topLeftCandidates.updated(
         placing.box.id,
-        updateCandidates(
+        updateCandidatesInPreviouslyExistingBox(
           placing.coordinates,
           rectangleTopRight,
           rectangleBottomLeft,
@@ -48,14 +77,9 @@ case class TopLeftFirstBinPackingSolution(
         )
       )
     }
-    TopLeftFirstBinPackingSolution(
-      updatedPlacement,
-      updatedCandidates,
-      boxLength
-    )
   }
 
-  private def updateCandidates(
+  private def updateCandidatesInPreviouslyExistingBox(
     rectangleTopLeft: Coordinates,
     rectangleTopRight: Coordinates,
     rectangleBottomLeft: Coordinates,
