@@ -24,30 +24,8 @@ case class TopLeftFirstBinPackingSolution(
 
   def placeTopLeftFirst(rectangle: Rectangle): TopLeftFirstBinPackingSolution = {
     val placementsPerBox = getPlacementsPerBox
-    val sortedPlacementsPerBox = placementsPerBox.toSeq.sortBy {
-      case (boxId, _) => boxId
-    }
-    val maxBoxId = sortedPlacementsPerBox.lastOption.map(_._1).getOrElse(0)
-    val (placedRectangle, placing) = sortedPlacementsPerBox
-      .foldLeft(Option.empty[(Rectangle, Placing)]) {
-        case (foundPlacing, (boxId, placement)) =>
-          foundPlacing.orElse(
-            placeRectangleInBoxAtMostTopLeftPoint(
-              rectangle,
-              placement,
-              considerRotation = true,
-              candidateCoordinates = Option(topLeftCandidates(boxId).toSeq)
-            ).map {
-              case (rectangle, coordinates) => rectangle -> Placing(Box(boxId, boxLength), coordinates)
-            }
-          )
-      }
-      .getOrElse(
-        rectangle -> Placing(
-          Box(maxBoxId + 1, boxLength),
-          Coordinates(0, 0)
-        )
-      )
+    val maxBoxId = placementsPerBox.keys.maxOption.getOrElse(0)
+    val (placedRectangle, placing) = findRectanglePlacing(rectangle, Option(topLeftCandidates))
     val updatedPlacement = placement.updated(placedRectangle, placing)
     val rectangleTopRight = Coordinates(placing.coordinates.x + placedRectangle.width, placing.coordinates.y)
     val rectangleBottomLeft = Coordinates(placing.coordinates.x, placing.coordinates.y + placedRectangle.height)
