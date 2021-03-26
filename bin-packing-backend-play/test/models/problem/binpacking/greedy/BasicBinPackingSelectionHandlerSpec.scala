@@ -58,7 +58,7 @@ class BasicBinPackingSelectionHandlerSpec extends WordSpec with MustMatchers {
     "place a candidate in box 1 in the top left corner according to the top left strategy" when {
       "given a solution without any candidate placed previously" in {
         val candidate = Rectangle(1, 3, 3)
-        val solution = SimpleBinPackingSolution(Map())
+        val solution = SimpleBinPackingSolution.apply(boxLength)
         selectionHandler.placeCandidateInSolution(candidate, solution).placement mustEqual {
           Map(candidate -> Placing(Box(1 ,boxLength), Coordinates(0, 0)))
         }

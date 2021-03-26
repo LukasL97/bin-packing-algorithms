@@ -1,16 +1,20 @@
 package models.problem.binpacking.solution
 
 import models.problem.binpacking.BinPackingTopLeftFirstPlacing
+import models.problem.binpacking.solution.initialization.EmptySolutionInitializer
 import models.problem.binpacking.solution.transformation.TopLeftFirstPlacingSupport
 
 import scala.collection.SortedSet
 
-object TopLeftFirstBinPackingSolution {
-  def apply(boxLength: Int): TopLeftFirstBinPackingSolution = new TopLeftFirstBinPackingSolution(
+object TopLeftFirstBinPackingSolution
+    extends EmptySolutionInitializer[TopLeftFirstBinPackingSolution] {
+
+  override def apply(boxLength: Int): TopLeftFirstBinPackingSolution = new TopLeftFirstBinPackingSolution(
     Map.empty[Rectangle, Placing],
     Map.empty[Int, SortedSet[Coordinates]],
     boxLength
   )
+
 }
 
 case class TopLeftFirstBinPackingSolution(

@@ -73,8 +73,8 @@ class BinPackingGreedyExecutorSpec
           BinPackingSolutionStep(
             runId,
             0,
-            SimpleBinPackingSolution(
-              Map()
+            SimpleBinPackingSolution.apply(
+              boxLength
             )
           )
         )
@@ -82,7 +82,7 @@ class BinPackingGreedyExecutorSpec
           BinPackingSolutionStep(
             runId,
             1,
-            SimpleBinPackingSolution(
+            SimpleBinPackingSolution.apply(
               Map(
                 binPacking.rectangles.toSeq.head -> Placing(box, Coordinates(0, 0))
               )
@@ -93,7 +93,7 @@ class BinPackingGreedyExecutorSpec
           BinPackingSolutionStep(
             runId,
             2,
-            SimpleBinPackingSolution(
+            SimpleBinPackingSolution.apply(
               Map(
                 binPacking.rectangles.toSeq.head -> Placing(box, Coordinates(0, 0)),
                 binPacking.rectangles.toSeq(1) -> Placing(box, Coordinates(0, 2))
@@ -105,7 +105,7 @@ class BinPackingGreedyExecutorSpec
           BinPackingSolutionStep(
             runId,
             3,
-            SimpleBinPackingSolution(
+            SimpleBinPackingSolution.apply(
               Map(
                 binPacking.rectangles.toSeq.head -> Placing(box, Coordinates(0, 0)),
                 binPacking.rectangles.toSeq(1) -> Placing(box, Coordinates(0, 2)),
@@ -118,7 +118,7 @@ class BinPackingGreedyExecutorSpec
           BinPackingSolutionStep(
             runId,
             4,
-            SimpleBinPackingSolution(
+            SimpleBinPackingSolution.apply(
               Map(
                 binPacking.rectangles.toSeq.head -> Placing(box, Coordinates(0, 0)),
                 binPacking.rectangles.toSeq(1) -> Placing(box, Coordinates(0, 2)),

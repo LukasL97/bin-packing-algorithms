@@ -56,7 +56,7 @@ class BinPackingLocalSearchExecutorSpec
                 override def getNeighborhood(solution: SimpleBinPackingSolution): View[SimpleBinPackingSolution] =
                   Set(
                     Option(
-                      SimpleBinPackingSolution(
+                      SimpleBinPackingSolution.apply(
                         solution.placement.map {
                           case (rectangle, Placing(box, Coordinates(x, y))) =>
                             rectangle -> Placing(box, Coordinates(x + 1, y + 1))
@@ -78,7 +78,7 @@ class BinPackingLocalSearchExecutorSpec
           BinPackingSolutionStep(
             runId,
             0,
-            solution = SimpleBinPackingSolution(
+            solution = SimpleBinPackingSolution.apply(
               Map(binPacking.rectangles.head -> Placing(box, Coordinates(0, 0)))
             )
           )
@@ -87,7 +87,7 @@ class BinPackingLocalSearchExecutorSpec
           BinPackingSolutionStep(
             runId,
             1,
-            solution = SimpleBinPackingSolution(
+            solution = SimpleBinPackingSolution.apply(
               Map(binPacking.rectangles.head -> Placing(box, Coordinates(1, 1)))
             )
           )
@@ -96,7 +96,7 @@ class BinPackingLocalSearchExecutorSpec
           BinPackingSolutionStep(
             runId,
             2,
-            solution = SimpleBinPackingSolution(
+            solution = SimpleBinPackingSolution.apply(
               Map(binPacking.rectangles.head -> Placing(box, Coordinates(2, 2)))
             )
           )
@@ -105,7 +105,7 @@ class BinPackingLocalSearchExecutorSpec
           BinPackingSolutionStep(
             runId,
             3,
-            solution = SimpleBinPackingSolution(
+            solution = SimpleBinPackingSolution.apply(
               Map(binPacking.rectangles.head -> Placing(box, Coordinates(2, 2)))
             ),
             finished = true

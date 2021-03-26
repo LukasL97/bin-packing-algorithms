@@ -18,7 +18,7 @@ trait BasicBinPackingGreedy extends BinPackingGreedy[SimpleBinPackingSolution] {
 trait BasicBinPackingSelectionHandler
     extends BinPackingSelectionHandler[SimpleBinPackingSolution] with BinPackingTopLeftFirstPlacing {
 
-  override val startSolution: SimpleBinPackingSolution = SimpleBinPackingSolution(Map())
+  override val startSolution: SimpleBinPackingSolution = SimpleBinPackingSolution(boxLength)
 
   override def placeCandidateInSolution(
     candidate: Rectangle,

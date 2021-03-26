@@ -168,7 +168,7 @@ class TopLeftFirstBinPackingSolutionSpec
     "place rectangles identically to an algorithm that goes through all coordinates" when {
       "given some random rectangles" in withRectangles(100, (1, 4), (1, 4)) { rectangles =>
         val solution = TopLeftFirstBinPackingSolution(boxLength)
-        val referenceSolution = SimpleBinPackingSolution(Map())
+        val referenceSolution = SimpleBinPackingSolution.apply(boxLength)
         val referenceAlgorithm = new AllCandidatesTopLeftFirstPlacingAlgorithm(boxLength)
         rectangles.foldLeft((solution, referenceSolution)) {
           case ((solution, referenceSolution), rectangle) =>
