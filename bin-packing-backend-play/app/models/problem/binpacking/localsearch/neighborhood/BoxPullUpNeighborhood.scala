@@ -4,15 +4,16 @@ import metrics.Metrics
 import models.problem.binpacking.BinPackingTopLeftFirstPlacing
 import models.problem.binpacking.solution.Box
 import models.problem.binpacking.solution.Placing
-import models.problem.binpacking.solution.BinPackingSolution
+import models.problem.binpacking.solution.transformation.RectanglePlacingUpdateSupport
+import models.problem.binpacking.solution.transformation.SquashingSupport
 
 import scala.collection.View
 
-class BoxPullUpNeighborhood(
+class BoxPullUpNeighborhood[A <: RectanglePlacingUpdateSupport[A] with SquashingSupport[A]](
   override val boxLength: Int
 ) extends BinPackingTopLeftFirstPlacing with Metrics {
 
-  def createBoxPullUpNeighborhood(solution: BinPackingSolution): View[BinPackingSolution] = {
+  def createBoxPullUpNeighborhood(solution: A): View[A] = {
     solution.placement.view.collect {
       case (rectangle, Placing(Box(id, length), _)) if id > 1 =>
         withTimer("box-pull-up-neighborhood") {

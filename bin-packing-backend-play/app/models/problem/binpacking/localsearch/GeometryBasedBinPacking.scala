@@ -11,8 +11,8 @@ import models.problem.binpacking.localsearch.neighborhood.CoarseMultipleBoxPullU
 import models.problem.binpacking.localsearch.neighborhood.GeometricShiftNeighborhood
 import models.problem.binpacking.localsearch.neighborhood.Left
 import models.problem.binpacking.localsearch.neighborhood.Up
-import models.problem.binpacking.solution.BinPackingSolution
 import models.problem.binpacking.solution.Rectangle
+import models.problem.binpacking.solution.SimpleBinPackingSolution
 
 import scala.collection.View
 
@@ -21,9 +21,9 @@ class GeometryBasedBinPacking(
   override val numRectangles: Int,
   override val rectangleWidthRange: (Int, Int),
   override val rectangleHeightRange: (Int, Int)
-) extends BinPackingLocalSearch {
+) extends BinPackingLocalSearch[SimpleBinPackingSolution] {
 
-  override val solutionHandler: BinPackingSolutionHandler =
+  override val solutionHandler: BinPackingSolutionHandler[SimpleBinPackingSolution] =
     new GeometryBasedBinPackingSolutionHandler(rectangles, boxLength)
 
 }
@@ -31,17 +31,17 @@ class GeometryBasedBinPacking(
 class GeometryBasedBinPackingSolutionHandler(
   override val rectangles: Set[Rectangle],
   override val boxLength: Int,
-) extends BinPackingSolutionHandler with BoxWeightedTopLeftFirstEvaluation with GeometricStartSolution with Metrics {
+) extends BinPackingSolutionHandler[SimpleBinPackingSolution] with BoxWeightedTopLeftFirstEvaluation with GeometricStartSolution with Metrics {
 
-  override val startSolution: BinPackingSolution = triviallyFeasibleStartSolution
+  override val startSolution: SimpleBinPackingSolution = triviallyFeasibleStartSolution
 
-  private val boxPullUpNeighborhood = new BoxPullUpNeighborhood(boxLength)
-  private val geometricShiftNeighborhood = new GeometricShiftNeighborhood(boxLength)
-  private val boxMergeNeighborhood = new BoxMergeNeighborhood(rectangles, boxLength)
-  private val coarseMultipleBoxPullUpNeighborhood = new CoarseMultipleBoxPullUpNeighborhood(boxLength)
-  private val boxReorderingNeighborhood = new BoxReorderingNeighborhood
+  private val boxPullUpNeighborhood = new BoxPullUpNeighborhood[SimpleBinPackingSolution](boxLength)
+  private val geometricShiftNeighborhood = new GeometricShiftNeighborhood[SimpleBinPackingSolution](boxLength)
+  private val boxMergeNeighborhood = new BoxMergeNeighborhood[SimpleBinPackingSolution](rectangles, boxLength)
+  private val coarseMultipleBoxPullUpNeighborhood = new CoarseMultipleBoxPullUpNeighborhood[SimpleBinPackingSolution](boxLength)
+  private val boxReorderingNeighborhood = new BoxReorderingNeighborhood[SimpleBinPackingSolution]
 
-  override def getNeighborhood(solution: BinPackingSolution): View[BinPackingSolution] = {
+  override def getNeighborhood(solution: SimpleBinPackingSolution): View[SimpleBinPackingSolution] = {
     val solutionsWithCoarseMultipleBoxPullUp =
       coarseMultipleBoxPullUpNeighborhood.createCoarseMultipleBoxPullUpNeighborhood(solution)
     val solutionsWithMergedBoxes = boxMergeNeighborhood.createBoxMergeNeighborhood(solution)
@@ -59,7 +59,7 @@ class GeometryBasedBinPackingSolutionHandler(
       solutionsWithBoxPullUp
   }
 
-  override def evaluate(solution: BinPackingSolution, step: Int): Score = withTimer("ls-geometry-evaluate") {
+  override def evaluate(solution: SimpleBinPackingSolution, step: Int): Score = withTimer("ls-geometry-evaluate") {
     evaluate(solution)
   }
 }

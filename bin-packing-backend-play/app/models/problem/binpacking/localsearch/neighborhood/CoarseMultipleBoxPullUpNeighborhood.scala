@@ -7,10 +7,12 @@ import models.problem.binpacking.solution.Box
 import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.Rectangle
+import models.problem.binpacking.solution.transformation.RectanglePlacingUpdateSupport
+import models.problem.binpacking.solution.transformation.SquashingSupport
 
 import scala.collection.View
 
-class CoarseMultipleBoxPullUpNeighborhood(
+class CoarseMultipleBoxPullUpNeighborhood[A <: RectanglePlacingUpdateSupport[A] with SquashingSupport[A]](
   override val boxLength: Int
 ) extends BinPackingTopLeftFirstPlacing with Metrics {
 
@@ -19,7 +21,7 @@ class CoarseMultipleBoxPullUpNeighborhood(
   override lazy val horizontalStepSize: Int = boxLength / granularity
   override lazy val verticalStepSize: Int = boxLength / granularity
 
-  def createCoarseMultipleBoxPullUpNeighborhood(solution: BinPackingSolution): View[BinPackingSolution] = {
+  def createCoarseMultipleBoxPullUpNeighborhood(solution: A): View[A] = {
     val placementsPerBox = solution.getPlacementsPerBox
     val placementsPerBoxInDescendingOrder = placementsPerBox.toSeq.sortBy {
       case (boxId, _) => boxId
@@ -27,15 +29,16 @@ class CoarseMultipleBoxPullUpNeighborhood(
     placementsPerBoxInDescendingOrder.filter {
       case (boxId, _) => boxId > 1
     }.view.map {
-      case (boxId, placement) => withTimer("coarse-multiple-box-pull-up-neighborhood") {
-        val updatedPlacings = placeRectanglesInBoxAtMostTopLeftPointUntilFull(
-          placement.keys.toSeq,
-          placementsPerBox(boxId - 1)
-        ).map {
-          case (rectangle, coordinates) => rectangle -> Placing(Box(boxId - 1, boxLength), coordinates)
-        }.toMap
-        solution.updated(updatedPlacings).squashed
-      }
+      case (boxId, placement) =>
+        withTimer("coarse-multiple-box-pull-up-neighborhood") {
+          val updatedPlacings = placeRectanglesInBoxAtMostTopLeftPointUntilFull(
+            placement.keys.toSeq,
+            placementsPerBox(boxId - 1)
+          ).map {
+            case (rectangle, coordinates) => rectangle -> Placing(Box(boxId - 1, boxLength), coordinates)
+          }.toMap
+          solution.updated(updatedPlacings).squashed
+        }
     }
   }
 

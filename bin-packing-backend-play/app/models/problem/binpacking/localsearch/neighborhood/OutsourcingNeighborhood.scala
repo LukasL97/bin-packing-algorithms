@@ -1,17 +1,17 @@
 package models.problem.binpacking.localsearch.neighborhood
 
-import models.problem.binpacking.solution.BinPackingSolution
 import models.problem.binpacking.solution.Box
 import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
+import models.problem.binpacking.solution.transformation.RectanglePlacingUpdateSupport
 
 import scala.collection.View
 
-class OutsourcingNeighborhood(
+class OutsourcingNeighborhood[A <: RectanglePlacingUpdateSupport[A]](
   val boxLength: Int
 ) {
 
-  def createOutsourcingNeighborhood(solution: BinPackingSolution): View[BinPackingSolution] = {
+  def createOutsourcingNeighborhood(solution: A): View[A] = {
     val boxIds = solution.placement.values.map(_.box.id)
     val boxIdsWithOnlyOneRectangle = boxIds
       .groupBy(id => id)

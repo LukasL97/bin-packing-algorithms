@@ -25,9 +25,9 @@ class BinPackingActor @Inject()(
 ) extends Actor {
 
   override def receive: Receive = {
-    case (runId: String, binPacking: BinPackingLocalSearch) =>
+    case (runId: String, binPacking: BinPackingLocalSearch[SimpleBinPackingSolution]) =>
       val dumper = createSolutionStepDumper(runId)
-      val executor = new BinPackingLocalSearchExecutor(dumper)
+      val executor = new BinPackingLocalSearchExecutor[SimpleBinPackingSolution](dumper)
       executor.execute(runId, binPacking)
     case (runId: String, binPacking: BasicBinPackingGreedy) =>
       val dumper = createSolutionStepDumper(runId)

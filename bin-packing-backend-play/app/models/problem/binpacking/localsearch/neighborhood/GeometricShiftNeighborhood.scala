@@ -7,19 +7,20 @@ import models.problem.binpacking.solution.Box
 import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.Rectangle
+import models.problem.binpacking.solution.transformation.RectanglePlacingUpdateSupport
 
 import scala.collection.View
 
-class GeometricShiftNeighborhood(
+class GeometricShiftNeighborhood[A <: RectanglePlacingUpdateSupport[A]](
   val boxLength: Int
 ) extends BinPackingSolutionValidator with Metrics {
 
   def createShiftedSolutions(
-    solution: BinPackingSolution,
+    solution: A,
     direction: Direction,
     stepSize: Int,
     allowOverlap: Boolean
-  ): View[BinPackingSolution] = {
+  ): View[A] = {
     solution.placement.view.flatMap {
       case (rectangle, placing) =>
         shiftRectangleInSolution(solution, rectangle, placing, direction, stepSize, allowOverlap)
@@ -27,9 +28,9 @@ class GeometricShiftNeighborhood(
   }
 
   def createMaximallyShiftedSolutions(
-    solution: BinPackingSolution,
+    solution: A,
     direction: Direction
-  ): View[BinPackingSolution] = {
+  ): View[A] = {
     solution.placement.view.flatMap {
       case (rectangle, placing) =>
         shiftRectangleInSolutionUntilHittingBarrier(solution, rectangle, placing, direction)
@@ -37,24 +38,25 @@ class GeometricShiftNeighborhood(
   }
 
   def createEntireBoxMaximallyShiftedSolutions(
-    solution: BinPackingSolution,
+    solution: A,
     direction: Direction
-  ): View[BinPackingSolution] = {
+  ): View[A] = {
     solution.getPlacementsPerBox.view.flatMap {
-      case (boxId, placement) => withTimer("entire-box-maximally-shifted-neighborhood") {
-        val placementWithBox = placement.map {
-          case (rectangle, coordinates) => rectangle -> Placing(Box(boxId, boxLength), coordinates)
+      case (boxId, placement) =>
+        withTimer("entire-box-maximally-shifted-neighborhood") {
+          val placementWithBox = placement.map {
+            case (rectangle, coordinates) => rectangle -> Placing(Box(boxId, boxLength), coordinates)
+          }
+          shiftAllRectanglesInBoxUntilHittingBarrier(solution, placementWithBox, direction)
         }
-        shiftAllRectanglesInBoxUntilHittingBarrier(solution, placementWithBox, direction)
-      }
     }
   }
 
   private def shiftAllRectanglesInBoxUntilHittingBarrier(
-    originalSolution: BinPackingSolution,
+    originalSolution: A,
     boxPlacement: Map[Rectangle, Placing],
     direction: Direction
-  ): Option[BinPackingSolution] = {
+  ): Option[A] = {
     implicit val placementOrdering: Ordering[(Rectangle, Placing)] = {
       (placingA: (Rectangle, Placing), placingB: (Rectangle, Placing)) =>
         direction match {
@@ -71,19 +73,19 @@ class GeometricShiftNeighborhood(
         (updatedSolution.getOrElse(solution), hasChanged || updatedSolution.isDefined)
     }
     updatedSolutionWithChangedFlag match {
-      case (_, false) => Option.empty[BinPackingSolution]
+      case (_, false) => Option.empty[A]
       case (solution, true) => Option(solution)
     }
   }
 
   private def shiftRectangleInSolutionUntilHittingBarrier(
-    originalSolution: BinPackingSolution,
+    originalSolution: A,
     rectangle: Rectangle,
     placing: Placing,
     direction: Direction
-  ): Option[BinPackingSolution] = {
+  ): Option[A] = {
     var stepSize = 1
-    var solutions: Seq[Option[BinPackingSolution]] =
+    var solutions: Seq[Option[A]] =
       Seq(
         shiftRectangleInSolution(originalSolution, rectangle, placing, direction, stepSize, allowOverlap = false)
       )
@@ -97,13 +99,13 @@ class GeometricShiftNeighborhood(
   }
 
   private def shiftRectangleInSolution(
-    solution: BinPackingSolution,
+    solution: A,
     rectangle: Rectangle,
     placing: Placing,
     direction: Direction,
     stepSize: Int,
     allowOverlap: Boolean
-  ): Option[BinPackingSolution] = {
+  ): Option[A] = {
     val newCoordinates = shift(placing.coordinates, direction, stepSize)
     if ((allowOverlap && inBounds(rectangle, newCoordinates, boxLength)) || validateNewPlacingInSingleBox(
           rectangle,
@@ -115,7 +117,7 @@ class GeometricShiftNeighborhood(
         solution.updated(rectangle, Placing(placing.box, newCoordinates))
       )
     } else {
-      Option.empty[BinPackingSolution]
+      Option.empty[A]
     }
   }
 

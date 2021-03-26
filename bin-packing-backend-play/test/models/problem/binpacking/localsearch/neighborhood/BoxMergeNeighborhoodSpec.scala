@@ -22,7 +22,7 @@ class BoxMergeNeighborhoodSpec extends WordSpec with MustMatchers {
     Rectangle(7, 2, 1)
   )
 
-  private val generator = new BoxMergeNeighborhood(rectangles.toSet, boxLength)
+  private val generator = new BoxMergeNeighborhood[SimpleBinPackingSolution](rectangles.toSet, boxLength)
 
   "BoxMergeNeighborhood" should {
     "merge boxes correctly" when {

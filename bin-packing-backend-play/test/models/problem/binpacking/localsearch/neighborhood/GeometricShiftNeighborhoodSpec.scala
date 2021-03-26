@@ -12,7 +12,7 @@ class GeometricShiftNeighborhoodSpec extends WordSpec with MustMatchers {
 
   private val boxLength = 5
 
-  private val neighborhood = new GeometricShiftNeighborhood(boxLength)
+  private val neighborhood = new GeometricShiftNeighborhood[SimpleBinPackingSolution](boxLength)
 
   "GeometricShiftNeighborhood" should {
 

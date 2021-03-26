@@ -1,6 +1,5 @@
 package models.problem.binpacking.localsearch.initialization
 
-import models.problem.binpacking.solution.BinPackingSolution
 import models.problem.binpacking.solution.Box
 import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
@@ -18,11 +17,11 @@ trait GeometricStartSolution {
   private lazy val maxRectangleWidth = rectangles.map(_.width).max
   private lazy val maxRectangleHeight = rectangles.map(_.height).max
 
-  def triviallyFeasibleStartSolution: BinPackingSolution = {
+  def triviallyFeasibleStartSolution: SimpleBinPackingSolution = {
     createStartSolution(getStartCoordinates(maxRectangleWidth, maxRectangleHeight))
   }
 
-  def overconfidentStartSolution: BinPackingSolution = {
+  def overconfidentStartSolution: SimpleBinPackingSolution = {
     createStartSolution(
       getStartCoordinates(
         (maxRectangleWidth + minRectangleWidth) / 2,
@@ -37,7 +36,7 @@ trait GeometricStartSolution {
       y <- 0 to (boxLength - maxRectangleHeight) by verticalStep
     } yield Coordinates(x, y)
 
-  private def createStartSolution(coordinates: Seq[Coordinates]): BinPackingSolution = {
+  private def createStartSolution(coordinates: Seq[Coordinates]): SimpleBinPackingSolution = {
     val placement = rectangles.zipWithIndex.map {
       case (rectangle, index) =>
         rectangle -> Placing(

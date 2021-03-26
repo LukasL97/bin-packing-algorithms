@@ -26,7 +26,7 @@ class BinPackingLocalSearchExecutorSpec
   private val probe = TestProbe()
   private val dumper = probe.ref
 
-  private val executor = new BinPackingLocalSearchExecutor(dumper)
+  private val executor = new BinPackingLocalSearchExecutor[SimpleBinPackingSolution](dumper)
 
   override def afterAll(): Unit = {
     TestKit.shutdownActorSystem(system)
@@ -40,34 +40,37 @@ class BinPackingLocalSearchExecutorSpec
         val boxLength_ = 3
         val box = Box(1, boxLength_)
 
-        val binPacking: BinPackingLocalSearch = new BinPackingLocalSearch {
-          override val boxLength: Int = boxLength_
-          override val numRectangles: Int = 1
-          override val rectangleWidthRange: (Int, Int) = (1, 1)
-          override val rectangleHeightRange: (Int, Int) = (1, 1)
+        val binPacking: BinPackingLocalSearch[SimpleBinPackingSolution] =
+          new BinPackingLocalSearch[SimpleBinPackingSolution] {
+            override val boxLength: Int = boxLength_
+            override val numRectangles: Int = 1
+            override val rectangleWidthRange: (Int, Int) = (1, 1)
+            override val rectangleHeightRange: (Int, Int) = (1, 1)
 
-          override val solutionHandler: BinPackingSolutionHandler = new BinPackingSolutionHandler {
-            override val startSolution: SimpleBinPackingSolution = SimpleBinPackingSolution(
-              Map(rectangles.head -> Placing(box, Coordinates(0, 0)))
-            )
+            override val solutionHandler: BinPackingSolutionHandler[SimpleBinPackingSolution] =
+              new BinPackingSolutionHandler[SimpleBinPackingSolution] {
+                override val startSolution: SimpleBinPackingSolution = SimpleBinPackingSolution(
+                  Map(rectangles.head -> Placing(box, Coordinates(0, 0)))
+                )
 
-            override def getNeighborhood(solution: BinPackingSolution): View[BinPackingSolution] =
-              Set(
-                Option(
-                  SimpleBinPackingSolution(
-                    solution.placement.map {
-                      case (rectangle, Placing(box, Coordinates(x, y))) =>
-                        rectangle -> Placing(box, Coordinates(x + 1, y + 1))
-                    }
-                  )
-                ).filter(solutionHandler.isFeasible)
-              ).flatten.view
+                override def getNeighborhood(solution: SimpleBinPackingSolution): View[SimpleBinPackingSolution] =
+                  Set(
+                    Option(
+                      SimpleBinPackingSolution(
+                        solution.placement.map {
+                          case (rectangle, Placing(box, Coordinates(x, y))) =>
+                            rectangle -> Placing(box, Coordinates(x + 1, y + 1))
+                        }
+                      )
+                    ).filter(solutionHandler.isFeasible)
+                  ).flatten.view
 
-            override def evaluate(solution: BinPackingSolution, step: Int): Score = solution.placement.head match {
-              case (_, Placing(_, Coordinates(x, y))) => OneDimensionalScore(-(x + y))
-            }
+                override def evaluate(solution: SimpleBinPackingSolution, step: Int): Score =
+                  solution.placement.head match {
+                    case (_, Placing(_, Coordinates(x, y))) => OneDimensionalScore(-(x + y))
+                  }
+              }
           }
-        }
 
         executor.execute(runId, binPacking)
 

@@ -1,6 +1,7 @@
 package models.problem.binpacking.solution
 
 import models.problem.binpacking.BinPackingTopLeftFirstPlacing
+import models.problem.binpacking.solution.transformation.TopLeftFirstPlacingSupport
 
 import scala.collection.SortedSet
 
@@ -16,15 +17,10 @@ case class TopLeftFirstBinPackingSolution(
   override val placement: Map[Rectangle, Placing],
   override val topLeftCandidates: Map[Int, SortedSet[Coordinates]],
   override val boxLength: Int
-) extends BinPackingSolution with TopLeftCandidates with BinPackingTopLeftFirstPlacing {
+) extends BinPackingSolution with TopLeftCandidates with BinPackingTopLeftFirstPlacing
+    with TopLeftFirstPlacingSupport[TopLeftFirstBinPackingSolution] {
 
   override def asSimpleSolution: SimpleBinPackingSolution = SimpleBinPackingSolution(placement)
-
-  override def updated(rectangle: Rectangle, placing: Placing): BinPackingSolution = throw new NotImplementedError
-
-  override def reset(placement: Map[Rectangle, Placing]): BinPackingSolution = throw new NotImplementedError
-
-  override def reorderBoxes(boxIdOrder: Seq[Int]): BinPackingSolution = throw new NotImplementedError
 
   def placeTopLeftFirst(rectangle: Rectangle): TopLeftFirstBinPackingSolution = {
     val placementsPerBox = getPlacementsPerBox

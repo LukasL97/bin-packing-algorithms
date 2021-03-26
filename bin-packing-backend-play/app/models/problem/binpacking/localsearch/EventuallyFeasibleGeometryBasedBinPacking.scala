@@ -13,6 +13,7 @@ import models.problem.binpacking.localsearch.neighborhood.Right
 import models.problem.binpacking.localsearch.neighborhood.Up
 import models.problem.binpacking.solution.BinPackingSolution
 import models.problem.binpacking.solution.Rectangle
+import models.problem.binpacking.solution.SimpleBinPackingSolution
 
 import scala.collection.View
 
@@ -21,9 +22,9 @@ class EventuallyFeasibleGeometryBasedBinPacking(
   override val numRectangles: Int,
   override val rectangleWidthRange: (Int, Int),
   override val rectangleHeightRange: (Int, Int)
-) extends BinPackingLocalSearch {
+) extends BinPackingLocalSearch[SimpleBinPackingSolution] {
 
-  override val solutionHandler: BinPackingSolutionHandler =
+  override val solutionHandler: BinPackingSolutionHandler[SimpleBinPackingSolution] =
     new EventuallyFeasibleGeometryBasedBinPackingSolutionHandler(
       rectangles,
       boxLength
@@ -34,16 +35,16 @@ class EventuallyFeasibleGeometryBasedBinPacking(
 class EventuallyFeasibleGeometryBasedBinPackingSolutionHandler(
   val rectangles: Set[Rectangle],
   override val boxLength: Int
-) extends BinPackingSolutionHandler with GeometricStartSolution with BoxWeightedTopLeftFirstEvaluation
-    with OverlapPenalization {
+) extends BinPackingSolutionHandler[SimpleBinPackingSolution] with GeometricStartSolution
+    with BoxWeightedTopLeftFirstEvaluation with OverlapPenalization {
 
-  override val startSolution: BinPackingSolution = overconfidentStartSolution
+  override val startSolution: SimpleBinPackingSolution = overconfidentStartSolution
 
-  private val boxPullUpNeighborhood = new BoxPullUpNeighborhood(boxLength)
-  private val geometricShiftNeighborhood = new GeometricShiftNeighborhood(boxLength)
-  private val outsourcingNeighborhood = new OutsourcingNeighborhood(boxLength)
+  private val boxPullUpNeighborhood = new BoxPullUpNeighborhood[SimpleBinPackingSolution](boxLength)
+  private val geometricShiftNeighborhood = new GeometricShiftNeighborhood[SimpleBinPackingSolution](boxLength)
+  private val outsourcingNeighborhood = new OutsourcingNeighborhood[SimpleBinPackingSolution](boxLength)
 
-  override def getNeighborhood(solution: BinPackingSolution): View[BinPackingSolution] = {
+  override def getNeighborhood(solution: SimpleBinPackingSolution): View[SimpleBinPackingSolution] = {
     val solutionsWithBoxPullUp = boxPullUpNeighborhood.createBoxPullUpNeighborhood(solution)
     val solutionsWithLeftShift =
       geometricShiftNeighborhood.createShiftedSolutions(solution, Left, 1, allowOverlap = true)
@@ -65,7 +66,7 @@ class EventuallyFeasibleGeometryBasedBinPackingSolutionHandler(
     0
   }
 
-  override def evaluate(solution: BinPackingSolution, step: Int): Score = {
+  override def evaluate(solution: SimpleBinPackingSolution, step: Int): Score = {
     val overlapPenalization = penalizeOverlap(solution, maxAllowedOverlap(step))
     PrioritizedPenalizationScore(
       evaluate(solution),
@@ -73,7 +74,7 @@ class EventuallyFeasibleGeometryBasedBinPackingSolutionHandler(
     )
   }
 
-  override def stopOnStagnation(solution: BinPackingSolution): Boolean = {
+  override def stopOnStagnation(solution: SimpleBinPackingSolution): Boolean = {
     isFeasible(solution)
   }
 }

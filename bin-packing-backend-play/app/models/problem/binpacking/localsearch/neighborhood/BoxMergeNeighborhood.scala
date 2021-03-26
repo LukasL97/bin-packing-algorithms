@@ -1,16 +1,17 @@
 package models.problem.binpacking.localsearch.neighborhood
 
 import metrics.Metrics
-import models.problem.binpacking.solution.BinPackingSolution
 import models.problem.binpacking.solution.Box
 import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.Rectangle
+import models.problem.binpacking.solution.transformation.RectanglePlacingUpdateSupport
+import models.problem.binpacking.solution.transformation.SquashingSupport
 
 import scala.annotation.tailrec
 import scala.collection.View
 
-class BoxMergeNeighborhood(
+class BoxMergeNeighborhood[A <: RectanglePlacingUpdateSupport[A] with SquashingSupport[A]](
   val rectangles: Set[Rectangle],
   val boxLength: Int
 ) extends Metrics {
@@ -18,7 +19,7 @@ class BoxMergeNeighborhood(
   private lazy val maxRectangleWidth = rectangles.map(_.width).max
   private lazy val maxRectangleHeight = rectangles.map(_.height).max
 
-  def createBoxMergeNeighborhood(solution: BinPackingSolution): View[BinPackingSolution] = {
+  def createBoxMergeNeighborhood(solution: A): View[A] = {
     withTimer("box-merge-neighborhood") {
       val sortedRectangleGroups = solution.placement.groupBy {
         case (_, placing) => placing.box.id
@@ -30,7 +31,7 @@ class BoxMergeNeighborhood(
       val coordinates = getCoordinates
       val mergeableRectangleGroups = collectRectanglesUntilBoxFull(sortedRectangleGroups, coordinates.size)
       if (mergeableRectangleGroups.length <= 1) {
-        Seq.empty[BinPackingSolution].view
+        Seq.empty[A].view
       } else {
         val (boxIds, rectangleGroups) = mergeableRectangleGroups.unzip
         val mergedBoxId = boxIds.min

@@ -5,29 +5,6 @@ trait BinPackingSolution {
 
   def asSimpleSolution: SimpleBinPackingSolution
 
-  def updated(rectangle: Rectangle, placing: Placing): BinPackingSolution
-
-  def updated(placement: Map[Rectangle, Placing]): BinPackingSolution = {
-    placement.foldLeft(this) {
-      case (updatedSolution, (rectangle, placing)) => updatedSolution.updated(rectangle, placing)
-    }
-  }
-
-  def reset(placement: Map[Rectangle, Placing]): BinPackingSolution
-
-  def reorderBoxes(boxIdOrder: Seq[Int]): BinPackingSolution
-
-  def squashed: BinPackingSolution = {
-    val boxIds = placement.values.map(_.box.id).toSeq.distinct.sorted
-    val boxIdSquashMapping = boxIds.zip(1 to boxIds.size).toMap
-    reset(
-      placement.map {
-        case (rectangle, Placing(Box(id, length), coordinates)) =>
-          rectangle -> Placing(Box(boxIdSquashMapping(id), length), coordinates)
-      }
-    )
-  }
-
   def getPlacementsPerBox: Map[Int, Map[Rectangle, Coordinates]] = {
     placement.groupBy {
       case (_, placing) => placing.box

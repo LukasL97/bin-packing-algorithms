@@ -1,11 +1,13 @@
 package models.problem.binpacking.solution
 
+import models.problem.binpacking.solution.transformation.RectanglePlacingUpdateSupport
+
 case class GridInfoBinPackingSolution(
   override val placement: Map[Rectangle, Placing],
   override val grids: Map[Int, Grid],
   override val boxLength: Int,
   override val tileLength: Int
-) extends BinPackingSolution with GridInfo {
+) extends BinPackingSolution with GridInfo with RectanglePlacingUpdateSupport[GridInfoBinPackingSolution] {
 
   override def asSimpleSolution: SimpleBinPackingSolution = SimpleBinPackingSolution(placement)
 
@@ -27,12 +29,6 @@ case class GridInfoBinPackingSolution(
     }.getOrElse(placeRectangleInGrids(rectangle, placing))
     GridInfoBinPackingSolution(updatedPlacement, updatedGrids, boxLength, tileLength)
   }
-
-  override def reset(placement: Map[Rectangle, Placing]): GridInfoBinPackingSolution = {
-    throw new NotImplementedError(s"Implementation of reset(placement) missing for ${getClass.getSimpleName}")
-  }
-
-  override def reorderBoxes(boxIdOrder: Seq[Int]): BinPackingSolution = throw new NotImplementedError
 }
 
 trait GridInfo {

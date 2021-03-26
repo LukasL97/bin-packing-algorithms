@@ -1,15 +1,15 @@
 package models.problem.binpacking.localsearch.neighborhood
 
 import metrics.Metrics
-import models.problem.binpacking.solution.BinPackingSolution
 import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Rectangle
+import models.problem.binpacking.solution.transformation.BoxReorderingSupport
 
 import scala.collection.View
 
-class BoxReorderingNeighborhood extends Metrics {
+class BoxReorderingNeighborhood[A <: BoxReorderingSupport[A]] extends Metrics {
 
-  def reorderBoxesByFillGrade(solution: BinPackingSolution): View[BinPackingSolution] = {
+  def reorderBoxesByFillGrade(solution: A): View[A] = {
     withTimer("reorder-boxes-by-fill-grade-neighborhood") {
       val reorderedBoxIds = solution.getPlacementsPerBox.toSeq.sortBy {
         case (_, placement) => getOverallRectangleArea(placement)

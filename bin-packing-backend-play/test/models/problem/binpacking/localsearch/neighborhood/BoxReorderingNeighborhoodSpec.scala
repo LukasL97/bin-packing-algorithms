@@ -10,7 +10,7 @@ import org.scalatest.WordSpec
 
 class BoxReorderingNeighborhoodSpec extends WordSpec with MustMatchers {
 
-  val generator = new BoxReorderingNeighborhood
+  val generator = new BoxReorderingNeighborhood[SimpleBinPackingSolution]
 
   "BoxReorderingNeighborhood" should {
     "reorder boxes in descending order according to their fill grade" when {

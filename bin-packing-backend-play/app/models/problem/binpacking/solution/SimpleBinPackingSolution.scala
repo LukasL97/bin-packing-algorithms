@@ -1,8 +1,15 @@
 package models.problem.binpacking.solution
 
+import models.problem.binpacking.solution.transformation.BoxReorderingSupport
+import models.problem.binpacking.solution.transformation.PlacementResetSupport
+import models.problem.binpacking.solution.transformation.RectanglePlacingUpdateSupport
+import models.problem.binpacking.solution.transformation.SquashingSupport
+
 case class SimpleBinPackingSolution(
   override val placement: Map[Rectangle, Placing]
-) extends BinPackingSolution {
+) extends BinPackingSolution with BoxReorderingSupport[SimpleBinPackingSolution]
+    with PlacementResetSupport[SimpleBinPackingSolution] with RectanglePlacingUpdateSupport[SimpleBinPackingSolution]
+    with SquashingSupport[SimpleBinPackingSolution] {
 
   override def asSimpleSolution: SimpleBinPackingSolution = this
 

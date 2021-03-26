@@ -12,7 +12,7 @@ class CoarseMultipleBoxPullUpNeighborhoodSpec extends WordSpec with MustMatchers
 
   private val boxLength = 20
 
-  private val generator = new CoarseMultipleBoxPullUpNeighborhood(boxLength)
+  private val generator = new CoarseMultipleBoxPullUpNeighborhood[SimpleBinPackingSolution](boxLength)
 
   "CoarseMultipleBoxPullUpNeighborhood" should {
     "create neighboring solutions correctly" when {
