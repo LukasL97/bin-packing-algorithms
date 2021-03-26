@@ -112,17 +112,25 @@ class App extends Component {
   }
 
   moveCurrentStepIndex = (index) => {
-    if (index >= 0 && this.state.solutionSteps.length > index) {
-      const oldSolutionStep = this.state.solutionSteps[this.state.currentStepIndex]
-      const newSolutionStep = this.state.solutionSteps[index]
-      const newRectanglesLastUpdate = {...this.state.rectanglesLastUpdate}
-      this.getUpdatedRectangleIdsInNewStep(oldSolutionStep, newSolutionStep).forEach(id => newRectanglesLastUpdate[id] = newSolutionStep.step)
-      this.setState(oldState => ({
-        ...oldState,
-        currentStepIndex: index,
-        rectanglesLastUpdate: newRectanglesLastUpdate
-      }))
+    if (this.state.solutionSteps.length === 0) {
+      return
     }
+    let actualIndex = index
+    if (index === undefined || index === '' || isNaN(index) || index < 0) {
+      actualIndex = 0
+    }
+    if (index >= this.state.solutionSteps.length) {
+      actualIndex = this.state.solutionSteps.length - 1
+    }
+    const oldSolutionStep = this.state.solutionSteps[this.state.currentStepIndex]
+    const newSolutionStep = this.state.solutionSteps[actualIndex]
+    const newRectanglesLastUpdate = {...this.state.rectanglesLastUpdate}
+    this.getUpdatedRectangleIdsInNewStep(oldSolutionStep, newSolutionStep).forEach(id => newRectanglesLastUpdate[id] = newSolutionStep.step)
+    this.setState(oldState => ({
+      ...oldState,
+      currentStepIndex: actualIndex,
+      rectanglesLastUpdate: newRectanglesLastUpdate
+    }))
   }
 
   updateMoveCurrentStepIndexInterval(visualizationIterationPeriod) {
@@ -145,6 +153,7 @@ class App extends Component {
   }
 
   getAutomaticVisualization = () => this.state.automaticVisualization
+  getCurrentStepIndex = () => this.state.currentStepIndex
 
   componentDidMount() {
     this.fetchSolutionStepsInterval = setInterval(
@@ -182,6 +191,8 @@ class App extends Component {
           updateVisualizationIterationPeriod={this.updateMoveCurrentStepIndexInterval.bind(this)}
           toggleAutomaticVisualization={this.toggleAutomaticVisualization.bind(this)}
           getAutomaticVisualization={this.getAutomaticVisualization.bind(this)}
+          getCurrentStepIndex={this.getCurrentStepIndex.bind(this)}
+          moveCurrentStepIndex={this.moveCurrentStepIndex.bind(this)}
           getProgress={this.getProgress}
         />
       </div>

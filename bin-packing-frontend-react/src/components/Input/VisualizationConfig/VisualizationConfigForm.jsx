@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import NumericalInputFormRow from '../NumericalInputFormRow'
 import ToggleFormRow from './ToggleFormRow'
+import ManualStepIndexMoverFormRow from './ManualStepIndexMoverFormRow'
 
 class VisualizationConfigForm extends Component {
 
@@ -42,7 +43,10 @@ class VisualizationConfigForm extends Component {
                 value={this.state.visualizationIterationPeriod}
                 onChange={this.handleMsPerIterationChange.bind(this)}
               /> :
-              null
+              <ManualStepIndexMoverFormRow
+                getCurrentStepIndex={this.props.getCurrentStepIndex}
+                moveCurrentStepIndex={this.props.moveCurrentStepIndex}
+              />
           }
         </form>
       </div>

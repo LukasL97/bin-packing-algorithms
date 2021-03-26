@@ -7,7 +7,7 @@ const ToggleFormRow = (props) => {
   const [checked, setChecked] = useState(value)
 
   return (
-    <div className="labeled-form-row toggle-form-row">
+    <div className="form-row labeled-form-row toggle-form-row">
       <label className="form-row-label" htmlFor={name}>{label}</label>
       <label className="switch">
         <input
