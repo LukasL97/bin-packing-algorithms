@@ -271,6 +271,17 @@ class TopLeftFirstBinPackingSolutionSpec
         }
       }
     }
+
+    "initialize with one rectangle per box" when {
+      "given some rectangles" in withRectangles(10, (1, 5), (1, 5)) { rectangles =>
+        TopLeftFirstBinPackingSolution
+          .apply(rectangles, boxLength)
+          .placement
+          .toSeq
+          .sortBy(_._2.box.id)
+          .map(_._1) mustEqual rectangles
+      }
+    }
   }
 
 }

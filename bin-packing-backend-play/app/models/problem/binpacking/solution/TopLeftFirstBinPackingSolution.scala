@@ -2,11 +2,14 @@ package models.problem.binpacking.solution
 
 import models.problem.binpacking.BinPackingTopLeftFirstPlacing
 import models.problem.binpacking.solution.initialization.EmptySolutionInitializer
+import models.problem.binpacking.solution.initialization.OneRectanglePerBoxSolutionInitializer
 import models.problem.binpacking.solution.transformation.TopLeftFirstPlacingSupport
 
 import scala.collection.SortedSet
 
-object TopLeftFirstBinPackingSolution extends EmptySolutionInitializer[TopLeftFirstBinPackingSolution] {
+object TopLeftFirstBinPackingSolution
+    extends EmptySolutionInitializer[TopLeftFirstBinPackingSolution]
+    with OneRectanglePerBoxSolutionInitializer[TopLeftFirstBinPackingSolution] {
 
   override def apply(boxLength: Int): TopLeftFirstBinPackingSolution = new TopLeftFirstBinPackingSolution(
     Map.empty[Rectangle, Placing],
@@ -14,6 +17,17 @@ object TopLeftFirstBinPackingSolution extends EmptySolutionInitializer[TopLeftFi
     boxLength
   )
 
+  override def apply(rectangles: Seq[Rectangle], boxLength: Int): TopLeftFirstBinPackingSolution = {
+    val emptySolution = TopLeftFirstBinPackingSolution(boxLength)
+    rectangles.zipWithIndex.foldLeft(emptySolution) {
+      case (solution, (rectangle, index)) =>
+        solution
+          .placeTopLeftFirstInSpecificBox(rectangle, index + 1)
+          .getOrElse(
+            throw new RuntimeException(s"Failed initializing ${getClass.getSimpleName} with one rectangle per box")
+          )
+    }
+  }
 }
 
 case class TopLeftFirstBinPackingSolution(
