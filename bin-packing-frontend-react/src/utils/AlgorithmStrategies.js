@@ -25,6 +25,10 @@ class AlgorithmStrategies {
       {
         id: 'localSearch eventuallyFeasibleGeometryBased',
         name: 'Local Search - Geometry-based (eventually feasible)'
+      },
+      {
+        id: 'localSearch boxMerging',
+        name: 'Local Search - Box Merging'
       }
     ]
   }
