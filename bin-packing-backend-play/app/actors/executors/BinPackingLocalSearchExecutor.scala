@@ -12,7 +12,7 @@ class BinPackingLocalSearchExecutor[A <: BinPackingSolution](dumper: ActorRef)
     extends BinPackingExecutor[BinPackingLocalSearch[A]] with Logging with Metrics {
 
   // TODO: proper configuration
-  val maxIterations = 1000
+  val maxIterations = 10000
 
   override def execute(runId: String, binPacking: BinPackingLocalSearch[A]): Unit = {
     withContext("runId" -> runId) {
