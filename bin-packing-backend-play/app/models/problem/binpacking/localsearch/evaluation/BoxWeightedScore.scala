@@ -1,14 +1,15 @@
 package models.problem.binpacking.localsearch.evaluation
 
+import metrics.Metrics
 import models.algorithm.Score
 
 import scala.annotation.tailrec
 
 case class BoxWeightedScore(
   boxScores: Seq[Score]
-) extends Score {
+) extends Score with Metrics {
 
-  override def compare(that: Score): Int = {
+  override def compare(that: Score): Int = withTimer("box-weighted-score-compare") {
     val other = that.asInstanceOf[BoxWeightedScore]
     boxScores.size.compareTo(other.boxScores.size) match {
       case 0 => compareBoxScores(boxScores, other.boxScores)
