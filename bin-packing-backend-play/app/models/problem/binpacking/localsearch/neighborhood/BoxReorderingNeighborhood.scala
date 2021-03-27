@@ -11,14 +11,26 @@ class BoxReorderingNeighborhood[A <: BoxReorderingSupport[A]] extends Metrics {
 
   def reorderBoxesByFillGrade(solution: A): View[A] = {
     withTimer("reorder-boxes-by-fill-grade-neighborhood") {
-      val reorderedBoxIds = solution.getPlacementsPerBox.toSeq.sortBy {
-        case (_, placement) => getOverallRectangleArea(placement)
-      }.reverse.map {
+      val reorderedBoxIds = solution.getPlacementsPerBox.toSeq.sorted.map {
         case (boxId, _) => boxId
       }
-      Seq(solution.reorderBoxes(reorderedBoxIds)).view
+      if (reorderedBoxIds == (1 to reorderedBoxIds.size)) {
+        View.empty[A]
+      } else {
+        Seq(solution.reorderBoxes(reorderedBoxIds)).view
+      }
     }
   }
+
+  private implicit val fillGradeOrdering: Ordering[(Int, Map[Rectangle, Coordinates])] =
+    (x: (Int, Map[Rectangle, Coordinates]), y: (Int, Map[Rectangle, Coordinates])) => {
+      val fillGradeComparison = getOverallRectangleArea(y._2) - getOverallRectangleArea(x._2)
+      if (fillGradeComparison == 0) {
+        x._1 - y._1
+      } else {
+        fillGradeComparison
+      }
+    }
 
   private def getOverallRectangleArea(placement: Map[Rectangle, Coordinates]): Int = {
     placement.keys.toSeq.map {
