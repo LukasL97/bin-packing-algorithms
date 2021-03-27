@@ -16,6 +16,8 @@ trait TopLeftFirstPlacingSupport[A <: TopLeftFirstPlacingSupport[A]]
 
   def placeTopLeftFirstInSpecificBox(rectangle: Rectangle, boxId: Int): Option[A]
 
+  def removeRectangleFromBox(rectangleId: Int, boxId: Int): A
+
   protected def findRectanglePlacing(
     rectangle: Rectangle,
     candidateCoordinates: Option[Map[Int, SortedSet[Coordinates]]] = None

@@ -282,6 +282,32 @@ class TopLeftFirstBinPackingSolutionSpec
           .map(_._1) mustEqual rectangles
       }
     }
+
+    "remove a rectangle from a box" when {
+      "given som rectangle id and box id" in {
+        val solution = TopLeftFirstBinPackingSolution(
+          Map(
+            Rectangle(1, 1, 3) -> Placing(Box(1, boxLength), Coordinates(0, 0)),
+            Rectangle(2, 1, 2) -> Placing(Box(1, boxLength), Coordinates(1, 0)),
+            Rectangle(3, 1, 1) -> Placing(Box(1, boxLength), Coordinates(2, 0)),
+          ),
+          Map(
+            1 -> SortedSet(Coordinates(3, 0), Coordinates(2, 1), Coordinates(1, 2), Coordinates(0, 3))
+          ),
+          boxLength
+        )
+        solution.removeRectangleFromBox(2, 1) mustEqual TopLeftFirstBinPackingSolution(
+          Map(
+            Rectangle(1, 1, 3) -> Placing(Box(1, boxLength), Coordinates(0, 0)),
+            Rectangle(3, 1, 1) -> Placing(Box(1, boxLength), Coordinates(2, 0)),
+          ),
+          Map(
+            1 -> SortedSet(Coordinates(3, 0), Coordinates(1, 1), Coordinates(1, 0), Coordinates(0, 3))
+          ),
+          boxLength
+        )
+      }
+    }
   }
 
 }

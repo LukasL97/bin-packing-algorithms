@@ -3,6 +3,8 @@ package models.problem.binpacking.solution
 import models.problem.binpacking.BinPackingTopLeftFirstPlacing
 import models.problem.binpacking.solution.initialization.EmptySolutionInitializer
 import models.problem.binpacking.solution.initialization.OneRectanglePerBoxSolutionInitializer
+import models.problem.binpacking.solution.transformation.BoxReorderingSupport
+import models.problem.binpacking.solution.transformation.SquashingSupport
 import models.problem.binpacking.solution.transformation.TopLeftFirstPlacingSupport
 
 import scala.collection.SortedSet
@@ -35,9 +37,59 @@ case class TopLeftFirstBinPackingSolution(
   override val topLeftCandidates: Map[Int, SortedSet[Coordinates]],
   override val boxLength: Int
 ) extends BinPackingSolution with TopLeftCandidates with BinPackingTopLeftFirstPlacing
-    with TopLeftFirstPlacingSupport[TopLeftFirstBinPackingSolution] {
+    with TopLeftFirstPlacingSupport[TopLeftFirstBinPackingSolution]
+    with BoxReorderingSupport[TopLeftFirstBinPackingSolution] with SquashingSupport[TopLeftFirstBinPackingSolution] {
 
   override def asSimpleSolution: SimpleBinPackingSolution = SimpleBinPackingSolution(placement)
+
+  override def removeRectangleFromBox(rectangleId: Int, boxId: Int): TopLeftFirstBinPackingSolution = {
+    val (rectangle, coordinates) = getPlacementInSingleBox(boxId).find {
+      case (rectangle, _) => rectangle.id == rectangleId
+    }.getOrElse(
+      throw new RuntimeException(s"Rectangle with id $rectangleId was not in box with id $boxId")
+    )
+    val updatedPlacement = placement.removed(rectangle)
+    val updatedBoxPlacement = updatedPlacement.collect {
+      case (rectangle, Placing(box, coordinates)) if box.id == boxId => rectangle -> coordinates
+    }
+    if (updatedBoxPlacement.isEmpty) {
+      copy(
+        placement = updatedPlacement,
+        topLeftCandidates = topLeftCandidates.removed(boxId)
+      )
+    } else {
+      val updatedBoxCandidates =
+        updateCandidatesOnRectangleRemoval(rectangle, coordinates, topLeftCandidates(boxId), updatedBoxPlacement)
+      copy(
+        placement = updatedPlacement,
+        topLeftCandidates = topLeftCandidates.updated(boxId, updatedBoxCandidates)
+      )
+    }
+  }
+
+  private def updateCandidatesOnRectangleRemoval(
+    rectangle: Rectangle,
+    coordinates: Coordinates,
+    boxCandidates: SortedSet[Coordinates],
+    updatedBoxPlacement: Map[Rectangle, Coordinates]
+  ): SortedSet[Coordinates] = {
+    val rectangleRightEdge =
+      VerticalEdge(coordinates.x + rectangle.width, coordinates.y, coordinates.y + rectangle.height)
+    val rectangleBottomEdge =
+      HorizontalEdge(coordinates.y + rectangle.height, coordinates.x, coordinates.x + rectangle.width)
+    val candidatesInRectangleRightEdge = boxCandidates.filter(rectangleRightEdge.containsNotBottom)
+    val unliftedCandidatesInRectangleRightEdge = candidatesInRectangleRightEdge
+      .map(c => Coordinates(coordinates.x, c.y))
+      .filter(isInSomeRightEdge(_, updatedBoxPlacement))
+    val candidatesInRectangleBottomEdge = boxCandidates.filter(rectangleBottomEdge.containsNotRight)
+    val unliftedCandidatesInRectangleBottomEdge = candidatesInRectangleBottomEdge
+      .map(c => Coordinates(c.x, coordinates.y))
+      .filter(isInSomeBottomEdge(_, updatedBoxPlacement))
+    boxCandidates.diff(candidatesInRectangleRightEdge ++ candidatesInRectangleBottomEdge) ++
+      unliftedCandidatesInRectangleRightEdge ++
+      unliftedCandidatesInRectangleBottomEdge ++
+      Seq(coordinates)
+  }
 
   override def placeTopLeftFirst(rectangle: Rectangle): TopLeftFirstBinPackingSolution = {
     val (placedRectangle, placing) = findRectanglePlacing(rectangle, Option(topLeftCandidates))
@@ -73,7 +125,6 @@ case class TopLeftFirstBinPackingSolution(
   ): Map[Int, SortedSet[Coordinates]] = {
     val placementsPerBox = getPlacementsPerBox
     val maxBoxId = placementsPerBox.keys.maxOption.getOrElse(0)
-    val updatedPlacement = placement.updated(rectangle, placing)
     val rectangleTopRight = Coordinates(placing.coordinates.x + rectangle.width, placing.coordinates.y)
     val rectangleBottomLeft = Coordinates(placing.coordinates.x, placing.coordinates.y + rectangle.height)
     if (placing.box.id > maxBoxId) {
@@ -218,11 +269,25 @@ case class TopLeftFirstBinPackingSolution(
     leftEdges.exists(_.containsNotBottom(point))
   }
 
+  private def isInSomeRightEdge(point: Coordinates, placement: Map[Rectangle, Coordinates]): Boolean = {
+    val rightEdges = placement.toSeq.map {
+      case (rectangle, coordinates) => getRightEdge(rectangle, coordinates)
+    }.appended(boxLeftBorder)
+    rightEdges.exists(_.containsNotBottom(point))
+  }
+
   private def isInSomeTopEdge(point: Coordinates, placement: Map[Rectangle, Coordinates]): Boolean = {
     val topEdges = placement.toSeq.map {
       case (rectangle, coordinates) => getTopEdge(rectangle, coordinates)
     }.appended(boxBottomBorder)
     topEdges.exists(_.containsNotRight(point))
+  }
+
+  private def isInSomeBottomEdge(point: Coordinates, placement: Map[Rectangle, Coordinates]): Boolean = {
+    val bottomEdges = placement.toSeq.map {
+      case (rectangle, coordinates) => getBottomEdge(rectangle, coordinates)
+    }.appended(boxTopBorder)
+    bottomEdges.exists(_.containsNotRight(point))
   }
 
   private def getLeftEdge(rectangle: Rectangle, coordinates: Coordinates): VerticalEdge = VerticalEdge(
@@ -242,7 +307,6 @@ case class TopLeftFirstBinPackingSolution(
     coordinates.x,
     coordinates.x + rectangle.width
   )
-
   private def getBottomEdge(rectangle: Rectangle, coordinates: Coordinates): HorizontalEdge = HorizontalEdge(
     coordinates.y + rectangle.height,
     coordinates.x,
@@ -251,8 +315,32 @@ case class TopLeftFirstBinPackingSolution(
   private val boxLeftBorder = VerticalEdge(0, 0, boxLength)
   private val boxRightBorder = VerticalEdge(boxLength, 0, boxLength)
   private val boxTopBorder = HorizontalEdge(0, 0, boxLength)
+
   private val boxBottomBorder = HorizontalEdge(boxLength, 0, boxLength)
 
+  override def reorderBoxes(boxIdOrder: Seq[Int]): TopLeftFirstBinPackingSolution = {
+    val newPlacement = reorderPlacement(boxIdOrder)
+    val boxIdMapping = boxIdOrder.zip(1 to boxIdOrder.size).toMap
+    val newCandidates = topLeftCandidates.map {
+      case (boxId, candidates) => boxIdMapping(boxId) -> candidates
+    }
+    copy(
+      placement = newPlacement,
+      topLeftCandidates = newCandidates
+    )
+  }
+
+  override def squashed: TopLeftFirstBinPackingSolution = {
+    val boxIdSquashMapping = getBoxIdSquashMapping
+    val updatedPlacement = squashPlacement(boxIdSquashMapping)
+    val updatedCandidates = topLeftCandidates.map {
+      case (boxId, candidates) => boxIdSquashMapping(boxId) -> candidates
+    }
+    copy(
+      placement = updatedPlacement,
+      topLeftCandidates = updatedCandidates
+    )
+  }
 }
 
 trait TopLeftCandidates {
