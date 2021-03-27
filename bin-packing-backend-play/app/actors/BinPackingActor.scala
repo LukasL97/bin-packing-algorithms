@@ -10,6 +10,7 @@ import com.google.inject.Inject
 import models.problem.binpacking.greedy.basic.BasicBinPackingGreedy
 import models.problem.binpacking.greedy.candidatesupported.CandidateSupportedBinPackingGreedy
 import models.problem.binpacking.localsearch.BinPackingLocalSearch
+import models.problem.binpacking.localsearch.TopLeftFirstBoxMergingBinPacking
 import models.problem.binpacking.solution.SimpleBinPackingSolution
 import models.problem.binpacking.solution.TopLeftFirstBinPackingSolution
 
@@ -25,6 +26,10 @@ class BinPackingActor @Inject()(
 ) extends Actor {
 
   override def receive: Receive = {
+    case (runId: String, binPacking: TopLeftFirstBoxMergingBinPacking) =>
+      val dumper = createSolutionStepDumper(runId)
+      val executor = new BinPackingLocalSearchExecutor[TopLeftFirstBinPackingSolution](dumper)
+      executor.execute(runId, binPacking)
     case (runId: String, binPacking: BinPackingLocalSearch[SimpleBinPackingSolution]) =>
       val dumper = createSolutionStepDumper(runId)
       val executor = new BinPackingLocalSearchExecutor[SimpleBinPackingSolution](dumper)
