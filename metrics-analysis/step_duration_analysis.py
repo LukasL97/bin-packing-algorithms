@@ -81,9 +81,12 @@ def analyze_step_durations(run_id, algorithm, endpoint):
 
 
 def analyze_timer(name, run_id, endpoint):
-    query = build_query_body(name, run_id)
-    metric = query_metrics(endpoint, query)[0]
-    return metric['result']['count'], metric['result']['mean'] / 1000000
+    try:
+        query = build_query_body(name, run_id)
+        metric = query_metrics(endpoint, query)[0]
+        return metric['result']['count'], metric['result']['mean'] / 1000000
+    except IndexError:
+        print('Metric %s not found' % name)
 
 
 def analyze_local_search_geometry_based(run_id, endpoint):
@@ -93,6 +96,20 @@ def analyze_local_search_geometry_based(run_id, endpoint):
         'box-pull-up-neighborhood',
         'coarse-multiple-box-pull-up-neighborhood',
         'entire-box-maximally-shifted-neighborhood'
+    ]
+    for timer in timers:
+        count, time = analyze_timer(timer, run_id, endpoint)
+        print('%s: count: %d, mean: %r ms, sum: %r ms' % (timer, count, time, count * time))
+
+def analyze_local_search_box_merging(run_id, endpoint):
+    timers = [
+        'ls-merging-start-solution',
+        'ls-merging-evaluate',
+        'box-weighted-score-compare',
+        'reorder-boxes-by-fill-grade-neighborhood',
+        'single-box-pull-up-neighborhood',
+        'maximal-box-pull-up-neighborhood',
+        'box-merge-neighborhood'
     ]
     for timer in timers:
         count, time = analyze_timer(timer, run_id, endpoint)
@@ -111,11 +128,12 @@ if __name__ == '__main__':
         'greedy_random',
         'greedy_size',
         'ls_geometry',
-        'ls_overlap'
+        'ls_overlap',
+        'ls_boxmerging'
     ]
     parser = argparse.ArgumentParser()
     parser.add_argument('--runId', type=str, required=True)
-    parser.add_argument('--algorithm', type=str, default='ls_geometry', choices=algorithms)
+    parser.add_argument('--algorithm', type=str, default='ls_boxmerging', choices=algorithms)
     parser.add_argument('--endpoint', type=str, default='http://localhost:9000/metrics')
     args = parser.parse_args()
 
@@ -127,3 +145,5 @@ if __name__ == '__main__':
 
     if args.algorithm == 'ls_geometry':
         analyze_local_search_geometry_based(args.runId, args.endpoint)
+    elif args.algorithm == 'ls_boxmerging':
+        analyze_local_search_box_merging(args.runId, args.endpoint)
