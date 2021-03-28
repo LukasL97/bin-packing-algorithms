@@ -12,19 +12,15 @@ import models.problem.binpacking.BinPacking
 import models.problem.binpacking.greedy.BoxClosingBinPackingGreedy
 import models.problem.binpacking.greedy.basic.RandomSelectionBinPackingGreedy
 import models.problem.binpacking.greedy.basic.SizeOrderedBinPackingGreedy
-import models.problem.binpacking.greedy.candidatesupported.{
-  RandomSelectionBinPackingGreedy => QuickRandomSelectionBinPackingGreedy
-}
-import models.problem.binpacking.greedy.candidatesupported.{
-  SizeOrderedBinPackingGreedy => QuickSizeOrderedBinPackingGreedy
-}
+import models.problem.binpacking.greedy.candidatesupported.{RandomSelectionBinPackingGreedy => QuickRandomSelectionBinPackingGreedy}
+import models.problem.binpacking.greedy.candidatesupported.{SizeOrderedBinPackingGreedy => QuickSizeOrderedBinPackingGreedy}
 import models.problem.binpacking.localsearch.EventuallyFeasibleGeometryBasedBinPacking
 import models.problem.binpacking.localsearch.GeometryBasedBinPacking
 import models.problem.binpacking.localsearch.TopLeftFirstBoxMergingBinPacking
 import play.api.libs.json.JsValue
 import play.api.mvc._
-import utils.JsonConversions._
 import utils.BinPackingSolutionSerializationUtil.formats
+import utils.JsonConversions._
 import utils.SerializationUtil
 
 import java.lang.Integer.parseInt
@@ -62,6 +58,14 @@ class BinPackingController @Inject()(
         .getSolutionStepsInStepRange(runId, parseInt(minStep), parseInt(maxStep))
         .map(solutionSteps => SerializationUtil.toJson(solutionSteps))
         .map(response => Ok(toPlayJson(response)))
+  }
+
+  def getRawSteps(runId: String, minStep: String, maxStep: String): Action[AnyContent] = Action.async {
+    implicit request: Request[AnyContent] =>
+      dao
+        .getRawSolutionsStepsInStepRange(runId, parseInt(minStep), parseInt(maxStep))
+        .map(toPlayJson)
+        .map(Ok(_))
   }
 
 }

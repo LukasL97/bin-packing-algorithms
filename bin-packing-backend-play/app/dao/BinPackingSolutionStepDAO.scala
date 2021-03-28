@@ -6,6 +6,7 @@ import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.model.Filters._
 import org.mongodb.scala.Completed
 import org.mongodb.scala.MongoDatabase
+import org.mongodb.scala.bson.BsonArray
 import utils.BinPackingSolutionSerializationUtil.formats
 import utils.SerializationUtil
 
@@ -35,6 +36,20 @@ class BinPackingSolutionStepDAO @Inject()(val db: MongoDatabase, implicit val ec
       .map(convertDocumentToSolutionStep)
       .toFuture()
       .map(steps => steps.sortBy(_.step))
+  }
+
+  def getRawSolutionsStepsInStepRange(runId: String, stepMin: Int, stepMax: Int): Future[BsonArray] = {
+    collection
+      .find(
+        and(
+          equal("runId", runId),
+          gte("step", stepMin),
+          lte("step", stepMax)
+        )
+      )
+      .toFuture()
+      .map(_.sortBy(_.get("step").asInt32()))
+      .map(BsonArray.fromIterable)
   }
 
   def convertSolutionStepToDocument(solutionStep: BinPackingSolutionStep): BsonDocument = {
