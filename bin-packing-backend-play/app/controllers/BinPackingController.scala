@@ -9,10 +9,15 @@ import akka.actor.Props
 import controllers.exceptions.UnknownStrategyException
 import dao.BinPackingSolutionStepDAO
 import models.problem.binpacking.BinPacking
+import models.problem.binpacking.greedy.BoxClosingBinPackingGreedy
 import models.problem.binpacking.greedy.basic.RandomSelectionBinPackingGreedy
 import models.problem.binpacking.greedy.basic.SizeOrderedBinPackingGreedy
-import models.problem.binpacking.greedy.candidatesupported.{RandomSelectionBinPackingGreedy => QuickRandomSelectionBinPackingGreedy}
-import models.problem.binpacking.greedy.candidatesupported.{SizeOrderedBinPackingGreedy => QuickSizeOrderedBinPackingGreedy}
+import models.problem.binpacking.greedy.candidatesupported.{
+  RandomSelectionBinPackingGreedy => QuickRandomSelectionBinPackingGreedy
+}
+import models.problem.binpacking.greedy.candidatesupported.{
+  SizeOrderedBinPackingGreedy => QuickSizeOrderedBinPackingGreedy
+}
 import models.problem.binpacking.localsearch.EventuallyFeasibleGeometryBasedBinPacking
 import models.problem.binpacking.localsearch.GeometryBasedBinPacking
 import models.problem.binpacking.localsearch.TopLeftFirstBoxMergingBinPacking
@@ -77,7 +82,7 @@ class BinPackingActorStarter @Inject()(
       (startInfo.rectanglesWidthRange.min, startInfo.rectanglesWidthRange.max),
       (startInfo.rectanglesHeightRange.min, startInfo.rectanglesHeightRange.max)
     )
-    val startSolution = binPacking.startSolution
+    val startSolution = binPacking.startSolution.asSimpleSolution
     actor.tell((runId, binPacking), noSender)
     BinPackingSolutionStep.startStep(runId, startSolution)
   }
@@ -142,6 +147,13 @@ object BinPackingProvider {
       )
     case "greedy2 sizeOrdered" =>
       new QuickSizeOrderedBinPackingGreedy(
+        boxLength,
+        numRectangles,
+        rectangleWidthRange,
+        rectangleHeightRange
+      )
+    case "greedy boxClosing" =>
+      new BoxClosingBinPackingGreedy(
         boxLength,
         numRectangles,
         rectangleWidthRange,
