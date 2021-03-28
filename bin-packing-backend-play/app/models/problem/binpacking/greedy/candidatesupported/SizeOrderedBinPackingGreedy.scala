@@ -1,37 +1,36 @@
 package models.problem.binpacking.greedy.candidatesupported
 
 import models.problem.binpacking.solution.Rectangle
+import models.problem.binpacking.solution.TopLeftFirstBinPackingSolution
+import models.problem.binpacking.utils.RectangleSizeOrdering
 
 class SizeOrderedBinPackingGreedy(
   override val boxLength: Int,
   override val numRectangles: Int,
   override val rectangleWidthRange: (Int, Int),
   override val rectangleHeightRange: (Int, Int)
-) extends CandidateSupportedBinPackingGreedy {
+) extends CandidateSupportedBinPackingGreedy with RectangleSizeOrdering {
 
-  override val selectionHandler: CandidateSupportedBinPackingSelectionHandler = new SizeOrderedBinPackingSelectionHandler(
-    boxLength,
-    rectangles
-  )
+  override val selectionHandler: CandidateSupportedBinPackingSelectionHandler =
+    new SizeOrderedBinPackingSelectionHandler(
+      boxLength,
+      rectangles.toSeq.sorted.reverse
+    )
 }
 
 /**
- * Select candidates ordered by their size (area) in descending order
- */
+  * Select candidates ordered by their size (area) in descending order
+  */
 class SizeOrderedBinPackingSelectionHandler(
   override val boxLength: Int,
-  override val candidates: Iterable[Rectangle]
+  override val candidates: Seq[Rectangle]
 ) extends CandidateSupportedBinPackingSelectionHandler {
 
-  private implicit val sizeOrdering: Ordering[Rectangle] = new Ordering[Rectangle] {
-    private def size(rectangle: Rectangle): Int = rectangle.width * rectangle.height
-
-    override def compare(x: Rectangle, y: Rectangle): Int = size(x) - size(y)
-  }
-
-  override def selectNextCandidate(candidates: Iterable[Rectangle]): (Rectangle, Iterable[Rectangle]) = {
-    val sizeOrderedCandidates = candidates.toSeq.sorted.reverse
-    (sizeOrderedCandidates.head, sizeOrderedCandidates.tail)
+  override def selectNextCandidate(
+    candidates: Iterable[Rectangle],
+    solution: TopLeftFirstBinPackingSolution
+  ): (Rectangle, Iterable[Rectangle]) = {
+    (candidates.head, candidates.tail)
   }
 
 }

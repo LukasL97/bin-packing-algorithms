@@ -34,7 +34,7 @@ class Greedy[Candidate, Solution](selectionHandler: SelectionHandler[Candidate, 
     candidates: Iterable[Candidate]
   ): (Solution, Iterable[Candidate]) = {
     withTimer("greedy-run-step", "step" -> step.toString) {
-      val (nextCandidate, remainingCandidates) = selectionHandler.selectNextCandidate(candidates)
+      val (nextCandidate, remainingCandidates) = selectionHandler.selectNextCandidate(candidates, currentSolution)
       val nextSolution = selectionHandler.placeCandidateInSolution(nextCandidate, currentSolution)
       (nextSolution, remainingCandidates)
     }
@@ -47,7 +47,7 @@ trait SelectionHandler[Candidate, Solution] {
   val startSolution: Solution
   val candidates: Iterable[Candidate]
 
-  def selectNextCandidate(candidates: Iterable[Candidate]): (Candidate, Iterable[Candidate])
+  def selectNextCandidate(candidates: Iterable[Candidate], solution: Solution): (Candidate, Iterable[Candidate])
 
   def placeCandidateInSolution(candidate: Candidate, solution: Solution): Solution
 }

@@ -34,7 +34,10 @@ class BinPackingGreedyExecutorSpec
     override val boxLength: Int,
     override val candidates: Iterable[Rectangle]
   ) extends BasicBinPackingSelectionHandler {
-    override def selectNextCandidate(candidates: Iterable[Rectangle]): (Rectangle, Iterable[Rectangle]) = {
+    override def selectNextCandidate(
+      candidates: Iterable[Rectangle],
+      solution: SimpleBinPackingSolution
+    ): (Rectangle, Iterable[Rectangle]) = {
       (candidates.head, candidates.tail)
     }
   }

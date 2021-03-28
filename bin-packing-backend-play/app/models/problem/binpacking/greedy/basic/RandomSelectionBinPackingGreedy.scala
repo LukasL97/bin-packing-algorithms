@@ -1,6 +1,7 @@
 package models.problem.binpacking.greedy.basic
 
 import models.problem.binpacking.solution.Rectangle
+import models.problem.binpacking.solution.SimpleBinPackingSolution
 
 class RandomSelectionBinPackingGreedy(
   override val boxLength: Int,
@@ -21,7 +22,10 @@ class RandomSelectionBinPackingSelectionHandler(
   override val candidates: Iterable[Rectangle]
 ) extends BasicBinPackingSelectionHandler {
 
-  override def selectNextCandidate(candidates: Iterable[Rectangle]): (Rectangle, Iterable[Rectangle]) = {
+  override def selectNextCandidate(
+    candidates: Iterable[Rectangle],
+    solution: SimpleBinPackingSolution
+  ): (Rectangle, Iterable[Rectangle]) = {
     (candidates.head, candidates.tail)
   }
 }
