@@ -20,7 +20,8 @@ trait TopLeftFirstPlacingSupport[A <: TopLeftFirstPlacingSupport[A]]
 
   protected def findRectanglePlacing(
     rectangle: Rectangle,
-    candidateCoordinates: Option[Map[Int, SortedSet[Coordinates]]] = None
+    candidateCoordinates: Option[Map[Int, SortedSet[Coordinates]]] = None,
+    ignoreBoxes: Seq[Int] = Seq.empty
   ): (Rectangle, Placing) = {
     val placementsPerBox = getPlacementsPerBox
     val sortedPlacementsPerBox = placementsPerBox.toSeq.sortBy {
@@ -30,16 +31,20 @@ trait TopLeftFirstPlacingSupport[A <: TopLeftFirstPlacingSupport[A]]
     sortedPlacementsPerBox
       .foldLeft(Option.empty[(Rectangle, Placing)]) {
         case (foundPlacing, (boxId, placement)) =>
-          foundPlacing.orElse(
-            placeRectangleInBoxAtMostTopLeftPoint(
-              rectangle,
-              placement,
-              considerRotation = true,
-              candidateCoordinates = candidateCoordinates.map(_(boxId).toSeq)
-            ).map {
-              case (rectangle, coordinates) => rectangle -> Placing(Box(boxId, boxLength), coordinates)
+          foundPlacing.orElse {
+            if (ignoreBoxes.contains(boxId)) {
+              Option.empty[(Rectangle, Placing)]
+            } else {
+              placeRectangleInBoxAtMostTopLeftPoint(
+                rectangle,
+                placement,
+                considerRotation = true,
+                candidateCoordinates = candidateCoordinates.map(_(boxId).toSeq)
+              ).map {
+                case (rectangle, coordinates) => rectangle -> Placing(Box(boxId, boxLength), coordinates)
+              }
             }
-          )
+          }
       }
       .getOrElse(
         rectangle -> Placing(
