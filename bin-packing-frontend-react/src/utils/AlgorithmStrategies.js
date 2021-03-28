@@ -19,6 +19,10 @@ class AlgorithmStrategies {
         name: 'Quick Greedy - Size-ordered'
       },
       {
+        id: 'greedy boxClosing',
+        name: 'Greedy - Box Closing'
+      },
+      {
         id: 'localSearch geometryBased',
         name: 'Local Search - Geometry-based'
       },
