@@ -47,10 +47,9 @@ case class BoxClosingTopLeftFirstBinPackingSolution(
       )
     } else {
       val updatedClosedBoxes = closedBoxes.appended(placing.box.id - 1)
-      val candidatesWithoutClosedBox = updatedCandidates.removed(placing.box.id - 1)
       copy(
         placement = updatedPlacement,
-        topLeftCandidates = candidatesWithoutClosedBox,
+        topLeftCandidates = updatedCandidates,
         closedBoxes = updatedClosedBoxes,
         rectangles = updatedRectangles
       )
@@ -80,6 +79,15 @@ case class BoxClosingTopLeftFirstBinPackingSolution(
 
   override def removeRectangleFromBox(rectangleId: Int, boxId: Int): BoxClosingTopLeftFirstBinPackingSolution = {
     throw new NotImplementedError()
+  }
+
+  def prefixWithOpenLastBox(lastBoxId: Int): BoxClosingTopLeftFirstBinPackingSolution = {
+    copy(
+      placement = placement.filter(_._2.box.id <= lastBoxId),
+      topLeftCandidates = topLeftCandidates.filter(_._1 <= lastBoxId),
+      closedBoxes = closedBoxes.filter(_ < lastBoxId),
+      rectangles = rectangles.filter(placement(_).box.id <= lastBoxId)
+    )
   }
 }
 
