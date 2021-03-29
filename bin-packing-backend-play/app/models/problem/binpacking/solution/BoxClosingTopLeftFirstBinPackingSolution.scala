@@ -8,19 +8,28 @@ import scala.collection.SortedSet
 object BoxClosingTopLeftFirstBinPackingSolution
     extends EmptySolutionInitializer[BoxClosingTopLeftFirstBinPackingSolution] {
 
-  override def apply(boxLength: Int): BoxClosingTopLeftFirstBinPackingSolution =
+  override def apply(boxLength: Int): BoxClosingTopLeftFirstBinPackingSolution = {
     new BoxClosingTopLeftFirstBinPackingSolution(
       Map.empty[Rectangle, Placing],
       Map.empty[Int, SortedSet[Coordinates]],
       Seq.empty[Int],
+      Seq.empty[Rectangle],
       boxLength
     )
+  }
+
+  def apply(rectangles: Seq[Rectangle], boxLength: Int): BoxClosingTopLeftFirstBinPackingSolution = {
+    rectangles.foldLeft(apply(boxLength)) {
+      case (solution, rectangle) => solution.placeTopLeftFirst(rectangle)
+    }
+  }
 }
 
 case class BoxClosingTopLeftFirstBinPackingSolution(
   override val placement: Map[Rectangle, Placing],
   override val topLeftCandidates: Map[Int, SortedSet[Coordinates]],
   override val closedBoxes: Seq[Int],
+  rectangles: Seq[Rectangle],
   override val boxLength: Int
 ) extends AbstractTopLeftFirstBinPackingSolution with ClosedBoxes
     with TopLeftFirstPlacingSupport[BoxClosingTopLeftFirstBinPackingSolution] {
@@ -29,10 +38,12 @@ case class BoxClosingTopLeftFirstBinPackingSolution(
     val (placedRectangle, placing) = findRectanglePlacing(rectangle, Option(topLeftCandidates), closedBoxes)
     val updatedPlacement = placement.updated(placedRectangle, placing)
     val updatedCandidates = updateCandidates(placedRectangle, placing)
+    val updatedRectangles = rectangles.appended(placedRectangle)
     if (placing.box.id == 1 || topLeftCandidates.contains(placing.box.id)) {
       copy(
         placement = updatedPlacement,
         topLeftCandidates = updatedCandidates,
+        rectangles = updatedRectangles
       )
     } else {
       val updatedClosedBoxes = closedBoxes.appended(placing.box.id - 1)
@@ -40,7 +51,8 @@ case class BoxClosingTopLeftFirstBinPackingSolution(
       copy(
         placement = updatedPlacement,
         topLeftCandidates = candidatesWithoutClosedBox,
-        closedBoxes = updatedClosedBoxes
+        closedBoxes = updatedClosedBoxes,
+        rectangles = updatedRectangles
       )
     }
   }
@@ -59,7 +71,8 @@ case class BoxClosingTopLeftFirstBinPackingSolution(
           val updatedCandidates = updateCandidates(placedRectangle, placing)
           copy(
             placement = updatedPlacement,
-            topLeftCandidates = updatedCandidates
+            topLeftCandidates = updatedCandidates,
+            rectangles = rectangles.appended(placedRectangle)
           )
       }
     }

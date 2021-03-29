@@ -8,6 +8,7 @@ class BoxClosingTopLeftFirstBinPackingSolutionSpec extends WordSpec with MustMat
   val boxLength = 10
 
   "BoxClosingTopLeftFirstBinPackingSolution" should {
+
     "not place rectangles into closed boxes even if they would fit" when {
       "given rectangles so that the third one would fit into the already closed first box" in {
         val solution = BoxClosingTopLeftFirstBinPackingSolution(boxLength)
@@ -25,7 +26,32 @@ class BoxClosingTopLeftFirstBinPackingSolutionSpec extends WordSpec with MustMat
           Rectangle(2, 10, 2) -> Placing(Box(2, boxLength), Coordinates(0, 0)),
           Rectangle(3, 1, 1) -> Placing(Box(2, boxLength), Coordinates(0, 2))
         )
+        finalSolution.rectangles mustEqual Seq(
+          Rectangle(1, 10, 9),
+          Rectangle(2, 10, 2),
+          Rectangle(3, 1, 1)
+        )
       }
+    }
+
+    "initialize from sequence of rectangles" in {
+      val rectangles = Seq(
+        Rectangle(1, 10, 9),
+        Rectangle(2, 10, 2),
+        Rectangle(3, 1, 1)
+      )
+      val solution = BoxClosingTopLeftFirstBinPackingSolution(rectangles, boxLength)
+      solution.closedBoxes mustEqual Seq(1)
+      solution.placement mustEqual Map(
+        Rectangle(1, 10, 9) -> Placing(Box(1, boxLength), Coordinates(0, 0)),
+        Rectangle(2, 10, 2) -> Placing(Box(2, boxLength), Coordinates(0, 0)),
+        Rectangle(3, 1, 1) -> Placing(Box(2, boxLength), Coordinates(0, 2))
+      )
+      solution.rectangles mustEqual Seq(
+        Rectangle(1, 10, 9),
+        Rectangle(2, 10, 2),
+        Rectangle(3, 1, 1)
+      )
     }
   }
 
