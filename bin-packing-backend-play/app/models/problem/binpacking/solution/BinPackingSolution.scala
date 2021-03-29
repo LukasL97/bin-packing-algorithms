@@ -26,6 +26,8 @@ case class Rectangle(
   height: Int
 ) {
   def rotated: Rectangle = Rectangle(id = id, width = height, height = width)
+
+  def getArea: Int = width * height
 }
 
 case class Placing(
