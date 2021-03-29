@@ -12,10 +12,15 @@ import models.problem.binpacking.BinPacking
 import models.problem.binpacking.greedy.BoxClosingBinPackingGreedy
 import models.problem.binpacking.greedy.basic.RandomSelectionBinPackingGreedy
 import models.problem.binpacking.greedy.basic.SizeOrderedBinPackingGreedy
-import models.problem.binpacking.greedy.candidatesupported.{RandomSelectionBinPackingGreedy => QuickRandomSelectionBinPackingGreedy}
-import models.problem.binpacking.greedy.candidatesupported.{SizeOrderedBinPackingGreedy => QuickSizeOrderedBinPackingGreedy}
+import models.problem.binpacking.greedy.candidatesupported.{
+  RandomSelectionBinPackingGreedy => QuickRandomSelectionBinPackingGreedy
+}
+import models.problem.binpacking.greedy.candidatesupported.{
+  SizeOrderedBinPackingGreedy => QuickSizeOrderedBinPackingGreedy
+}
 import models.problem.binpacking.localsearch.EventuallyFeasibleGeometryBasedBinPacking
 import models.problem.binpacking.localsearch.GeometryBasedBinPacking
+import models.problem.binpacking.localsearch.RectanglePermutationBinPacking
 import models.problem.binpacking.localsearch.TopLeftFirstBoxMergingBinPacking
 import play.api.libs.json.JsValue
 import play.api.mvc._
@@ -123,6 +128,13 @@ object BinPackingProvider {
       )
     case "localSearch boxMerging" =>
       new TopLeftFirstBoxMergingBinPacking(
+        boxLength,
+        numRectangles,
+        rectangleWidthRange,
+        rectangleHeightRange
+      )
+    case "localSearch rectanglePermutation" =>
+      new RectanglePermutationBinPacking(
         boxLength,
         numRectangles,
         rectangleWidthRange,
