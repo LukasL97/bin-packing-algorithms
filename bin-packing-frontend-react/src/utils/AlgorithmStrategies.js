@@ -33,6 +33,10 @@ class AlgorithmStrategies {
       {
         id: 'localSearch boxMerging',
         name: 'Local Search - Box Merging'
+      },
+      {
+        id: 'localSearch rectanglePermutation',
+        name: 'Local Search - Rectangle Permutation'
       }
     ]
   }
