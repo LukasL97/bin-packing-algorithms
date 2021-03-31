@@ -1,5 +1,6 @@
 package models.problem.binpacking.localsearch.neighborhood
 
+import metrics.Metrics
 import models.problem.binpacking.solution.Overlapping
 import models.problem.binpacking.solution.OverlappingTopLeftFirstBinPackingSolution
 import models.problem.binpacking.solution.Rectangle
@@ -8,23 +9,25 @@ import scala.collection.View
 
 class ExceededOverlapOutsourcingNeighborhood(
   val boxLength: Int
-) {
+) extends Metrics {
 
   def createExceededOverlapOutsourcingNeighborhood(
     solution: OverlappingTopLeftFirstBinPackingSolution,
     maxOverlap: Double
   ): View[OverlappingTopLeftFirstBinPackingSolution] = {
-    val exceededOverlappings = solution.getExceededOverlappings(maxOverlap)
-    if (exceededOverlappings.isEmpty) {
-      View.empty[OverlappingTopLeftFirstBinPackingSolution]
-    } else {
-      Seq(
-        resolveExceededOverlappingsByOutsourcingIntoNewBoxes(
-          solution,
-          maxOverlap,
-          exceededOverlappings
-        )
-      ).view
+    withTimer("exceeded-overlap-outsourcing-neighborhood") {
+      val exceededOverlappings = solution.getExceededOverlappings(maxOverlap)
+      if (exceededOverlappings.isEmpty) {
+        View.empty[OverlappingTopLeftFirstBinPackingSolution]
+      } else {
+        Seq(
+          resolveExceededOverlappingsByOutsourcingIntoNewBoxes(
+            solution,
+            maxOverlap,
+            exceededOverlappings
+          )
+        ).view
+      }
     }
   }
 

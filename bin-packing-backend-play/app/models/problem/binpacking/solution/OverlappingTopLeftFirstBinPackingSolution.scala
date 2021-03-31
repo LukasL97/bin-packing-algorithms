@@ -2,6 +2,7 @@ package models.problem.binpacking.solution
 
 import models.problem.binpacking.BinPackingSolutionValidator
 import models.problem.binpacking.solution.initialization.EmptySolutionInitializer
+import models.problem.binpacking.solution.transformation.SquashingSupport
 
 import scala.collection.SortedSet
 
@@ -33,7 +34,8 @@ case class OverlappingTopLeftFirstBinPackingSolution(
   override val topLeftCandidates: Map[Int, SortedSet[Coordinates]],
   override val overlappings: Map[Int, Set[Overlapping]],
   boxLength: Int
-) extends AbstractTopLeftFirstBinPackingSolution with Overlappings with BinPackingSolutionValidator {
+) extends AbstractTopLeftFirstBinPackingSolution with Overlappings with BinPackingSolutionValidator
+    with SquashingSupport[OverlappingTopLeftFirstBinPackingSolution] {
 
   override def asSimpleSolution: SimpleBinPackingSolution = SimpleBinPackingSolution(placement)
 
@@ -352,6 +354,21 @@ case class OverlappingTopLeftFirstBinPackingSolution(
     point.y < coordinates.y + rectangle.height
   }
 
+  override def squashed: OverlappingTopLeftFirstBinPackingSolution = {
+    val boxIdSquashMapping = getBoxIdSquashMapping
+    val updatedPlacement = squashPlacement(boxIdSquashMapping)
+    val updatedCandidates = topLeftCandidates.map {
+      case (boxId, candidates) => boxIdSquashMapping(boxId) -> candidates
+    }
+    val updatedOverlappings = overlappings.map {
+      case (boxId, boxOverlappings) => boxIdSquashMapping(boxId) -> boxOverlappings
+    }
+    copy(
+      placement = updatedPlacement,
+      topLeftCandidates = updatedCandidates,
+      overlappings = updatedOverlappings
+    )
+  }
 }
 
 trait Overlappings {

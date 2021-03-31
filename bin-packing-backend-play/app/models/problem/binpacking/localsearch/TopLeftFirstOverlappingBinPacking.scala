@@ -1,10 +1,12 @@
 package models.problem.binpacking.localsearch
 
+import metrics.Metrics
 import models.algorithm.OneDimensionalScore
 import models.algorithm.Score
 import models.problem.binpacking.localsearch.evaluation.BoxWeightedScore
 import models.problem.binpacking.localsearch.evaluation.BoxWeightedTopLeftFirstEvaluation
 import models.problem.binpacking.localsearch.neighborhood.ExceededOverlapOutsourcingNeighborhood
+import models.problem.binpacking.localsearch.neighborhood.TopLeftFirstOverlappingBoxPullUpNeighborhood
 import models.problem.binpacking.solution.OverlappingTopLeftFirstBinPackingSolution
 import models.problem.binpacking.solution.Rectangle
 
@@ -25,27 +27,35 @@ class TopLeftFirstOverlappingBinPackingSolutionHandler(
   rectangles: Set[Rectangle],
   override val boxLength: Int
 ) extends BinPackingSolutionHandler[OverlappingTopLeftFirstBinPackingSolution]
-    with BoxWeightedTopLeftFirstEvaluation {
+    with BoxWeightedTopLeftFirstEvaluation with Metrics {
 
   override val startSolution: OverlappingTopLeftFirstBinPackingSolution =
     OverlappingTopLeftFirstBinPackingSolution.apply(rectangles.toSeq, boxLength, 1.0)
 
   private val exceededOverlapOutsourcingNeighborhood = new ExceededOverlapOutsourcingNeighborhood(boxLength)
+  private val boxPullUpNeighborhood = new TopLeftFirstOverlappingBoxPullUpNeighborhood(boxLength)
 
   override def getNeighborhood(
     solution: OverlappingTopLeftFirstBinPackingSolution,
     step: Int
   ): View[OverlappingTopLeftFirstBinPackingSolution] = {
+    val maxOverlap = maxAllowedOverlap(step)
     val solutionsWithOutsourcedRectangles = exceededOverlapOutsourcingNeighborhood
-      .createExceededOverlapOutsourcingNeighborhood(solution, maxAllowedOverlap(step))
-    solutionsWithOutsourcedRectangles
+      .createExceededOverlapOutsourcingNeighborhood(solution, maxOverlap)
+    val solutionsWithSingleBoxPullUps = boxPullUpNeighborhood.createSolutionsWithSingleBoxPullUp(solution, maxOverlap)
+    val solutionsWithMaximalBoxPullUps = boxPullUpNeighborhood.createSolutionsWithMaximalBoxPullUp(solution, maxOverlap)
+    solutionsWithOutsourcedRectangles ++
+      solutionsWithMaximalBoxPullUps ++
+      solutionsWithSingleBoxPullUps
   }
 
   override def evaluate(solution: OverlappingTopLeftFirstBinPackingSolution, step: Int): Score = {
-    OverlappingBoxWeightedScore(
-      evaluate(solution),
-      OneDimensionalScore(solution.getExceededOverlapCount(maxAllowedOverlap(step)))
-    )
+    withTimer("ls-overlapping-evaluate") {
+      OverlappingBoxWeightedScore(
+        evaluate(solution),
+        OneDimensionalScore(solution.getExceededOverlapCount(maxAllowedOverlap(step)))
+      )
+    }
   }
 
   private def maxAllowedOverlap(step: Int): Double = {
