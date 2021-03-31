@@ -60,7 +60,7 @@ abstract class AbstractTopLeftFirstBinPackingSolution
     }
   }
 
-  private def updateCandidatesInPreviouslyExistingBox(
+  protected def updateCandidatesInPreviouslyExistingBox(
     rectangleTopLeft: Coordinates,
     rectangleTopRight: Coordinates,
     rectangleBottomLeft: Coordinates,
@@ -93,7 +93,7 @@ abstract class AbstractTopLeftFirstBinPackingSolution
     candidatesWithCoveredCoordinatesDropped ++ newCandidates
   }
 
-  private def liftCandidatesShadowedByNewRectangleLeftEdge(
+  protected def liftCandidatesShadowedByNewRectangleLeftEdge(
     rectangleTopLeft: Coordinates,
     rectangleBottomLeft: Coordinates,
     rectangleRightX: Int,
@@ -109,7 +109,7 @@ abstract class AbstractTopLeftFirstBinPackingSolution
     candidates ++ liftedCandidates.filterNot(isInSomeLeftEdge(_, placement))
   }
 
-  private def liftCandidatesShadowedByNewRectangleTopEdge(
+  protected def liftCandidatesShadowedByNewRectangleTopEdge(
     rectangleTopLeft: Coordinates,
     rectangleTopRight: Coordinates,
     rectangleBottomY: Int,
@@ -124,7 +124,7 @@ abstract class AbstractTopLeftFirstBinPackingSolution
     candidates ++ liftedCandidates.filterNot(isInSomeTopEdge(_, placement))
   }
 
-  private def dropCandidatesCoveredByNewRectangle(
+  protected def dropCandidatesCoveredByNewRectangle(
     rectangleTopLeft: Coordinates,
     rectangleTopRight: Coordinates,
     rectangleBottomLeft: Coordinates,
@@ -206,33 +206,34 @@ abstract class AbstractTopLeftFirstBinPackingSolution
     bottomEdges.exists(_.containsNotRight(point))
   }
 
-  private def getLeftEdge(rectangle: Rectangle, coordinates: Coordinates): VerticalEdge = VerticalEdge(
+  protected def getLeftEdge(rectangle: Rectangle, coordinates: Coordinates): VerticalEdge = VerticalEdge(
     coordinates.x,
     coordinates.y,
     coordinates.y + rectangle.height
   )
 
-  private def getRightEdge(rectangle: Rectangle, coordinates: Coordinates): VerticalEdge = VerticalEdge(
+  protected def getRightEdge(rectangle: Rectangle, coordinates: Coordinates): VerticalEdge = VerticalEdge(
     coordinates.x + rectangle.width,
     coordinates.y,
     coordinates.y + rectangle.height
   )
 
-  private def getTopEdge(rectangle: Rectangle, coordinates: Coordinates): HorizontalEdge = HorizontalEdge(
+  protected def getTopEdge(rectangle: Rectangle, coordinates: Coordinates): HorizontalEdge = HorizontalEdge(
     coordinates.y,
     coordinates.x,
     coordinates.x + rectangle.width
   )
-  private def getBottomEdge(rectangle: Rectangle, coordinates: Coordinates): HorizontalEdge = HorizontalEdge(
+
+  protected def getBottomEdge(rectangle: Rectangle, coordinates: Coordinates): HorizontalEdge = HorizontalEdge(
     coordinates.y + rectangle.height,
     coordinates.x,
     coordinates.x + rectangle.width
   )
-  private val boxLeftBorder = VerticalEdge(0, 0, boxLength)
-  private val boxRightBorder = VerticalEdge(boxLength, 0, boxLength)
-  private val boxTopBorder = HorizontalEdge(0, 0, boxLength)
 
-  private val boxBottomBorder = HorizontalEdge(boxLength, 0, boxLength)
+  protected val boxLeftBorder: VerticalEdge = VerticalEdge(0, 0, boxLength)
+  protected val boxRightBorder: VerticalEdge = VerticalEdge(boxLength, 0, boxLength)
+  protected val boxTopBorder: HorizontalEdge = HorizontalEdge(0, 0, boxLength)
+  protected val boxBottomBorder: HorizontalEdge = HorizontalEdge(boxLength, 0, boxLength)
 
 }
 
@@ -240,18 +241,18 @@ trait TopLeftCandidates {
   val topLeftCandidates: Map[Int, SortedSet[Coordinates]]
 }
 
-private sealed trait Edge {
+protected sealed trait Edge {
   def contains(point: Coordinates): Boolean
   def containsInner(point: Coordinates): Boolean
 }
 
-private case class VerticalEdge(x: Int, top: Int, bottom: Int) extends Edge {
+protected case class VerticalEdge(x: Int, top: Int, bottom: Int) extends Edge {
   override def contains(point: Coordinates): Boolean = point.x == x && top <= point.y && point.y <= bottom
   override def containsInner(point: Coordinates): Boolean = point.x == x && top < point.y && point.y < bottom
   def containsNotBottom(point: Coordinates): Boolean = point.x == x && top <= point.y && point.y < bottom
 }
 
-private case class HorizontalEdge(y: Int, left: Int, right: Int) extends Edge {
+protected case class HorizontalEdge(y: Int, left: Int, right: Int) extends Edge {
   override def contains(point: Coordinates): Boolean = point.y == y && left <= point.x && point.x <= right
   override def containsInner(point: Coordinates): Boolean = point.y == y && left < point.x && point.x < right
   def containsNotRight(point: Coordinates): Boolean = point.y == y && left <= point.x && point.x < right
