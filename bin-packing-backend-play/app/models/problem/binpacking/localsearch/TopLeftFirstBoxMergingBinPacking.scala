@@ -38,7 +38,7 @@ class TopLeftFirstBoxMergingBinPackingSolutionHandler(
     new TopLeftFirstBoxPullUpNeighborhood[TopLeftFirstBinPackingSolution](boxLength)
   private val boxMergeNeighborhood = new TopLeftFirstBoxMergeNeighborhood[TopLeftFirstBinPackingSolution](boxLength)
 
-  override def getNeighborhood(solution: TopLeftFirstBinPackingSolution): View[TopLeftFirstBinPackingSolution] = {
+  override def getNeighborhood(solution: TopLeftFirstBinPackingSolution, step: Int): View[TopLeftFirstBinPackingSolution] = {
     val solutionsWithReorderedBoxes = boxReorderingNeighborhood.reorderBoxesByFillGrade(solution)
     val solutionsWithSingleBoxPullUp = boxPullUpNeighborhood.createSolutionsWithSingleBoxPullUp(solution)
     val solutionsWithMaximalBoxPullUp = boxPullUpNeighborhood.createSolutionsWithMaximalBoxPullUp(solution)

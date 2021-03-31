@@ -34,7 +34,7 @@ class LocalSearch[Solution](solutionHandler: SolutionHandler[Solution]) extends 
   private def step(currentSolution: Solution, step: Int): StepResult = {
     withTimer("local-search-run-step", "step" -> step.toString) {
       val currentSolutionResult = solutionHandler.evaluate(currentSolution, step)
-      val neighborhood = solutionHandler.getNeighborhood(currentSolution)
+      val neighborhood = solutionHandler.getNeighborhood(currentSolution, step)
       neighborhood.find(solutionHandler.evaluate(_, step) < currentSolutionResult) match {
         case Some(solution) => Ongoing(solution)
         case None => stagnation(currentSolution)
@@ -56,7 +56,7 @@ trait SolutionHandler[Solution] {
 
   val startSolution: Solution
 
-  def getNeighborhood(solution: Solution): View[Solution]
+  def getNeighborhood(solution: Solution, step: Int): View[Solution]
 
   def evaluate(solution: Solution, step: Int): Score
 

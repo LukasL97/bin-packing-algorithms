@@ -44,7 +44,7 @@ class EventuallyFeasibleGeometryBasedBinPackingSolutionHandler(
   private val geometricShiftNeighborhood = new GeometricShiftNeighborhood[SimpleBinPackingSolution](boxLength)
   private val outsourcingNeighborhood = new OutsourcingNeighborhood[SimpleBinPackingSolution](boxLength)
 
-  override def getNeighborhood(solution: SimpleBinPackingSolution): View[SimpleBinPackingSolution] = {
+  override def getNeighborhood(solution: SimpleBinPackingSolution, step: Int): View[SimpleBinPackingSolution] = {
     val solutionsWithBoxPullUp = boxPullUpNeighborhood.createBoxPullUpNeighborhood(solution)
     val solutionsWithLeftShift =
       geometricShiftNeighborhood.createShiftedSolutions(solution, Left, 1, allowOverlap = true)

@@ -43,7 +43,7 @@ class GeometryBasedBinPackingSolutionHandler(
     new CoarseMultipleBoxPullUpNeighborhood[SimpleBinPackingSolution](boxLength)
   private val boxReorderingNeighborhood = new BoxReorderingNeighborhood[SimpleBinPackingSolution]
 
-  override def getNeighborhood(solution: SimpleBinPackingSolution): View[SimpleBinPackingSolution] = {
+  override def getNeighborhood(solution: SimpleBinPackingSolution, step: Int): View[SimpleBinPackingSolution] = {
     val solutionsWithCoarseMultipleBoxPullUp =
       coarseMultipleBoxPullUpNeighborhood.createCoarseMultipleBoxPullUpNeighborhood(solution)
     val solutionsWithMergedBoxes = boxMergeNeighborhood.createBoxMergeNeighborhood(solution)

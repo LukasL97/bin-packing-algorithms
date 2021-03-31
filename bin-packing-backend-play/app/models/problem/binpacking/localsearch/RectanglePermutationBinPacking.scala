@@ -35,7 +35,8 @@ class RectanglePermutationBinPackingSolutionHandler(
   )
 
   override def getNeighborhood(
-    solution: BoxClosingTopLeftFirstBinPackingSolution
+    solution: BoxClosingTopLeftFirstBinPackingSolution,
+    step: Int
   ): View[BoxClosingTopLeftFirstBinPackingSolution] = {
     neighborhood.createRectanglePermutationNeighborhood(solution)
   }

@@ -27,7 +27,8 @@ class TopLeftFirstOverlappingBinPackingSolutionHandler(
     OverlappingTopLeftFirstBinPackingSolution.apply(rectangles.toSeq, boxLength, 1.0)
 
   override def getNeighborhood(
-    solution: OverlappingTopLeftFirstBinPackingSolution
+    solution: OverlappingTopLeftFirstBinPackingSolution,
+    step: Int
   ): View[OverlappingTopLeftFirstBinPackingSolution] = View.empty
 
   override def evaluate(solution: OverlappingTopLeftFirstBinPackingSolution, step: Int): Score = {

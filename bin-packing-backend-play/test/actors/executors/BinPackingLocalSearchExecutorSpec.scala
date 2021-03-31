@@ -53,7 +53,10 @@ class BinPackingLocalSearchExecutorSpec
                   Map(rectangles.head -> Placing(box, Coordinates(0, 0)))
                 )
 
-                override def getNeighborhood(solution: SimpleBinPackingSolution): View[SimpleBinPackingSolution] =
+                override def getNeighborhood(
+                  solution: SimpleBinPackingSolution,
+                  step: Int
+                ): View[SimpleBinPackingSolution] =
                   Set(
                     Option(
                       SimpleBinPackingSolution.apply(
