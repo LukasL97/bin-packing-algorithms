@@ -22,6 +22,7 @@ import models.problem.binpacking.localsearch.EventuallyFeasibleGeometryBasedBinP
 import models.problem.binpacking.localsearch.GeometryBasedBinPacking
 import models.problem.binpacking.localsearch.RectanglePermutationBinPacking
 import models.problem.binpacking.localsearch.TopLeftFirstBoxMergingBinPacking
+import models.problem.binpacking.localsearch.TopLeftFirstOverlappingBinPacking
 import play.api.libs.json.JsValue
 import play.api.mvc._
 import utils.BinPackingSolutionSerializationUtil.formats
@@ -128,6 +129,13 @@ object BinPackingProvider {
       )
     case "localSearch boxMerging" =>
       new TopLeftFirstBoxMergingBinPacking(
+        boxLength,
+        numRectangles,
+        rectangleWidthRange,
+        rectangleHeightRange
+      )
+    case "localSearch overlapping" =>
+      new TopLeftFirstOverlappingBinPacking(
         boxLength,
         numRectangles,
         rectangleWidthRange,

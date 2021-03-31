@@ -13,7 +13,9 @@ import models.problem.binpacking.greedy.candidatesupported.CandidateSupportedBin
 import models.problem.binpacking.localsearch.BinPackingLocalSearch
 import models.problem.binpacking.localsearch.RectanglePermutationBinPacking
 import models.problem.binpacking.localsearch.TopLeftFirstBoxMergingBinPacking
+import models.problem.binpacking.localsearch.TopLeftFirstOverlappingBinPacking
 import models.problem.binpacking.solution.BoxClosingTopLeftFirstBinPackingSolution
+import models.problem.binpacking.solution.OverlappingTopLeftFirstBinPackingSolution
 import models.problem.binpacking.solution.SimpleBinPackingSolution
 import models.problem.binpacking.solution.TopLeftFirstBinPackingSolution
 
@@ -32,6 +34,10 @@ class BinPackingActor @Inject()(
     case (runId: String, binPacking: TopLeftFirstBoxMergingBinPacking) =>
       val dumper = createSolutionStepDumper(runId)
       val executor = new BinPackingLocalSearchExecutor[TopLeftFirstBinPackingSolution](dumper)
+      executor.execute(runId, binPacking)
+    case (runId: String, binPacking: TopLeftFirstOverlappingBinPacking) =>
+      val dumper = createSolutionStepDumper(runId)
+      val executor = new BinPackingLocalSearchExecutor[OverlappingTopLeftFirstBinPackingSolution](dumper)
       executor.execute(runId, binPacking)
     case (runId: String, binPacking: RectanglePermutationBinPacking) =>
       val dumper = createSolutionStepDumper(runId)
