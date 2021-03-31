@@ -115,6 +115,18 @@ def analyze_local_search_box_merging(run_id, endpoint):
         count, time = analyze_timer(timer, run_id, endpoint)
         print('%s: count: %d, mean: %r ms, sum: %r ms' % (timer, count, time, count * time))
 
+def analyze_local_search_overlapping(run_id, endpoint):
+    timers = [
+        'ls-overlapping-evaluate',
+        'box-weighted-score-compare',
+        'single-box-pull-up-neighborhood',
+        'maximal-box-pull-up-neighborhood',
+        'exceeded-overlap-outsourcing-neighborhood'
+    ]
+    for timer in timers:
+        count, time = analyze_timer(timer, run_id, endpoint)
+        print('%s: count: %d, mean: %r ms, sum: %r ms' % (timer, count, time, count * time))
+
 
 def analyze_run_time(run_id, algorithm, endpoint):
     run_name = get_run_name(algorithm)
@@ -129,11 +141,12 @@ if __name__ == '__main__':
         'greedy_size',
         'ls_geometry',
         'ls_overlap',
-        'ls_boxmerging'
+        'ls_boxmerging',
+        'ls_overlapping'
     ]
     parser = argparse.ArgumentParser()
     parser.add_argument('--runId', type=str, required=True)
-    parser.add_argument('--algorithm', type=str, default='ls_boxmerging', choices=algorithms)
+    parser.add_argument('--algorithm', type=str, default='ls_overlapping', choices=algorithms)
     parser.add_argument('--endpoint', type=str, default='http://localhost:9000/metrics')
     args = parser.parse_args()
 
@@ -147,3 +160,6 @@ if __name__ == '__main__':
         analyze_local_search_geometry_based(args.runId, args.endpoint)
     elif args.algorithm == 'ls_boxmerging':
         analyze_local_search_box_merging(args.runId, args.endpoint)
+    elif args.algorithm == 'ls_overlapping':
+        analyze_local_search_overlapping(args.runId, args.endpoint)
+
