@@ -37,7 +37,26 @@ case class OverlappingTopLeftFirstBinPackingSolution(
 
   override def asSimpleSolution: SimpleBinPackingSolution = SimpleBinPackingSolution(placement)
 
-  def removeRectangleFromBox(rectangleId: Int, boxId: Int): Overlappings = {
+  def appended(solution: OverlappingTopLeftFirstBinPackingSolution): OverlappingTopLeftFirstBinPackingSolution = {
+    val currentMaxBoxId = placement.values.map(_.box.id).maxOption.getOrElse(0)
+    val appendedPlacement = solution.placement.map {
+      case (rectangle, Placing(Box(boxId, boxLength), coordinates)) =>
+        rectangle -> Placing(Box(boxId + currentMaxBoxId, boxLength), coordinates)
+    }
+    val appendedCandidates = solution.topLeftCandidates.map {
+      case (boxId -> candidates) => boxId + currentMaxBoxId -> candidates
+    }
+    val appendedOverlappings = solution.overlappings.map {
+      case (boxId -> overlappings) => boxId + currentMaxBoxId -> overlappings
+    }
+    copy(
+      placement = placement ++ appendedPlacement,
+      topLeftCandidates = topLeftCandidates ++ appendedCandidates,
+      overlappings = overlappings ++ appendedOverlappings
+    )
+  }
+
+  def removeRectangleFromBox(rectangleId: Int, boxId: Int): OverlappingTopLeftFirstBinPackingSolution = {
     val (rectangle, coordinates) = getPlacementInSingleBox(boxId).find {
       case (rectangle, _) => rectangle.id == rectangleId
     }.getOrElse(
@@ -337,6 +356,18 @@ case class OverlappingTopLeftFirstBinPackingSolution(
 
 trait Overlappings {
   val overlappings: Map[Int, Set[Overlapping]]
+
+  def getExceededOverlapCount(maxOverlap: Double): Int = {
+    overlappings.values.flatten.count(_.overlap > maxOverlap)
+  }
+
+  def getExceededOverlappings(maxOverlap: Double): Map[Int, Set[Overlapping]] = {
+    overlappings.map {
+      case (boxId, boxOverlappings) => boxId -> boxOverlappings.filter(_.overlap > maxOverlap)
+    }.filterNot {
+      case (_, boxOverlappings) => boxOverlappings.isEmpty
+    }
+  }
 }
 
 case class Overlapping(
