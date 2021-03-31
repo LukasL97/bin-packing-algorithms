@@ -140,6 +140,33 @@ class OverlappingTopLeftFirstBinPackingSolutionSpec
         )
       }
     }
+
+    "initialize from given rectangles" when {
+      "any overlap is allowed" in {
+        val rectangles = Seq(
+          Rectangle(1, 1, 1),
+          Rectangle(2, 3, 1),
+          Rectangle(3, 3, 3),
+          Rectangle(4, 2, 2),
+          Rectangle(5, 8, 8)
+        )
+        val solution = OverlappingTopLeftFirstBinPackingSolution.apply(rectangles, boxLength, 1.0)
+        solution.placement mustEqual Map(
+          Rectangle(1, 1, 1) -> Placing(Box(1, boxLength), Coordinates(0, 0)),
+          Rectangle(2, 3, 1) -> Placing(Box(1, boxLength), Coordinates(0, 1)),
+          Rectangle(3, 3, 3) -> Placing(Box(1, boxLength), Coordinates(1, 0)),
+          Rectangle(4, 2, 2) -> Placing(Box(1, boxLength), Coordinates(0, 2)),
+          Rectangle(5, 8, 8) -> Placing(Box(2, boxLength), Coordinates(0, 0))
+        )
+        solution.overlappings mustEqual Map(
+          1 -> Set(
+            Overlapping(Rectangle(3, 3, 3), Coordinates(1, 0), Rectangle(2, 3, 1), Coordinates(0, 1), 2.0 / 9),
+            Overlapping(Rectangle(4, 2, 2), Coordinates(0, 2), Rectangle(3, 3, 3), Coordinates(1, 0), 1.0 / 9)
+          ),
+          2 -> Set.empty[Overlapping]
+        )
+      }
+    }
   }
 
 }

@@ -15,6 +15,17 @@ object OverlappingTopLeftFirstBinPackingSolution
       Map.empty[Int, Set[Overlapping]],
       boxLength
     )
+
+  def apply(
+    rectangles: Seq[Rectangle],
+    boxLength: Int,
+    maxOverlap: Double
+  ): OverlappingTopLeftFirstBinPackingSolution = {
+    val emptySolution = OverlappingTopLeftFirstBinPackingSolution(boxLength)
+    rectangles.foldLeft(emptySolution) {
+      case (solution, rectangle) => solution.placeTopLeftFirst(rectangle, maxOverlap)
+    }
+  }
 }
 
 case class OverlappingTopLeftFirstBinPackingSolution(
