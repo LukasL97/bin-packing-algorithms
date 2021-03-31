@@ -35,6 +35,10 @@ class AlgorithmStrategies {
         name: 'Local Search - Box Merging'
       },
       {
+        id: 'localSearch overlapping',
+        name: 'Local Search - Overlapping'
+      },
+      {
         id: 'localSearch rectanglePermutation',
         name: 'Local Search - Rectangle Permutation'
       }
