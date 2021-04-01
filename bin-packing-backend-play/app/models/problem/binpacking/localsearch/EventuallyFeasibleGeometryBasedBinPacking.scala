@@ -1,6 +1,7 @@
 package models.problem.binpacking.localsearch
 import models.algorithm.OneDimensionalScore
 import models.algorithm.Score
+import models.problem.binpacking.BinPackingInstance
 import models.problem.binpacking.localsearch.evaluation.BoxWeightedTopLeftFirstEvaluation
 import models.problem.binpacking.localsearch.evaluation.OverlapPenalization
 import models.problem.binpacking.localsearch.initialization.GeometricStartSolution
@@ -11,23 +12,19 @@ import models.problem.binpacking.localsearch.neighborhood.Left
 import models.problem.binpacking.localsearch.neighborhood.OutsourcingNeighborhood
 import models.problem.binpacking.localsearch.neighborhood.Right
 import models.problem.binpacking.localsearch.neighborhood.Up
-import models.problem.binpacking.solution.BinPackingSolution
 import models.problem.binpacking.solution.Rectangle
 import models.problem.binpacking.solution.SimpleBinPackingSolution
 
 import scala.collection.View
 
 class EventuallyFeasibleGeometryBasedBinPacking(
-  override val boxLength: Int,
-  override val numRectangles: Int,
-  override val rectangleWidthRange: (Int, Int),
-  override val rectangleHeightRange: (Int, Int)
+  override val instance: BinPackingInstance
 ) extends BinPackingLocalSearch[SimpleBinPackingSolution] {
 
   override val solutionHandler: BinPackingSolutionHandler[SimpleBinPackingSolution] =
     new EventuallyFeasibleGeometryBasedBinPackingSolutionHandler(
-      rectangles,
-      boxLength
+      instance.rectangles.toSet,
+      instance.boxLength
     )
 
 }

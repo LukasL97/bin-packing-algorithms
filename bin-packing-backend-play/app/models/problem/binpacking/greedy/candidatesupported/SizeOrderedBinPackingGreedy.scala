@@ -1,20 +1,18 @@
 package models.problem.binpacking.greedy.candidatesupported
 
+import models.problem.binpacking.BinPackingInstance
 import models.problem.binpacking.solution.Rectangle
 import models.problem.binpacking.solution.TopLeftFirstBinPackingSolution
 import models.problem.binpacking.utils.RectangleSizeOrdering
 
 class SizeOrderedBinPackingGreedy(
-  override val boxLength: Int,
-  override val numRectangles: Int,
-  override val rectangleWidthRange: (Int, Int),
-  override val rectangleHeightRange: (Int, Int)
+  override val instance: BinPackingInstance
 ) extends CandidateSupportedBinPackingGreedy with RectangleSizeOrdering {
 
   override val selectionHandler: CandidateSupportedBinPackingSelectionHandler =
     new SizeOrderedBinPackingSelectionHandler(
-      boxLength,
-      rectangles.toSeq.sorted.reverse
+      instance.boxLength,
+      instance.rectangles.sorted.reverse
     )
 }
 

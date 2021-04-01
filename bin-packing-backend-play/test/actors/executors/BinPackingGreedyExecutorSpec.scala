@@ -4,8 +4,7 @@ import actors.BinPackingSolutionStep
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
 import akka.testkit.TestProbe
-import models.problem.binpacking.greedy.BinPackingGreedy
-import models.problem.binpacking.greedy.BinPackingSelectionHandler
+import models.problem.binpacking.BinPackingInstance
 import models.problem.binpacking.greedy.basic.BasicBinPackingGreedy
 import models.problem.binpacking.greedy.basic.BasicBinPackingSelectionHandler
 import models.problem.binpacking.solution.Box
@@ -22,12 +21,9 @@ class BinPackingGreedyExecutorSpec
     with BeforeAndAfterAll {
 
   private class BinPackingGreedyImpl(
-    override val boxLength: Int,
-    override val numRectangles: Int,
-    override val rectangleWidthRange: (Int, Int),
-    override val rectangleHeightRange: (Int, Int)
+    override val instance: BinPackingInstance
   ) extends BasicBinPackingGreedy {
-    override val selectionHandler = new BinPackingSelectionHandlerImpl(boxLength, rectangles)
+    override val selectionHandler = new BinPackingSelectionHandlerImpl(instance.boxLength, instance.rectangles)
   }
 
   private class BinPackingSelectionHandlerImpl(
@@ -58,17 +54,23 @@ class BinPackingGreedyExecutorSpec
 
         val boxLength = 6
         val numRectangles = 3
-        val rectanglesWidthRange = (3, 3)
-        val rectanglesHeightRange = (2, 2)
+        val minWidth = 3
+        val maxWidth = 3
+        val minHeight = 2
+        val maxHeight = 2
+
+        val instance = BinPackingInstance(
+          boxLength,
+          numRectangles,
+          minWidth,
+          maxWidth,
+          minHeight,
+          maxHeight
+        )
 
         val box = Box(1, boxLength)
 
-        val binPacking = new BinPackingGreedyImpl(
-          boxLength,
-          numRectangles,
-          rectanglesWidthRange,
-          rectanglesHeightRange
-        )
+        val binPacking = new BinPackingGreedyImpl(instance)
 
         executor.execute(runId, binPacking)
 
@@ -87,7 +89,7 @@ class BinPackingGreedyExecutorSpec
             1,
             SimpleBinPackingSolution.apply(
               Map(
-                binPacking.rectangles.toSeq.head -> Placing(box, Coordinates(0, 0))
+                instance.rectangles.toSeq.head -> Placing(box, Coordinates(0, 0))
               )
             )
           )
@@ -98,8 +100,8 @@ class BinPackingGreedyExecutorSpec
             2,
             SimpleBinPackingSolution.apply(
               Map(
-                binPacking.rectangles.toSeq.head -> Placing(box, Coordinates(0, 0)),
-                binPacking.rectangles.toSeq(1) -> Placing(box, Coordinates(0, 2))
+                instance.rectangles.toSeq.head -> Placing(box, Coordinates(0, 0)),
+                instance.rectangles.toSeq(1) -> Placing(box, Coordinates(0, 2))
               )
             )
           )
@@ -110,9 +112,9 @@ class BinPackingGreedyExecutorSpec
             3,
             SimpleBinPackingSolution.apply(
               Map(
-                binPacking.rectangles.toSeq.head -> Placing(box, Coordinates(0, 0)),
-                binPacking.rectangles.toSeq(1) -> Placing(box, Coordinates(0, 2)),
-                binPacking.rectangles.toSeq(2) -> Placing(box, Coordinates(3, 0))
+                instance.rectangles.toSeq.head -> Placing(box, Coordinates(0, 0)),
+                instance.rectangles.toSeq(1) -> Placing(box, Coordinates(0, 2)),
+                instance.rectangles.toSeq(2) -> Placing(box, Coordinates(3, 0))
               )
             )
           )
@@ -123,9 +125,9 @@ class BinPackingGreedyExecutorSpec
             4,
             SimpleBinPackingSolution.apply(
               Map(
-                binPacking.rectangles.toSeq.head -> Placing(box, Coordinates(0, 0)),
-                binPacking.rectangles.toSeq(1) -> Placing(box, Coordinates(0, 2)),
-                binPacking.rectangles.toSeq(2) -> Placing(box, Coordinates(3, 0))
+                instance.rectangles.toSeq.head -> Placing(box, Coordinates(0, 0)),
+                instance.rectangles.toSeq(1) -> Placing(box, Coordinates(0, 2)),
+                instance.rectangles.toSeq(2) -> Placing(box, Coordinates(3, 0))
               )
             ),
             finished = true

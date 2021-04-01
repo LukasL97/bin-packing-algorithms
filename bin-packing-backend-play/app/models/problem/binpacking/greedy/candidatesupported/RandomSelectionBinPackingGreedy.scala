@@ -1,19 +1,17 @@
 package models.problem.binpacking.greedy.candidatesupported
 
+import models.problem.binpacking.BinPackingInstance
 import models.problem.binpacking.solution.Rectangle
 import models.problem.binpacking.solution.TopLeftFirstBinPackingSolution
 
 class RandomSelectionBinPackingGreedy(
-  override val boxLength: Int,
-  override val numRectangles: Int,
-  override val rectangleWidthRange: (Int, Int),
-  override val rectangleHeightRange: (Int, Int)
+  override val instance: BinPackingInstance
 ) extends CandidateSupportedBinPackingGreedy {
 
   override val selectionHandler: CandidateSupportedBinPackingSelectionHandler =
     new RandomSelectionBinPackingSelectionHandler(
-      boxLength,
-      rectangles
+      instance.boxLength,
+      instance.rectangles
     )
 }
 

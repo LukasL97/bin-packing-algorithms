@@ -1,6 +1,7 @@
 package models.problem.binpacking.localsearch
 
 import models.algorithm.Score
+import models.problem.binpacking.BinPackingInstance
 import models.problem.binpacking.localsearch.evaluation.BoxWeightedTopLeftFirstEvaluation
 import models.problem.binpacking.localsearch.neighborhood.RectanglePermutationNeighborhood
 import models.problem.binpacking.solution.BoxClosingTopLeftFirstBinPackingSolution
@@ -9,14 +10,11 @@ import models.problem.binpacking.solution.Rectangle
 import scala.collection.View
 
 class RectanglePermutationBinPacking(
-  override val boxLength: Int,
-  override val numRectangles: Int,
-  override val rectangleWidthRange: (Int, Int),
-  override val rectangleHeightRange: (Int, Int)
+  override val instance: BinPackingInstance
 ) extends BinPackingLocalSearch[BoxClosingTopLeftFirstBinPackingSolution] {
 
   override val solutionHandler: BinPackingSolutionHandler[BoxClosingTopLeftFirstBinPackingSolution] =
-    new RectanglePermutationBinPackingSolutionHandler(rectangles.toSeq, boxLength)
+    new RectanglePermutationBinPackingSolutionHandler(instance.rectangles, instance.boxLength)
 }
 
 class RectanglePermutationBinPackingSolutionHandler(

@@ -2,6 +2,7 @@ package models.problem.binpacking.localsearch
 
 import metrics.Metrics
 import models.algorithm.Score
+import models.problem.binpacking.BinPackingInstance
 import models.problem.binpacking.localsearch.evaluation.BoxWeightedTopLeftFirstEvaluation
 import models.problem.binpacking.localsearch.initialization.GeometricStartSolution
 import models.problem.binpacking.localsearch.neighborhood.BoxMergeNeighborhood
@@ -17,14 +18,11 @@ import models.problem.binpacking.solution.SimpleBinPackingSolution
 import scala.collection.View
 
 class GeometryBasedBinPacking(
-  override val boxLength: Int,
-  override val numRectangles: Int,
-  override val rectangleWidthRange: (Int, Int),
-  override val rectangleHeightRange: (Int, Int)
+  override val instance: BinPackingInstance
 ) extends BinPackingLocalSearch[SimpleBinPackingSolution] {
 
   override val solutionHandler: BinPackingSolutionHandler[SimpleBinPackingSolution] =
-    new GeometryBasedBinPackingSolutionHandler(rectangles, boxLength)
+    new GeometryBasedBinPackingSolutionHandler(instance.rectangles.toSet, instance.boxLength)
 
 }
 

@@ -3,6 +3,7 @@ package models.problem.binpacking.localsearch
 import metrics.Metrics
 import models.algorithm.OneDimensionalScore
 import models.algorithm.Score
+import models.problem.binpacking.BinPackingInstance
 import models.problem.binpacking.localsearch.evaluation.BoxWeightedScore
 import models.problem.binpacking.localsearch.evaluation.BoxWeightedTopLeftFirstEvaluation
 import models.problem.binpacking.localsearch.neighborhood.BoxReorderingNeighborhood
@@ -15,24 +16,21 @@ import models.problem.binpacking.solution.Rectangle
 import scala.collection.View
 
 class TopLeftFirstOverlappingBinPacking(
-  override val boxLength: Int,
-  override val numRectangles: Int,
-  override val rectangleWidthRange: (Int, Int),
-  override val rectangleHeightRange: (Int, Int)
+  override val instance: BinPackingInstance
 ) extends BinPackingLocalSearch[OverlappingTopLeftFirstBinPackingSolution] {
 
   override val solutionHandler: BinPackingSolutionHandler[OverlappingTopLeftFirstBinPackingSolution] =
-    new TopLeftFirstOverlappingBinPackingSolutionHandler(rectangles, boxLength)
+    new TopLeftFirstOverlappingBinPackingSolutionHandler(instance.rectangles, instance.boxLength)
 }
 
 class TopLeftFirstOverlappingBinPackingSolutionHandler(
-  rectangles: Set[Rectangle],
+  rectangles: Seq[Rectangle],
   override val boxLength: Int
 ) extends BinPackingSolutionHandler[OverlappingTopLeftFirstBinPackingSolution] with BoxWeightedTopLeftFirstEvaluation
     with Metrics {
 
   override val startSolution: OverlappingTopLeftFirstBinPackingSolution =
-    OverlappingTopLeftFirstBinPackingSolution.apply(rectangles.toSeq, boxLength, 1.0)
+    OverlappingTopLeftFirstBinPackingSolution.apply(rectangles, boxLength, 1.0)
 
   private val exceededOverlapOutsourcingNeighborhood = new ExceededOverlapOutsourcingNeighborhood(boxLength)
   private val boxPullUpNeighborhood =

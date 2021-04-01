@@ -9,6 +9,7 @@ import akka.actor.Props
 import controllers.exceptions.UnknownStrategyException
 import dao.BinPackingSolutionStepDAO
 import models.problem.binpacking.BinPacking
+import models.problem.binpacking.BinPackingInstance
 import models.problem.binpacking.greedy.BoxClosingBinPackingGreedy
 import models.problem.binpacking.greedy.basic.RandomSelectionBinPackingGreedy
 import models.problem.binpacking.greedy.basic.SizeOrderedBinPackingGreedy
@@ -47,7 +48,15 @@ class BinPackingController @Inject()(
     try {
       request.body.asJson.map { json =>
         val startInfo = SerializationUtil.fromJson[StartRequestBody](json)
-        val startSolution = actorStarter(startInfo)
+        val instance = BinPackingInstance(
+          startInfo.boxLength,
+          startInfo.numRectangles,
+          startInfo.rectanglesWidthRange.min,
+          startInfo.rectanglesWidthRange.max,
+          startInfo.rectanglesHeightRange.min,
+          startInfo.rectanglesHeightRange.max
+        )
+        val startSolution = actorStarter(startInfo.strategy, instance)
         val response: JsValue = SerializationUtil.toJson(startSolution)
         Ok(response)
       }.getOrElse(
@@ -82,16 +91,10 @@ class BinPackingActorStarter @Inject()(
   val actorFactory: BinPackingActor.Factory
 ) {
 
-  def apply(startInfo: StartRequestBody): BinPackingSolutionStep = {
+  def apply(strategy: String, instance: BinPackingInstance): BinPackingSolutionStep = {
     val runId = generateRunId()
     val actor = createActor(runId)
-    val binPacking = BinPackingProvider.get(
-      startInfo.strategy,
-      startInfo.boxLength,
-      startInfo.numRectangles,
-      (startInfo.rectanglesWidthRange.min, startInfo.rectanglesWidthRange.max),
-      (startInfo.rectanglesHeightRange.min, startInfo.rectanglesHeightRange.max)
-    )
+    val binPacking = BinPackingProvider.get(strategy, instance)
     val startSolution = binPacking.startSolution.asSimpleSolution
     actor.tell((runId, binPacking), noSender)
     BinPackingSolutionStep.startStep(runId, startSolution)
@@ -108,81 +111,18 @@ class BinPackingActorStarter @Inject()(
 object BinPackingProvider {
   def get(
     strategy: String,
-    boxLength: Int,
-    numRectangles: Int,
-    rectangleWidthRange: (Int, Int),
-    rectangleHeightRange: (Int, Int)
+    instance: BinPackingInstance
   ): BinPacking = strategy match {
-    case "localSearch geometryBased" =>
-      new GeometryBasedBinPacking(
-        boxLength,
-        numRectangles,
-        rectangleWidthRange,
-        rectangleHeightRange
-      )
-    case "localSearch eventuallyFeasibleGeometryBased" =>
-      new EventuallyFeasibleGeometryBasedBinPacking(
-        boxLength,
-        numRectangles,
-        rectangleWidthRange,
-        rectangleHeightRange
-      )
-    case "localSearch boxMerging" =>
-      new TopLeftFirstBoxMergingBinPacking(
-        boxLength,
-        numRectangles,
-        rectangleWidthRange,
-        rectangleHeightRange
-      )
-    case "localSearch overlapping" =>
-      new TopLeftFirstOverlappingBinPacking(
-        boxLength,
-        numRectangles,
-        rectangleWidthRange,
-        rectangleHeightRange
-      )
-    case "localSearch rectanglePermutation" =>
-      new RectanglePermutationBinPacking(
-        boxLength,
-        numRectangles,
-        rectangleWidthRange,
-        rectangleHeightRange
-      )
-    case "greedy randomSelection" =>
-      new RandomSelectionBinPackingGreedy(
-        boxLength,
-        numRectangles,
-        rectangleWidthRange,
-        rectangleHeightRange
-      )
-    case "greedy sizeOrdered" =>
-      new SizeOrderedBinPackingGreedy(
-        boxLength,
-        numRectangles,
-        rectangleWidthRange,
-        rectangleHeightRange
-      )
-    case "greedy2 randomSelection" =>
-      new QuickRandomSelectionBinPackingGreedy(
-        boxLength,
-        numRectangles,
-        rectangleWidthRange,
-        rectangleHeightRange
-      )
-    case "greedy2 sizeOrdered" =>
-      new QuickSizeOrderedBinPackingGreedy(
-        boxLength,
-        numRectangles,
-        rectangleWidthRange,
-        rectangleHeightRange
-      )
-    case "greedy boxClosing" =>
-      new BoxClosingBinPackingGreedy(
-        boxLength,
-        numRectangles,
-        rectangleWidthRange,
-        rectangleHeightRange
-      )
+    case "localSearch geometryBased" => new GeometryBasedBinPacking(instance)
+    case "localSearch eventuallyFeasibleGeometryBased" => new EventuallyFeasibleGeometryBasedBinPacking(instance)
+    case "localSearch boxMerging" => new TopLeftFirstBoxMergingBinPacking(instance)
+    case "localSearch overlapping" => new TopLeftFirstOverlappingBinPacking(instance)
+    case "localSearch rectanglePermutation" => new RectanglePermutationBinPacking(instance)
+    case "greedy randomSelection" => new RandomSelectionBinPackingGreedy(instance)
+    case "greedy sizeOrdered" => new SizeOrderedBinPackingGreedy(instance)
+    case "greedy2 randomSelection" => new QuickRandomSelectionBinPackingGreedy(instance)
+    case "greedy2 sizeOrdered" => new QuickSizeOrderedBinPackingGreedy(instance)
+    case "greedy boxClosing" => new BoxClosingBinPackingGreedy(instance)
     case unknownStrategy => throw UnknownStrategyException(unknownStrategy)
   }
 }

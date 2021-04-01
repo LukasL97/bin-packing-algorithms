@@ -2,6 +2,7 @@ package models.problem.binpacking.localsearch
 
 import metrics.Metrics
 import models.algorithm.Score
+import models.problem.binpacking.BinPackingInstance
 import models.problem.binpacking.localsearch.evaluation.BoxWeightedTopLeftFirstEvaluation
 import models.problem.binpacking.localsearch.neighborhood.BoxReorderingNeighborhood
 import models.problem.binpacking.localsearch.neighborhood.TopLeftFirstBoxPullUpNeighborhood
@@ -12,25 +13,22 @@ import models.problem.binpacking.solution.TopLeftFirstBinPackingSolution
 import scala.collection.View
 
 class TopLeftFirstBoxMergingBinPacking(
-  override val boxLength: Int,
-  override val numRectangles: Int,
-  override val rectangleWidthRange: (Int, Int),
-  override val rectangleHeightRange: (Int, Int)
+  override val instance: BinPackingInstance
 ) extends BinPackingLocalSearch[TopLeftFirstBinPackingSolution] {
 
   override val solutionHandler: BinPackingSolutionHandler[TopLeftFirstBinPackingSolution] =
-    new TopLeftFirstBoxMergingBinPackingSolutionHandler(rectangles, boxLength)
+    new TopLeftFirstBoxMergingBinPackingSolutionHandler(instance.rectangles, instance.boxLength)
 
 }
 
 class TopLeftFirstBoxMergingBinPackingSolutionHandler(
-  val rectangles: Set[Rectangle],
+  val rectangles: Seq[Rectangle],
   override val boxLength: Int
 ) extends BinPackingSolutionHandler[TopLeftFirstBinPackingSolution] with BoxWeightedTopLeftFirstEvaluation
     with Metrics {
 
   override val startSolution: TopLeftFirstBinPackingSolution = withTimer("ls-merging-start-solution") {
-    TopLeftFirstBinPackingSolution.apply(rectangles.toSeq, boxLength)
+    TopLeftFirstBinPackingSolution.apply(rectangles, boxLength)
   }
 
   private val boxReorderingNeighborhood = new BoxReorderingNeighborhood[TopLeftFirstBinPackingSolution]

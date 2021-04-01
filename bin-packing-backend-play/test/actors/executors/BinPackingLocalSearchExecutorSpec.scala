@@ -6,6 +6,7 @@ import akka.testkit.TestKit
 import akka.testkit.TestProbe
 import models.algorithm.OneDimensionalScore
 import models.algorithm.Score
+import models.problem.binpacking.BinPackingInstance
 import models.problem.binpacking.localsearch.BinPackingLocalSearch
 import models.problem.binpacking.localsearch.BinPackingSolutionHandler
 import models.problem.binpacking.solution.BinPackingSolution
@@ -42,15 +43,13 @@ class BinPackingLocalSearchExecutorSpec
 
         val binPacking: BinPackingLocalSearch[SimpleBinPackingSolution] =
           new BinPackingLocalSearch[SimpleBinPackingSolution] {
-            override val boxLength: Int = boxLength_
-            override val numRectangles: Int = 1
-            override val rectangleWidthRange: (Int, Int) = (1, 1)
-            override val rectangleHeightRange: (Int, Int) = (1, 1)
+
+            override val instance: BinPackingInstance = BinPackingInstance(boxLength_, 1, 1, 1, 1, 1)
 
             override val solutionHandler: BinPackingSolutionHandler[SimpleBinPackingSolution] =
               new BinPackingSolutionHandler[SimpleBinPackingSolution] {
                 override val startSolution: SimpleBinPackingSolution = SimpleBinPackingSolution(
-                  Map(rectangles.head -> Placing(box, Coordinates(0, 0)))
+                  Map(instance.rectangles.head -> Placing(box, Coordinates(0, 0)))
                 )
 
                 override def getNeighborhood(
@@ -82,7 +81,7 @@ class BinPackingLocalSearchExecutorSpec
             runId,
             0,
             solution = SimpleBinPackingSolution.apply(
-              Map(binPacking.rectangles.head -> Placing(box, Coordinates(0, 0)))
+              Map(binPacking.instance.rectangles.head -> Placing(box, Coordinates(0, 0)))
             )
           )
         )
@@ -91,7 +90,7 @@ class BinPackingLocalSearchExecutorSpec
             runId,
             1,
             solution = SimpleBinPackingSolution.apply(
-              Map(binPacking.rectangles.head -> Placing(box, Coordinates(1, 1)))
+              Map(binPacking.instance.rectangles.head -> Placing(box, Coordinates(1, 1)))
             )
           )
         )
@@ -100,7 +99,7 @@ class BinPackingLocalSearchExecutorSpec
             runId,
             2,
             solution = SimpleBinPackingSolution.apply(
-              Map(binPacking.rectangles.head -> Placing(box, Coordinates(2, 2)))
+              Map(binPacking.instance.rectangles.head -> Placing(box, Coordinates(2, 2)))
             )
           )
         )
@@ -109,7 +108,7 @@ class BinPackingLocalSearchExecutorSpec
             runId,
             3,
             solution = SimpleBinPackingSolution.apply(
-              Map(binPacking.rectangles.head -> Placing(box, Coordinates(2, 2)))
+              Map(binPacking.instance.rectangles.head -> Placing(box, Coordinates(2, 2)))
             ),
             finished = true
           )

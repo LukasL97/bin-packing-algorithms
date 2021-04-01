@@ -1,5 +1,6 @@
 package models.problem.binpacking.greedy
 
+import models.problem.binpacking.BinPackingInstance
 import models.problem.binpacking.greedy.basic.BasicBinPackingGreedy
 import models.problem.binpacking.greedy.basic.BasicBinPackingSelectionHandler
 import models.problem.binpacking.solution.Box
@@ -16,7 +17,7 @@ class BasicBinPackingGreedySpec extends WordSpec with MustMatchers {
     "place rectangles in separate boxes in the given candidate order" when {
       "given a selection strategy with sequential candidate selection and one box per rectangle placing strategy" in {
 
-        val binPacking = new BinPackingGreedyImpl(10, 4, (3, 3), (3, 3))
+        val binPacking = new BinPackingGreedyImpl(BinPackingInstance.apply(10, 4, 3, 3, 3, 3))
 
         val finalSolution = binPacking.greedy.run()
 
@@ -33,16 +34,13 @@ class BasicBinPackingGreedySpec extends WordSpec with MustMatchers {
 }
 
 private class BinPackingGreedyImpl(
-  override val boxLength: Int = 10,
-  override val numRectangles: Int = 4,
-  override val rectangleWidthRange: (Int, Int) = (3, 3),
-  override val rectangleHeightRange: (Int, Int) = (3, 3)
+  override val instance: BinPackingInstance
 ) extends BasicBinPackingGreedy {
 
-  val orderedRectangles: Seq[Rectangle] = rectangles.toSeq.sortBy(_.id)
+  val orderedRectangles: Seq[Rectangle] = instance.rectangles.sortBy(_.id)
 
   override val selectionHandler: BasicBinPackingSelectionHandler = new BinPackingSelectionHandlerImpl(
-    boxLength,
+    instance.boxLength,
     orderedRectangles
   )
 }
