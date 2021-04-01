@@ -4,6 +4,7 @@ import models.problem.binpacking.BinPackingInstance
 import org.mongodb.scala.Completed
 import org.mongodb.scala.MongoDatabase
 import org.mongodb.scala.bson.BsonDocument
+import org.mongodb.scala.model.Filters.equal
 import utils.SerializationUtil
 
 import javax.inject.Inject
@@ -16,6 +17,23 @@ class BinPackingInstanceDAO @Inject()(val db: MongoDatabase, implicit val ec: Ex
 
   def dumpInstance(instance: BinPackingInstance): Future[Completed] = {
     collection.insertOne(convertInstanceToDocument(instance)).toFuture()
+  }
+
+  def getInstance(id: String): Future[BinPackingInstance] = {
+    collection
+      .find(
+        equal("id", id)
+      )
+      .headOption()
+      .map(_.getOrElse(throw new RuntimeException(s"Could not find instance with id $id in database")))
+      .map(convertDocumentToInstance)
+  }
+
+  def getAllInstances: Future[Seq[BinPackingInstance]] = {
+    collection
+      .find()
+      .toFuture()
+      .map(documents => documents.map(convertDocumentToInstance))
   }
 
   def convertInstanceToDocument(instance: BinPackingInstance): BsonDocument = {

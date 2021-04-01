@@ -14,14 +14,19 @@ import models.problem.binpacking.BinPackingInstance
 import models.problem.binpacking.greedy.BoxClosingBinPackingGreedy
 import models.problem.binpacking.greedy.basic.RandomSelectionBinPackingGreedy
 import models.problem.binpacking.greedy.basic.SizeOrderedBinPackingGreedy
-import models.problem.binpacking.greedy.candidatesupported.{RandomSelectionBinPackingGreedy => QuickRandomSelectionBinPackingGreedy}
-import models.problem.binpacking.greedy.candidatesupported.{SizeOrderedBinPackingGreedy => QuickSizeOrderedBinPackingGreedy}
+import models.problem.binpacking.greedy.candidatesupported.{
+  RandomSelectionBinPackingGreedy => QuickRandomSelectionBinPackingGreedy
+}
+import models.problem.binpacking.greedy.candidatesupported.{
+  SizeOrderedBinPackingGreedy => QuickSizeOrderedBinPackingGreedy
+}
 import models.problem.binpacking.localsearch.EventuallyFeasibleGeometryBasedBinPacking
 import models.problem.binpacking.localsearch.GeometryBasedBinPacking
 import models.problem.binpacking.localsearch.RectanglePermutationBinPacking
 import models.problem.binpacking.localsearch.TopLeftFirstBoxMergingBinPacking
 import models.problem.binpacking.localsearch.TopLeftFirstOverlappingBinPacking
 import play.api.libs.json.JsValue
+import play.api.mvc.Action
 import play.api.mvc._
 import utils.BinPackingSolutionSerializationUtil.formats
 import utils.JsonConversions._
@@ -64,6 +69,19 @@ class BinPackingController @Inject()(
     } catch {
       case e: UnknownStrategyException => BadRequest(e.getMessage)
     }
+  }
+
+  def startFromInstance(strategy: String, instanceId: String): Action[AnyContent] = Action.async {
+    implicit request: Request[AnyContent] =>
+      instanceDao.getInstance(instanceId).map { instance =>
+        try {
+          val startSolution = actorStarter(strategy, instance)
+          val response: JsValue = SerializationUtil.toJson(startSolution)
+          Ok(response)
+        } catch {
+          case e: UnknownStrategyException => BadRequest(e.getMessage)
+        }
+      }
   }
 
   def getSteps(runId: String, minStep: String, maxStep: String): Action[AnyContent] = Action.async {
