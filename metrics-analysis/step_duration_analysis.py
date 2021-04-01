@@ -121,7 +121,9 @@ def analyze_local_search_overlapping(run_id, endpoint):
         'box-weighted-score-compare',
         'single-box-pull-up-neighborhood',
         'maximal-box-pull-up-neighborhood',
-        'exceeded-overlap-outsourcing-neighborhood'
+        'exceeded-overlap-outsourcing-neighborhood',
+        'box-merge-neighborhood',
+        'reorder-boxes-by-fill-grade-neighborhood'
     ]
     for timer in timers:
         count, time = analyze_timer(timer, run_id, endpoint)
