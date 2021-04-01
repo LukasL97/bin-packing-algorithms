@@ -8,5 +8,7 @@ PUT     /binPacking/startFromInstance   controllers.BinPackingController.startFr
 GET     /binPacking/steps               controllers.BinPackingController.getSteps(runId, minStep, maxStep)
 GET     /binPacking/rawSteps            controllers.BinPackingController.getRawSteps(runId, minStep, maxStep)
 
+GET     /instances                      controllers.InstanceController.getAllInstances()
+
 GET     /metrics                        controllers.MetricsController.get()
 
