@@ -15,13 +15,13 @@ class TopLeftFirstBoxMergeNeighborhood[A <: TopLeftFirstPlacingSupport[A] with S
 
   val boxMergeCombinedAreaThresholdFactor = 0.8
 
-  def createSolutionsWithMergedBoxes(solution: A): View[A] = {
+  def createSolutionsWithMergedBoxes(solution: A, maxOverlap: Option[Double] = None): View[A] = {
     val reversedPlacementsPerBox = getReversedPlacementsPerBox(solution)
     val placementsPerBoxUntilThreshold = collectBoxesUntilAreaExceedsThreshold(reversedPlacementsPerBox)
     val placementsPerBoxPrefixes = getPrefixes(placementsPerBoxUntilThreshold).reverse.view
     placementsPerBoxPrefixes.flatMap { placementsPerBoxPrefix =>
       withTimer("box-merge-neighborhood") {
-        mergeBoxes(solution, placementsPerBoxPrefix)
+        mergeBoxes(solution, placementsPerBoxPrefix, maxOverlap)
       }
     }
   }
@@ -57,27 +57,34 @@ class TopLeftFirstBoxMergeNeighborhood[A <: TopLeftFirstPlacingSupport[A] with S
     consideredPlacementsPerBox
   }
 
-  private def mergeBoxes(solution: A, placementsPerBox: Seq[(Int, Map[Rectangle, Coordinates])]): Option[A] = {
+  private def mergeBoxes(
+    solution: A,
+    placementsPerBox: Seq[(Int, Map[Rectangle, Coordinates])],
+    maxOverlap: Option[Double]
+  ): Option[A] = {
     val boxes = placementsPerBox.sortBy(_._1)
     val pulledBoxes = boxes.tail
     val targetBoxId = boxes.head._1
-    pulledBoxes.foldLeft(Option(solution)) {
-      case (Some(updatedSolution), (boxId, placement)) =>
-        pullUpAllRectanglesFromBox(updatedSolution, boxId, targetBoxId, placement.keys.toSeq)
-      case (None, _) => None
-    }.map(_.squashed)
+    pulledBoxes
+      .foldLeft(Option(solution)) {
+        case (Some(updatedSolution), (boxId, placement)) =>
+          pullUpAllRectanglesFromBox(updatedSolution, boxId, targetBoxId, placement.keys.toSeq, maxOverlap)
+        case (None, _) => None
+      }
+      .map(_.squashed)
   }
 
   private def pullUpAllRectanglesFromBox(
     solution: A,
     sourceBoxId: Int,
     targetBoxId: Int,
-    rectangles: Seq[Rectangle]
+    rectangles: Seq[Rectangle],
+    maxOverlap: Option[Double]
   ): Option[A] = {
     rectangles.foldLeft(Option(solution)) {
       case (Some(updatedSolution), rectangle) =>
         val solutionWithRectangleRemoved = updatedSolution.removeRectangleFromBox(rectangle.id, sourceBoxId)
-        solutionWithRectangleRemoved.placeTopLeftFirstInSpecificBox(rectangle, targetBoxId)
+        solutionWithRectangleRemoved.placeTopLeftFirstInSpecificBox(rectangle, targetBoxId, maxOverlap)
       case (None, _) => None
     }
   }

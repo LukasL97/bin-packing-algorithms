@@ -2,6 +2,7 @@ package models.problem.binpacking.solution
 
 import models.problem.binpacking.BinPackingSolutionValidator
 import models.problem.binpacking.solution.initialization.EmptySolutionInitializer
+import models.problem.binpacking.solution.transformation.BoxReorderingSupport
 import models.problem.binpacking.solution.transformation.SquashingSupport
 import models.problem.binpacking.solution.transformation.TopLeftFirstPlacingSupport
 
@@ -37,7 +38,8 @@ case class OverlappingTopLeftFirstBinPackingSolution(
   boxLength: Int
 ) extends AbstractTopLeftFirstBinPackingSolution with Overlappings with BinPackingSolutionValidator
     with TopLeftFirstPlacingSupport[OverlappingTopLeftFirstBinPackingSolution]
-    with SquashingSupport[OverlappingTopLeftFirstBinPackingSolution] {
+    with SquashingSupport[OverlappingTopLeftFirstBinPackingSolution]
+    with BoxReorderingSupport[OverlappingTopLeftFirstBinPackingSolution] {
 
   override def asSimpleSolution: SimpleBinPackingSolution = SimpleBinPackingSolution(placement)
 
@@ -370,6 +372,22 @@ case class OverlappingTopLeftFirstBinPackingSolution(
       placement = updatedPlacement,
       topLeftCandidates = updatedCandidates,
       overlappings = updatedOverlappings
+    )
+  }
+
+  override def reorderBoxes(boxIdOrder: Seq[Int]): OverlappingTopLeftFirstBinPackingSolution = {
+    val newPlacement = reorderPlacement(boxIdOrder)
+    val boxIdMapping = boxIdOrder.zip(1 to boxIdOrder.size).toMap
+    val newCandidates = topLeftCandidates.map {
+      case (boxId, candidates) => boxIdMapping(boxId) -> candidates
+    }
+    val newOverlappings = overlappings.map {
+      case (boxId, candidates) => boxIdMapping(boxId) -> candidates
+    }
+    copy(
+      placement = newPlacement,
+      topLeftCandidates = newCandidates,
+      overlappings = newOverlappings
     )
   }
 }

@@ -5,7 +5,9 @@ import models.algorithm.OneDimensionalScore
 import models.algorithm.Score
 import models.problem.binpacking.localsearch.evaluation.BoxWeightedScore
 import models.problem.binpacking.localsearch.evaluation.BoxWeightedTopLeftFirstEvaluation
+import models.problem.binpacking.localsearch.neighborhood.BoxReorderingNeighborhood
 import models.problem.binpacking.localsearch.neighborhood.ExceededOverlapOutsourcingNeighborhood
+import models.problem.binpacking.localsearch.neighborhood.TopLeftFirstBoxMergeNeighborhood
 import models.problem.binpacking.localsearch.neighborhood.TopLeftFirstBoxPullUpNeighborhood
 import models.problem.binpacking.solution.OverlappingTopLeftFirstBinPackingSolution
 import models.problem.binpacking.solution.Rectangle
@@ -35,6 +37,9 @@ class TopLeftFirstOverlappingBinPackingSolutionHandler(
   private val exceededOverlapOutsourcingNeighborhood = new ExceededOverlapOutsourcingNeighborhood(boxLength)
   private val boxPullUpNeighborhood =
     new TopLeftFirstBoxPullUpNeighborhood[OverlappingTopLeftFirstBinPackingSolution](boxLength)
+  private val boxReorderingNeighborhood = new BoxReorderingNeighborhood[OverlappingTopLeftFirstBinPackingSolution]
+  private val boxMergeNeighborhood =
+    new TopLeftFirstBoxMergeNeighborhood[OverlappingTopLeftFirstBinPackingSolution](boxLength)
 
   override def getNeighborhood(
     solution: OverlappingTopLeftFirstBinPackingSolution,
@@ -43,13 +48,19 @@ class TopLeftFirstOverlappingBinPackingSolutionHandler(
     val maxOverlap = maxAllowedOverlap(step)
     val solutionsWithOutsourcedRectangles = exceededOverlapOutsourcingNeighborhood
       .createExceededOverlapOutsourcingNeighborhood(solution, maxOverlap)
-    val solutionsWithSingleBoxPullUps =
-      boxPullUpNeighborhood.createSolutionsWithSingleBoxPullUp(solution, Option(maxOverlap))
-    val solutionsWithMaximalBoxPullUps =
+    val solutionsWithSingleBoxPullUp = maxOverlap match {
+      case 0.0 => boxPullUpNeighborhood.createSolutionsWithSingleBoxPullUp(solution, Option(maxOverlap))
+      case _ =>  View.empty[OverlappingTopLeftFirstBinPackingSolution]
+    }
+    val solutionsWithMaximalBoxPullUp =
       boxPullUpNeighborhood.createSolutionsWithMaximalBoxPullUp(solution, Option(maxOverlap))
+    val solutionsWithReorderedBoxes = boxReorderingNeighborhood.reorderBoxesByFillGrade(solution)
+    val solutionsWithMergedBoxes = boxMergeNeighborhood.createSolutionsWithMergedBoxes(solution, Option(maxOverlap))
     solutionsWithOutsourcedRectangles ++
-      solutionsWithMaximalBoxPullUps ++
-      solutionsWithSingleBoxPullUps
+      solutionsWithReorderedBoxes ++
+      solutionsWithMergedBoxes ++
+      solutionsWithMaximalBoxPullUp ++
+      solutionsWithSingleBoxPullUp
   }
 
   override def evaluate(solution: OverlappingTopLeftFirstBinPackingSolution, step: Int): Score = {
