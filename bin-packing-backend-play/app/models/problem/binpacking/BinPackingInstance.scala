@@ -3,12 +3,13 @@ package models.problem.binpacking
 import models.problem.binpacking.solution.Rectangle
 import org.joda.time.DateTime
 
+import java.util.Date
 import java.util.UUID
 import scala.util.Random
 
 case class BinPackingInstance(
   id: String,
-  creationDate: DateTime,
+  creationDate: Date,
   boxLength: Int,
   numRectangles: Int,
   minWidth: Int,
@@ -29,7 +30,7 @@ object BinPackingInstance {
     maxHeight: Int
   ): BinPackingInstance = {
     val id = UUID.randomUUID().toString
-    val creationDate = DateTime.now()
+    val creationDate = DateTime.now().toDate
     val rectangles = generateRectangles(numRectangles, minWidth, maxWidth, minHeight, maxHeight)
     new BinPackingInstance(
       id,

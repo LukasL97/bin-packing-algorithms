@@ -7,18 +7,15 @@ import akka.actor.ActorRef.noSender
 import akka.actor.ActorSystem
 import akka.actor.Props
 import controllers.exceptions.UnknownStrategyException
+import dao.BinPackingInstanceDAO
 import dao.BinPackingSolutionStepDAO
 import models.problem.binpacking.BinPacking
 import models.problem.binpacking.BinPackingInstance
 import models.problem.binpacking.greedy.BoxClosingBinPackingGreedy
 import models.problem.binpacking.greedy.basic.RandomSelectionBinPackingGreedy
 import models.problem.binpacking.greedy.basic.SizeOrderedBinPackingGreedy
-import models.problem.binpacking.greedy.candidatesupported.{
-  RandomSelectionBinPackingGreedy => QuickRandomSelectionBinPackingGreedy
-}
-import models.problem.binpacking.greedy.candidatesupported.{
-  SizeOrderedBinPackingGreedy => QuickSizeOrderedBinPackingGreedy
-}
+import models.problem.binpacking.greedy.candidatesupported.{RandomSelectionBinPackingGreedy => QuickRandomSelectionBinPackingGreedy}
+import models.problem.binpacking.greedy.candidatesupported.{SizeOrderedBinPackingGreedy => QuickSizeOrderedBinPackingGreedy}
 import models.problem.binpacking.localsearch.EventuallyFeasibleGeometryBasedBinPacking
 import models.problem.binpacking.localsearch.GeometryBasedBinPacking
 import models.problem.binpacking.localsearch.RectanglePermutationBinPacking
@@ -40,7 +37,8 @@ import scala.concurrent.ExecutionContext
 class BinPackingController @Inject()(
   val controllerComponents: ControllerComponents,
   val actorStarter: BinPackingActorStarter,
-  val dao: BinPackingSolutionStepDAO,
+  val solutionStepDao: BinPackingSolutionStepDAO,
+  val instanceDao: BinPackingInstanceDAO,
   implicit val ec: ExecutionContext
 ) extends BaseController {
 
@@ -56,6 +54,7 @@ class BinPackingController @Inject()(
           startInfo.rectanglesHeightRange.min,
           startInfo.rectanglesHeightRange.max
         )
+        instanceDao.dumpInstance(instance)
         val startSolution = actorStarter(startInfo.strategy, instance)
         val response: JsValue = SerializationUtil.toJson(startSolution)
         Ok(response)
@@ -69,7 +68,7 @@ class BinPackingController @Inject()(
 
   def getSteps(runId: String, minStep: String, maxStep: String): Action[AnyContent] = Action.async {
     implicit request: Request[AnyContent] =>
-      dao
+      solutionStepDao
         .getSolutionStepsInStepRange(runId, parseInt(minStep), parseInt(maxStep))
         .map(solutionSteps => SerializationUtil.toJson(solutionSteps))
         .map(response => Ok(toPlayJson(response)))
@@ -77,7 +76,7 @@ class BinPackingController @Inject()(
 
   def getRawSteps(runId: String, minStep: String, maxStep: String): Action[AnyContent] = Action.async {
     implicit request: Request[AnyContent] =>
-      dao
+      solutionStepDao
         .getRawSolutionsStepsInStepRange(runId, parseInt(minStep), parseInt(maxStep))
         .map(toPlayJson)
         .map(Ok(_))
