@@ -7,7 +7,7 @@ const StrategySelectorFormRow = (props) => {
   )
 
   return (
-    <div className='strategy-selector-form-row'>
+    <div className='strategy-selector drop-down-form-row'>
       <select id='strategy' name='strategy' onChange={props.onChange} onLoad={props.onChange}>
         {strategies}
       </select>

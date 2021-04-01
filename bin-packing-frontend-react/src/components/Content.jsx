@@ -12,6 +12,7 @@ class Content extends Component {
       getCurrentSolutionStep,
       getRectanglesLastUpdate,
       start,
+      startFromInstance,
       visualizationIterationPeriodDefault,
       updateVisualizationIterationPeriod,
       toggleAutomaticVisualization,
@@ -24,7 +25,7 @@ class Content extends Component {
     return (
       <div className="content-container">
         <div className="input-container">
-          <AlgorithmInputForm start={start}/>
+          <AlgorithmInputForm start={start} startFromInstance={startFromInstance}/>
           <VisualizationConfigForm
             visualizationIterationPeriodDefault={visualizationIterationPeriodDefault}
             updateVisualizationIterationPeriod={updateVisualizationIterationPeriod}

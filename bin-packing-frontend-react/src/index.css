@@ -41,12 +41,12 @@
     text-align: right;
 }
 
-.strategy-selector-form-row {
+.drop-down-form-row {
     margin-bottom: 10px;
     width: 240px;
 }
 
-.strategy-selector-form-row select {
+.drop-down-form-row select {
     width: 100%;
 }
 

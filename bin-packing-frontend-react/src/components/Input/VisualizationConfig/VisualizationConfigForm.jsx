@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import NumericalInputFormRow from '../NumericalInputFormRow'
-import ToggleFormRow from './ToggleFormRow'
+import ToggleFormRow from '../ToggleFormRow'
 import ManualStepIndexMoverFormRow from './ManualStepIndexMoverFormRow'
 
 class VisualizationConfigForm extends Component {

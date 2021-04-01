@@ -53,17 +53,23 @@ class App extends Component {
       maxWidth,
       minHeight,
       maxHeight
-    )(startSolutionStep => {
-      console.log(startSolutionStep)
-      this.setState(oldState => ({
-        ...oldState,
-        running: true,
-        runId: startSolutionStep.data.runId,
-        rectanglesLastUpdate: {},
-        solutionSteps: [startSolutionStep.data],
-        currentStepIndex: 0
-      }))
-    })
+    )(this.loadStartSolutionStepIntoState.bind(this))
+  }
+
+  startFromInstance = (strategy, instanceId) => {
+    this.backendClient.startAlgorithmFromInstance(strategy, instanceId)(this.loadStartSolutionStepIntoState.bind(this))
+  }
+
+  loadStartSolutionStepIntoState(startSolutionStep) {
+    console.log(startSolutionStep)
+    this.setState(oldState => ({
+      ...oldState,
+      running: true,
+      runId: startSolutionStep.data.runId,
+      rectanglesLastUpdate: {},
+      solutionSteps: [startSolutionStep.data],
+      currentStepIndex: 0
+    }))
   }
 
   blockFetch = () => {
@@ -187,6 +193,7 @@ class App extends Component {
           getCurrentSolutionStep={this.getCurrentSolutionStep}
           getRectanglesLastUpdate={this.getRectanglesLastUpdate}
           start={this.start}
+          startFromInstance={this.startFromInstance}
           visualizationIterationPeriodDefault={this.visualizationIterationPeriodDefault}
           updateVisualizationIterationPeriod={this.updateMoveCurrentStepIndexInterval.bind(this)}
           toggleAutomaticVisualization={this.toggleAutomaticVisualization.bind(this)}
