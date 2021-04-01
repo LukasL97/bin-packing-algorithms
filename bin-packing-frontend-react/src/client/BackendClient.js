@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from 'axios'
 
 class BackendClient {
 
@@ -33,9 +33,25 @@ class BackendClient {
     }
   }
 
+  startAlgorithmFromInstance(strategy, instanceId) {
+    return (callback) => {
+      console.trace('Starting algorithm from instance with id ' + instanceId)
+      axios.put(
+        '/binPacking/startFromInstance',
+        null,
+        {
+          params: {
+            strategy: strategy,
+            instanceId: instanceId
+          }
+        }
+      ).then(startSolutionStep => callback(startSolutionStep))
+    }
+  }
+
   fetchSolutionSteps(runId, minStep, maxStep) {
     return (callback) => {
-      console.trace('Fetching steps ' + minStep  + ' - ' + maxStep + ' for runId ' + runId)
+      console.trace('Fetching steps ' + minStep + ' - ' + maxStep + ' for runId ' + runId)
       axios.get(
         '/binPacking/steps',
         {
@@ -46,6 +62,15 @@ class BackendClient {
           }
         }
       ).then(solutionSteps => callback(solutionSteps))
+    }
+  }
+
+  fetchAllInstances() {
+    return (callback) => {
+      console.trace('Fetch all instances')
+      axios.get(
+        '/instances'
+      ).then(instances => callback(instances))
     }
   }
 
