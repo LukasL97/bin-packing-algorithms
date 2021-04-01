@@ -6,7 +6,7 @@ import models.algorithm.Score
 import models.problem.binpacking.localsearch.evaluation.BoxWeightedScore
 import models.problem.binpacking.localsearch.evaluation.BoxWeightedTopLeftFirstEvaluation
 import models.problem.binpacking.localsearch.neighborhood.ExceededOverlapOutsourcingNeighborhood
-import models.problem.binpacking.localsearch.neighborhood.TopLeftFirstOverlappingBoxPullUpNeighborhood
+import models.problem.binpacking.localsearch.neighborhood.TopLeftFirstBoxPullUpNeighborhood
 import models.problem.binpacking.solution.OverlappingTopLeftFirstBinPackingSolution
 import models.problem.binpacking.solution.Rectangle
 
@@ -26,14 +26,15 @@ class TopLeftFirstOverlappingBinPacking(
 class TopLeftFirstOverlappingBinPackingSolutionHandler(
   rectangles: Set[Rectangle],
   override val boxLength: Int
-) extends BinPackingSolutionHandler[OverlappingTopLeftFirstBinPackingSolution]
-    with BoxWeightedTopLeftFirstEvaluation with Metrics {
+) extends BinPackingSolutionHandler[OverlappingTopLeftFirstBinPackingSolution] with BoxWeightedTopLeftFirstEvaluation
+    with Metrics {
 
   override val startSolution: OverlappingTopLeftFirstBinPackingSolution =
     OverlappingTopLeftFirstBinPackingSolution.apply(rectangles.toSeq, boxLength, 1.0)
 
   private val exceededOverlapOutsourcingNeighborhood = new ExceededOverlapOutsourcingNeighborhood(boxLength)
-  private val boxPullUpNeighborhood = new TopLeftFirstOverlappingBoxPullUpNeighborhood(boxLength)
+  private val boxPullUpNeighborhood =
+    new TopLeftFirstBoxPullUpNeighborhood[OverlappingTopLeftFirstBinPackingSolution](boxLength)
 
   override def getNeighborhood(
     solution: OverlappingTopLeftFirstBinPackingSolution,
@@ -42,8 +43,10 @@ class TopLeftFirstOverlappingBinPackingSolutionHandler(
     val maxOverlap = maxAllowedOverlap(step)
     val solutionsWithOutsourcedRectangles = exceededOverlapOutsourcingNeighborhood
       .createExceededOverlapOutsourcingNeighborhood(solution, maxOverlap)
-    val solutionsWithSingleBoxPullUps = boxPullUpNeighborhood.createSolutionsWithSingleBoxPullUp(solution, maxOverlap)
-    val solutionsWithMaximalBoxPullUps = boxPullUpNeighborhood.createSolutionsWithMaximalBoxPullUp(solution, maxOverlap)
+    val solutionsWithSingleBoxPullUps =
+      boxPullUpNeighborhood.createSolutionsWithSingleBoxPullUp(solution, Option(maxOverlap))
+    val solutionsWithMaximalBoxPullUps =
+      boxPullUpNeighborhood.createSolutionsWithMaximalBoxPullUp(solution, Option(maxOverlap))
     solutionsWithOutsourcedRectangles ++
       solutionsWithMaximalBoxPullUps ++
       solutionsWithSingleBoxPullUps

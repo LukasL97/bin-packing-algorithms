@@ -34,7 +34,11 @@ case class BoxClosingTopLeftFirstBinPackingSolution(
 ) extends AbstractTopLeftFirstBinPackingSolution with ClosedBoxes
     with TopLeftFirstPlacingSupport[BoxClosingTopLeftFirstBinPackingSolution] {
 
-  override def placeTopLeftFirst(rectangle: Rectangle): BoxClosingTopLeftFirstBinPackingSolution = {
+  override def placeTopLeftFirst(
+    rectangle: Rectangle,
+    maxOverlap: Option[Double] = None
+  ): BoxClosingTopLeftFirstBinPackingSolution = {
+    require(maxOverlap.isEmpty)
     val (placedRectangle, placing) = findRectanglePlacing(rectangle, Option(topLeftCandidates), closedBoxes)
     val updatedPlacement = placement.updated(placedRectangle, placing)
     val updatedCandidates = updateCandidates(placedRectangle, placing)
@@ -58,8 +62,10 @@ case class BoxClosingTopLeftFirstBinPackingSolution(
 
   override def placeTopLeftFirstInSpecificBox(
     rectangle: Rectangle,
-    boxId: Int
+    boxId: Int,
+    maxOverlap: Option[Double] = None
   ): Option[BoxClosingTopLeftFirstBinPackingSolution] = {
+    require(maxOverlap.isEmpty)
     if (closedBoxes.contains(boxId)) {
       Option.empty[BoxClosingTopLeftFirstBinPackingSolution]
     } else {

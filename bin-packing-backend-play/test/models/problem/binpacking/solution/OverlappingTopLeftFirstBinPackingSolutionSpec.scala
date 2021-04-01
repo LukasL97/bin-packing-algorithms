@@ -26,7 +26,7 @@ class OverlappingTopLeftFirstBinPackingSolutionSpec
           boxLength
         )
         val rectangle = Rectangle(3, 2, 2)
-        solution.placeTopLeftFirst(rectangle, 0) mustEqual OverlappingTopLeftFirstBinPackingSolution(
+        solution.placeTopLeftFirst(rectangle, Option(0)) mustEqual OverlappingTopLeftFirstBinPackingSolution(
           Map(
             Rectangle(1, 1, 1) -> Placing(Box(1, boxLength), Coordinates(0, 0)),
             Rectangle(2, 2, 1) -> Placing(Box(1, boxLength), Coordinates(0, 1)),
@@ -57,7 +57,7 @@ class OverlappingTopLeftFirstBinPackingSolutionSpec
           boxLength
         )
         val rectangle = Rectangle(3, 2, 2)
-        solution.placeTopLeftFirst(rectangle, 0.3) mustEqual OverlappingTopLeftFirstBinPackingSolution(
+        solution.placeTopLeftFirst(rectangle, Option(0.3)) mustEqual OverlappingTopLeftFirstBinPackingSolution(
           Map(
             Rectangle(1, 1, 1) -> Placing(Box(1, boxLength), Coordinates(0, 0)),
             Rectangle(2, 2, 1) -> Placing(Box(1, boxLength), Coordinates(0, 1)),
@@ -84,7 +84,7 @@ class OverlappingTopLeftFirstBinPackingSolutionSpec
           boxLength
         )
         val rectangle = Rectangle(2, 5, 5)
-        solution.placeTopLeftFirstInSpecificBox(rectangle, 1, 0.3) mustEqual Option(
+        solution.placeTopLeftFirstInSpecificBox(rectangle, 1, Option(0.3)) mustEqual Option(
           OverlappingTopLeftFirstBinPackingSolution(
             Map(
               Rectangle(1, 8, 10) -> Placing(Box(1, boxLength), Coordinates(2, 0)),
@@ -111,7 +111,7 @@ class OverlappingTopLeftFirstBinPackingSolutionSpec
           boxLength
         )
         val rectangle = Rectangle(2, 5, 5)
-        solution.placeTopLeftFirstInSpecificBox(rectangle, 1, 0.1) must be(None)
+        solution.placeTopLeftFirstInSpecificBox(rectangle, 1, Option(0.1)) must be(None)
       }
     }
 

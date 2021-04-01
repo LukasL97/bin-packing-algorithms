@@ -3,6 +3,7 @@ package models.problem.binpacking.solution
 import models.problem.binpacking.BinPackingSolutionValidator
 import models.problem.binpacking.solution.initialization.EmptySolutionInitializer
 import models.problem.binpacking.solution.transformation.SquashingSupport
+import models.problem.binpacking.solution.transformation.TopLeftFirstPlacingSupport
 
 import scala.collection.SortedSet
 
@@ -24,7 +25,7 @@ object OverlappingTopLeftFirstBinPackingSolution
   ): OverlappingTopLeftFirstBinPackingSolution = {
     val emptySolution = OverlappingTopLeftFirstBinPackingSolution(boxLength)
     rectangles.foldLeft(emptySolution) {
-      case (solution, rectangle) => solution.placeTopLeftFirst(rectangle, maxOverlap)
+      case (solution, rectangle) => solution.placeTopLeftFirst(rectangle, Option(maxOverlap))
     }
   }
 }
@@ -35,6 +36,7 @@ case class OverlappingTopLeftFirstBinPackingSolution(
   override val overlappings: Map[Int, Set[Overlapping]],
   boxLength: Int
 ) extends AbstractTopLeftFirstBinPackingSolution with Overlappings with BinPackingSolutionValidator
+    with TopLeftFirstPlacingSupport[OverlappingTopLeftFirstBinPackingSolution]
     with SquashingSupport[OverlappingTopLeftFirstBinPackingSolution] {
 
   override def asSimpleSolution: SimpleBinPackingSolution = SimpleBinPackingSolution(placement)
@@ -88,8 +90,9 @@ case class OverlappingTopLeftFirstBinPackingSolution(
     }
   }
 
-  def placeTopLeftFirst(rectangle: Rectangle, maxOverlap: Double): OverlappingTopLeftFirstBinPackingSolution = {
-    val (placedRectangle, placing, newOverlappings) = findRectanglePlacing(rectangle, maxOverlap)
+  def placeTopLeftFirst(rectangle: Rectangle, maxOverlap: Option[Double]): OverlappingTopLeftFirstBinPackingSolution = {
+    val (placedRectangle, placing, newOverlappings) =
+      findRectanglePlacing(rectangle, maxOverlap.getOrElse(throw new IllegalArgumentException))
     val updatedPlacement = placement.updated(placedRectangle, placing)
     val updatedCandidates = updateCandidates(placedRectangle, placing)
     val updatedOverlappings = overlappings.updated(
@@ -106,9 +109,9 @@ case class OverlappingTopLeftFirstBinPackingSolution(
   def placeTopLeftFirstInSpecificBox(
     rectangle: Rectangle,
     boxId: Int,
-    maxOverlap: Double
+    maxOverlap: Option[Double]
   ): Option[OverlappingTopLeftFirstBinPackingSolution] = {
-    findRectanglePlacingInSpecificBox(rectangle, boxId, maxOverlap).map {
+    findRectanglePlacingInSpecificBox(rectangle, boxId, maxOverlap.getOrElse(throw new IllegalArgumentException)).map {
       case (placedRectangle, coordinates, newOverlappings) =>
         val placing = Placing(Box(boxId, boxLength), coordinates)
         val updatedPlacement = placement.updated(placedRectangle, placing)

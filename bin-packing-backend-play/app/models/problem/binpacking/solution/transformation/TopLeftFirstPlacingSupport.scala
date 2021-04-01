@@ -12,9 +12,9 @@ import scala.collection.SortedSet
 trait TopLeftFirstPlacingSupport[A <: TopLeftFirstPlacingSupport[A]]
     extends BinPackingSolution with BinPackingTopLeftFirstPlacing {
 
-  def placeTopLeftFirst(rectangle: Rectangle): A
+  def placeTopLeftFirst(rectangle: Rectangle, maxOverlap: Option[Double] = None): A
 
-  def placeTopLeftFirstInSpecificBox(rectangle: Rectangle, boxId: Int): Option[A]
+  def placeTopLeftFirstInSpecificBox(rectangle: Rectangle, boxId: Int, maxOverlap: Option[Double] = None): Option[A]
 
   def removeRectangleFromBox(rectangleId: Int, boxId: Int): A
 

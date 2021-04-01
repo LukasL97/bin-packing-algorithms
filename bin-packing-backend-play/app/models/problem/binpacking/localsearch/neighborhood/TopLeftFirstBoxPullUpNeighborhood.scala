@@ -13,34 +13,44 @@ class TopLeftFirstBoxPullUpNeighborhood[A <: TopLeftFirstPlacingSupport[A] with 
   val boxLength: Int
 ) extends TopLeftFirstCoordinateOrdering with Metrics {
 
-  val entireBoxPullUpCombinedAreaThresholdFactor = 0.8
+  private val entireBoxPullUpCombinedAreaThresholdFactor = 0.8
 
-  def createSolutionsWithSingleBoxPullUp(solution: A): View[A] = {
+  def createSolutionsWithSingleBoxPullUp(solution: A, maxOverlap: Option[Double] = None): View[A] = {
     getReversedPlacementsPerBoxWithoutFirstBox(solution).view.flatMap {
       case (boxId, placement) =>
-        pullUpRectanglesFromBox(solution, boxId, placement.toSeq.sortBy(_._2).reverse.map(_._1))
+        pullUpRectanglesFromBox(solution, boxId, placement.toSeq.sortBy(_._2).reverse.map(_._1), maxOverlap)
     }
   }
 
-  private def pullUpRectanglesFromBox(solution: A, boxId: Int, rectangles: Seq[Rectangle]): View[A] = {
+  private def pullUpRectanglesFromBox(
+    solution: A,
+    boxId: Int,
+    rectangles: Seq[Rectangle],
+    maxOverlap: Option[Double]
+  ): View[A] = {
     rectangles.view.flatMap { rectangle =>
       withTimer("single-box-pull-up-neighborhood") {
         val solutionWithRectangleRemoved = solution.removeRectangleFromBox(rectangle.id, boxId).squashed
-        solutionWithRectangleRemoved.placeTopLeftFirstInSpecificBox(rectangle, boxId - 1)
+        solutionWithRectangleRemoved.placeTopLeftFirstInSpecificBox(rectangle, boxId - 1, maxOverlap)
       }
     }
   }
 
-  def createSolutionsWithMaximalBoxPullUp(solution: A): View[A] = {
+  def createSolutionsWithMaximalBoxPullUp(solution: A, maxOverlap: Option[Double] = None): View[A] = {
     getReversedPlacementsPerBoxWithoutFirstBox(solution).view.flatMap {
       case (boxId, placement) =>
         withTimer("maximal-box-pull-up-neighborhood") {
-          pullUpRectanglesFromBoxUntilFull(solution, boxId, placement.toSeq.sortBy(_._2).reverse.map(_._1))
+          pullUpRectanglesFromBoxUntilFull(solution, boxId, placement.toSeq.sortBy(_._2).reverse.map(_._1), maxOverlap)
         }
     }
   }
 
-  private def pullUpRectanglesFromBoxUntilFull(solution: A, boxId: Int, rectangles: Seq[Rectangle]): Option[A] = {
+  private def pullUpRectanglesFromBoxUntilFull(
+    solution: A,
+    boxId: Int,
+    rectangles: Seq[Rectangle],
+    maxOverlap: Option[Double]
+  ): Option[A] = {
     val (updatedSolution, changed, _) = rectangles.foldLeft(solution, false, false) {
       case ((updatedSolution, changed, finished), rectangle) =>
         if (finished) {
@@ -48,7 +58,7 @@ class TopLeftFirstBoxPullUpNeighborhood[A <: TopLeftFirstPlacingSupport[A] with 
         } else {
           val solutionWithRectangleRemoved = updatedSolution.removeRectangleFromBox(rectangle.id, boxId)
           val solutionWithRectanglePulledUp =
-            solutionWithRectangleRemoved.placeTopLeftFirstInSpecificBox(rectangle, boxId - 1)
+            solutionWithRectangleRemoved.placeTopLeftFirstInSpecificBox(rectangle, boxId - 1, maxOverlap)
           solutionWithRectanglePulledUp match {
             case Some(solution) => (solution, true, false)
             case None => (updatedSolution, changed, true)
@@ -62,23 +72,28 @@ class TopLeftFirstBoxPullUpNeighborhood[A <: TopLeftFirstPlacingSupport[A] with 
     }
   }
 
-  def createSolutionsWithEntireBoxPullUp(solution: A): View[A] = {
+  def createSolutionsWithEntireBoxPullUp(solution: A, maxOverlap: Option[Double] = None): View[A] = {
     getReversedPlacementsPerBoxWithoutFirstBox(solution).view.collect {
       case (boxId, placement)
           if belowEntireBoxPullUpCombinedAreaThreshold(
             getOverallRectangleArea(placement) + getOverallRectangleArea(solution.getPlacementInSingleBox(boxId - 1))
           ) =>
         withTimer("entire-box-pull-up-neighborhood") {
-          pullUpAllRectanglesFromBox(solution, boxId, placement.keys.toSeq)
+          pullUpAllRectanglesFromBox(solution, boxId, placement.keys.toSeq, maxOverlap)
         }
     }.flatten
   }
 
-  private def pullUpAllRectanglesFromBox(solution: A, boxId: Int, rectangles: Seq[Rectangle]): Option[A] = {
+  private def pullUpAllRectanglesFromBox(
+    solution: A,
+    boxId: Int,
+    rectangles: Seq[Rectangle],
+    maxOverlap: Option[Double]
+  ): Option[A] = {
     rectangles.foldLeft(Option(solution)) {
       case (Some(updatedSolution), rectangle) =>
         val solutionWithRectangleRemoved = updatedSolution.removeRectangleFromBox(rectangle.id, boxId).squashed
-        solutionWithRectangleRemoved.placeTopLeftFirstInSpecificBox(rectangle, boxId - 1)
+        solutionWithRectangleRemoved.placeTopLeftFirstInSpecificBox(rectangle, boxId - 1, maxOverlap)
       case (None, _) => None
     }
   }

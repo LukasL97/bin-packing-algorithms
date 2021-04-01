@@ -65,7 +65,11 @@ case class TopLeftFirstBinPackingSolution(
     }
   }
 
-  override def placeTopLeftFirst(rectangle: Rectangle): TopLeftFirstBinPackingSolution = {
+  override def placeTopLeftFirst(
+    rectangle: Rectangle,
+    maxOverlap: Option[Double] = None
+  ): TopLeftFirstBinPackingSolution = {
+    require(maxOverlap.isEmpty)
     val (placedRectangle, placing) = findRectanglePlacing(rectangle, Option(topLeftCandidates))
     val updatedPlacement = placement.updated(placedRectangle, placing)
     val updatedCandidates = updateCandidates(placedRectangle, placing)
@@ -78,8 +82,10 @@ case class TopLeftFirstBinPackingSolution(
 
   override def placeTopLeftFirstInSpecificBox(
     rectangle: Rectangle,
-    boxId: Int
+    boxId: Int,
+    maxOverlap: Option[Double] = None
   ): Option[TopLeftFirstBinPackingSolution] = {
+    require(maxOverlap.isEmpty)
     findRectanglePlacingInSpecificBox(rectangle, boxId, topLeftCandidates.get(boxId)).map {
       case (placedRectangle, coordinates) =>
         val placing = Placing(Box(boxId, boxLength), coordinates)
