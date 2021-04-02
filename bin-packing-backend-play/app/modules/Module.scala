@@ -1,7 +1,7 @@
 package modules
 
 import actors.BinPackingActor
-import actors.SolutionStepDumper
+import actors.dumpers.SolutionStepDumper
 import com.google.inject.AbstractModule
 import org.mongodb.scala.MongoClient
 import org.mongodb.scala.MongoDatabase

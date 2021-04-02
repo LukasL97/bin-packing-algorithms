@@ -1,5 +1,6 @@
-package actors
+package actors.dumpers
 
+import actors.BinPackingSolutionStep
 import akka.actor.Actor
 import com.google.inject.Inject
 import dao.BinPackingSolutionStepDAO
