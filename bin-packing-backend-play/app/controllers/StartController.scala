@@ -14,12 +14,8 @@ import models.problem.binpacking.BinPackingInstance
 import models.problem.binpacking.greedy.BoxClosingBinPackingGreedy
 import models.problem.binpacking.greedy.basic.RandomSelectionBinPackingGreedy
 import models.problem.binpacking.greedy.basic.SizeOrderedBinPackingGreedy
-import models.problem.binpacking.greedy.candidatesupported.{
-  RandomSelectionBinPackingGreedy => QuickRandomSelectionBinPackingGreedy
-}
-import models.problem.binpacking.greedy.candidatesupported.{
-  SizeOrderedBinPackingGreedy => QuickSizeOrderedBinPackingGreedy
-}
+import models.problem.binpacking.greedy.candidatesupported.{RandomSelectionBinPackingGreedy => QuickRandomSelectionBinPackingGreedy}
+import models.problem.binpacking.greedy.candidatesupported.{SizeOrderedBinPackingGreedy => QuickSizeOrderedBinPackingGreedy}
 import models.problem.binpacking.localsearch.EventuallyFeasibleGeometryBasedBinPacking
 import models.problem.binpacking.localsearch.GeometryBasedBinPacking
 import models.problem.binpacking.localsearch.RectanglePermutationBinPacking
@@ -32,7 +28,6 @@ import utils.BinPackingSolutionSerializationUtil.formats
 import utils.JsonConversions._
 import utils.SerializationUtil
 
-import java.lang.Integer.parseInt
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -40,7 +35,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
-class BinPackingController @Inject()(
+class StartController @Inject()(
   val controllerComponents: ControllerComponents,
   val actorStarter: BinPackingActorStarter,
   val solutionStepDao: BinPackingSolutionStepDAO,
@@ -85,22 +80,6 @@ class BinPackingController @Inject()(
         }
       }
     }.getOrElse(Future.successful(BadRequest))
-  }
-
-  def getSteps(runId: String, minStep: String, maxStep: String): Action[AnyContent] = Action.async {
-    implicit request: Request[AnyContent] =>
-      solutionStepDao
-        .getSolutionStepsInStepRange(runId, parseInt(minStep), parseInt(maxStep))
-        .map(solutionSteps => SerializationUtil.toJson(solutionSteps))
-        .map(response => Ok(toPlayJson(response)))
-  }
-
-  def getRawSteps(runId: String, minStep: String, maxStep: String): Action[AnyContent] = Action.async {
-    implicit request: Request[AnyContent] =>
-      solutionStepDao
-        .getRawSolutionsStepsInStepRange(runId, parseInt(minStep), parseInt(maxStep))
-        .map(toPlayJson)
-        .map(Ok(_))
   }
 
 }
