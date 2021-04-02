@@ -17,6 +17,7 @@ class AlgorithmInputForm extends Component {
       maxWidth: '',
       minHeight: '',
       maxHeight: '',
+      timeLimit: '',
       useExistingInstance: false,
       instance: ''
     }
@@ -40,8 +41,13 @@ class AlgorithmInputForm extends Component {
 
   startWithoutPageRefresh(event) {
     event.preventDefault()
+    const timeLimit = this.state.timeLimit === '' ? null : this.state.timeLimit * 1000
     if (this.state.useExistingInstance) {
-      this.props.startFromInstance(this.state.strategy, this.state.instance)
+      this.props.startFromInstance(
+        this.state.strategy,
+        this.state.instance,
+        timeLimit
+      )
     } else {
       this.props.start(
         this.state.strategy,
@@ -50,7 +56,8 @@ class AlgorithmInputForm extends Component {
         this.state.minWidth,
         this.state.maxWidth,
         this.state.minHeight,
-        this.state.maxHeight
+        this.state.maxHeight,
+        timeLimit
       )
     }
   }
@@ -144,6 +151,12 @@ class AlgorithmInputForm extends Component {
             name={'max-height'}
             value={this.state.maxHeight}
             onChange={this.handleNumericalInputChange('maxHeight').bind(this)}
+          />
+          <NumericalInputFormRow
+            label={'Time Limit (in s)'}
+            name={'time-limit'}
+            value={this.state.timeLimit}
+            onChange={this.handleNumericalInputChange('timeLimit').bind(this)}
           />
           <div className="input-form-button-container">
             <button onClick={this.startWithoutPageRefresh.bind(this)}>Start</button>

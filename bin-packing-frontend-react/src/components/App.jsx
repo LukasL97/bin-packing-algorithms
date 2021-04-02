@@ -43,7 +43,8 @@ class App extends Component {
     minWidth,
     maxWidth,
     minHeight,
-    maxHeight
+    maxHeight,
+    timeLimit
   ) => {
     this.backendClient.startAlgorithm(
       strategy,
@@ -52,12 +53,15 @@ class App extends Component {
       minWidth,
       maxWidth,
       minHeight,
-      maxHeight
+      maxHeight,
+      timeLimit
     )(this.loadStartSolutionStepIntoState.bind(this))
   }
 
-  startFromInstance = (strategy, instanceId) => {
-    this.backendClient.startAlgorithmFromInstance(strategy, instanceId)(this.loadStartSolutionStepIntoState.bind(this))
+  startFromInstance = (strategy, instanceId, timeLimit) => {
+    this.backendClient.startAlgorithmFromInstance(strategy, instanceId, timeLimit)(
+      this.loadStartSolutionStepIntoState.bind(this)
+    )
   }
 
   loadStartSolutionStepIntoState(startSolutionStep) {

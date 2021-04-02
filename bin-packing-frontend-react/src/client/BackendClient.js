@@ -11,7 +11,7 @@ class BackendClient {
     console.info('Setup API connection to ' + axios.defaults.baseURL)
   }
 
-  startAlgorithm(strategy, boxLength, numRectangles, minWidth, maxWidth, minHeight, maxHeight) {
+  startAlgorithm(strategy, boxLength, numRectangles, minWidth, maxWidth, minHeight, maxHeight, timeLimit) {
     return (callback) => {
       console.trace('Starting algorithm')
       axios.put(
@@ -27,20 +27,22 @@ class BackendClient {
           rectanglesHeightRange: {
             min: minHeight,
             max: maxHeight
-          }
+          },
+          timeLimit: timeLimit
         }
       ).then(startSolutionStep => callback(startSolutionStep))
     }
   }
 
-  startAlgorithmFromInstance(strategy, instanceId) {
+  startAlgorithmFromInstance(strategy, instanceId, timeLimit) {
     return (callback) => {
       console.trace('Starting algorithm from instance with id ' + instanceId)
       axios.put(
         '/binPacking/startFromInstance',
         {
           strategy: strategy,
-          instanceId: instanceId
+          instanceId: instanceId,
+          timeLimit: timeLimit
         }
       ).then(startSolutionStep => callback(startSolutionStep))
     }

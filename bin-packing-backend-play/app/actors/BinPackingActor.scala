@@ -31,31 +31,31 @@ class BinPackingActor @Inject()(
 ) extends Actor {
 
   override def receive: Receive = {
-    case (runId: String, binPacking: TopLeftFirstBoxMergingBinPacking) =>
+    case (runId: String, binPacking: TopLeftFirstBoxMergingBinPacking, timeLimit: Option[Int]) =>
       val dumper = createSolutionStepDumper(runId)
-      val executor = new BinPackingLocalSearchExecutor[TopLeftFirstBinPackingSolution](dumper)
+      val executor = new BinPackingLocalSearchExecutor[TopLeftFirstBinPackingSolution](dumper, timeLimit)
       executor.execute(runId, binPacking)
-    case (runId: String, binPacking: TopLeftFirstOverlappingBinPacking) =>
+    case (runId: String, binPacking: TopLeftFirstOverlappingBinPacking, timeLimit: Option[Int]) =>
       val dumper = createSolutionStepDumper(runId)
-      val executor = new BinPackingLocalSearchExecutor[OverlappingTopLeftFirstBinPackingSolution](dumper)
+      val executor = new BinPackingLocalSearchExecutor[OverlappingTopLeftFirstBinPackingSolution](dumper, timeLimit)
       executor.execute(runId, binPacking)
-    case (runId: String, binPacking: RectanglePermutationBinPacking) =>
+    case (runId: String, binPacking: RectanglePermutationBinPacking, timeLimit: Option[Int]) =>
       val dumper = createSolutionStepDumper(runId)
-      val executor = new BinPackingLocalSearchExecutor[BoxClosingTopLeftFirstBinPackingSolution](dumper)
+      val executor = new BinPackingLocalSearchExecutor[BoxClosingTopLeftFirstBinPackingSolution](dumper, timeLimit)
       executor.execute(runId, binPacking)
-    case (runId: String, binPacking: BinPackingLocalSearch[SimpleBinPackingSolution]) =>
+    case (runId: String, binPacking: BinPackingLocalSearch[SimpleBinPackingSolution], timeLimit: Option[Int]) =>
       val dumper = createSolutionStepDumper(runId)
-      val executor = new BinPackingLocalSearchExecutor[SimpleBinPackingSolution](dumper)
+      val executor = new BinPackingLocalSearchExecutor[SimpleBinPackingSolution](dumper, timeLimit)
       executor.execute(runId, binPacking)
-    case (runId: String, binPacking: BasicBinPackingGreedy) =>
+    case (runId: String, binPacking: BasicBinPackingGreedy, timeLimit: Option[Int]) =>
       val dumper = createSolutionStepDumper(runId)
       val executor = new BinPackingGreedyExecutor[SimpleBinPackingSolution](dumper)
       executor.execute(runId, binPacking)
-    case (runId: String, binPacking: CandidateSupportedBinPackingGreedy) =>
+    case (runId: String, binPacking: CandidateSupportedBinPackingGreedy, timeLimit: Option[Int]) =>
       val dumper = createSolutionStepDumper(runId)
       val executor = new BinPackingGreedyExecutor[TopLeftFirstBinPackingSolution](dumper)
       executor.execute(runId, binPacking)
-    case (runId: String, binPacking: BoxClosingBinPackingGreedy) =>
+    case (runId: String, binPacking: BoxClosingBinPackingGreedy, timeLimit: Option[Int]) =>
       val dumper = createSolutionStepDumper(runId)
       val executor = new BinPackingGreedyExecutor[BoxClosingTopLeftFirstBinPackingSolution](dumper)
       executor.execute(runId, binPacking)

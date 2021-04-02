@@ -8,8 +8,10 @@ import models.problem.binpacking.localsearch.BinPackingLocalSearch
 import models.problem.binpacking.solution.BinPackingSolution
 import play.api.Logging
 
-class BinPackingLocalSearchExecutor[A <: BinPackingSolution](dumper: ActorRef)
-    extends BinPackingExecutor[BinPackingLocalSearch[A]] with Logging with Metrics {
+class BinPackingLocalSearchExecutor[A <: BinPackingSolution](
+  val dumper: ActorRef,
+  val timeLimit: Option[Int]
+) extends BinPackingExecutor[BinPackingLocalSearch[A]] with Logging with Metrics {
 
   // TODO: proper configuration
   val maxIterations = 10000
@@ -25,7 +27,7 @@ class BinPackingLocalSearchExecutor[A <: BinPackingSolution](dumper: ActorRef)
           ),
           noSender
         )
-        binPacking.localSearch.run(maxIterations, dumpSolutionStep(runId))
+        binPacking.localSearch.run(maxIterations, timeLimit, dumpSolutionStep(runId))
         logger.info(s"Finished ${getClass.getSimpleName} for runId $runId")
       }
     }
@@ -39,7 +41,7 @@ class BinPackingLocalSearchExecutor[A <: BinPackingSolution](dumper: ActorRef)
         runId,
         step,
         solution.asSimpleSolution,
-        finished || (step == maxIterations)
+        finished
       ),
       noSender
     )

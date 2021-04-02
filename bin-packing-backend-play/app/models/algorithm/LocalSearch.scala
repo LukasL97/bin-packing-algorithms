@@ -11,10 +11,12 @@ class LocalSearch[Solution](solutionHandler: SolutionHandler[Solution]) extends 
   case class Ongoing(solution: Solution) extends StepResult
   case class Finished(solution: Solution) extends StepResult
 
-  def run(maxSteps: Int, afterStep: (Solution, Int, Boolean) => Unit): Solution = {
+  def run(maxSteps: Int, timeLimit: Option[Int], afterStep: (Solution, Int, Boolean) => Unit): Solution = {
+    val startTime = System.currentTimeMillis()
+
     @tailrec
     def runRecursively(currentSolution: Solution, currentStep: Int): Solution = {
-      if (currentStep <= maxSteps) {
+      if (currentStep <= maxSteps && !timeIsUp(startTime, timeLimit)) {
         step(currentSolution, currentStep) match {
           case Ongoing(solution) =>
             afterStep(solution, currentStep, false)
@@ -24,6 +26,7 @@ class LocalSearch[Solution](solutionHandler: SolutionHandler[Solution]) extends 
             solution
         }
       } else {
+        afterStep(currentSolution, currentStep, true)
         currentSolution
       }
     }
@@ -48,6 +51,10 @@ class LocalSearch[Solution](solutionHandler: SolutionHandler[Solution]) extends 
     } else {
       Ongoing(solution)
     }
+  }
+
+  private def timeIsUp(startTime: Long, timeLimit: Option[Int]): Boolean = {
+    timeLimit.exists(millis => System.currentTimeMillis() - startTime >= millis)
   }
 
 }

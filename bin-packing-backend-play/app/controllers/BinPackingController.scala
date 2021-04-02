@@ -61,7 +61,7 @@ class BinPackingController @Inject()(
           startInfo.rectanglesHeightRange.max
         )
         instanceDao.dumpInstance(instance)
-        val startSolution = actorStarter(startInfo.strategy, instance)
+        val startSolution = actorStarter(startInfo.strategy, instance, startInfo.timeLimit)
         val response: JsValue = SerializationUtil.toJson(startSolution)
         Ok(response)
       }.getOrElse(
@@ -77,7 +77,7 @@ class BinPackingController @Inject()(
       val startInfo = SerializationUtil.fromJson[StartFromInstanceRequestBody](json)
       instanceDao.getInstance(startInfo.instanceId).map { instance =>
         try {
-          val startSolution = actorStarter(startInfo.strategy, instance)
+          val startSolution = actorStarter(startInfo.strategy, instance, startInfo.timeLimit)
           val response: JsValue = SerializationUtil.toJson(startSolution)
           Ok(response)
         } catch {
@@ -111,12 +111,12 @@ class BinPackingActorStarter @Inject()(
   val actorFactory: BinPackingActor.Factory
 ) {
 
-  def apply(strategy: String, instance: BinPackingInstance): BinPackingSolutionStep = {
+  def apply(strategy: String, instance: BinPackingInstance, timeLimit: Option[Int]): BinPackingSolutionStep = {
     val runId = generateRunId()
     val actor = createActor(runId)
     val binPacking = BinPackingProvider.get(strategy, instance)
     val startSolution = binPacking.startSolution.asSimpleSolution
-    actor.tell((runId, binPacking), noSender)
+    actor.tell((runId, binPacking, timeLimit), noSender)
     BinPackingSolutionStep.startStep(runId, startSolution)
   }
 
@@ -152,7 +152,8 @@ case class StartRequestBody(
   boxLength: Int,
   numRectangles: Int,
   rectanglesWidthRange: Range,
-  rectanglesHeightRange: Range
+  rectanglesHeightRange: Range,
+  timeLimit: Option[Int]
 )
 
 case class Range(
@@ -162,5 +163,6 @@ case class Range(
 
 case class StartFromInstanceRequestBody(
   strategy: String,
-  instanceId: String
+  instanceId: String,
+  timeLimit: Option[Int]
 )
