@@ -68,7 +68,7 @@ class BinPackingGreedyExecutorSpec
         val runId = "runId"
         val binPacking = new BinPackingGreedyImpl(instance)
 
-        val executor = new BinPackingGreedyExecutor(binPacking, runId, dumper)
+        val executor = new BinPackingGreedyExecutor(binPacking, runId, Seq(dumper))
         executor.execute()
 
         val box = Box(1, boxLength)

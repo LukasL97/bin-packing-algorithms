@@ -1,5 +1,8 @@
 package actors
 
+import actors.dumpers.SolutionStepDumper
+import actors.dumpers.combining.CombiningSolutionStepDumper
+import actors.dumpers.combining.CombiningSolutionStepDumperProcessorProvider
 import actors.executors.BinPackingExecutor
 import actors.executors.BinPackingGreedyExecutor
 import actors.executors.BinPackingLocalSearchExecutor
@@ -20,13 +23,16 @@ object BinPackingActor {
 
 class BinPackingActor @Inject()(
   val system: ActorSystem,
-  val dumperFactory: SolutionStepDumper.Factory
+  val dumperFactory: SolutionStepDumper.Factory,
+  val combiningDumperProcessorProvider: CombiningSolutionStepDumperProcessorProvider
 ) extends Actor {
 
   override def receive: Receive = {
     case (runId: String, binPacking: BinPacking, timeLimit: Option[Int]) =>
       val dumper = createSolutionStepDumper(runId)
-      val executor = BinPackingExecutorProvider.get(binPacking, runId, dumper, timeLimit)
+      val combiningDumper = createCombiningSolutionStepDumper(binPacking, runId)
+      val dumpers = Seq(dumper) ++ combiningDumper.toSeq
+      val executor = BinPackingExecutorProvider.get(binPacking, runId, dumpers, timeLimit)
       executor.execute()
   }
 
@@ -36,18 +42,27 @@ class BinPackingActor @Inject()(
       s"solution-step-dumper-$runId"
     )
   }
+
+  private def createCombiningSolutionStepDumper(binPacking: BinPacking, runId: String): Option[ActorRef] = {
+    combiningDumperProcessorProvider.get(binPacking).map { processor =>
+      system.actorOf(
+        Props(classOf[CombiningSolutionStepDumper], processor),
+        s"combining-solution-step-dumper-$runId"
+      )
+    }
+  }
 }
 
 private object BinPackingExecutorProvider {
   def get(
     binPacking: BinPacking,
     runId: String,
-    dumper: ActorRef,
+    dumpers: Seq[ActorRef],
     timeLimit: Option[Int]
   ): BinPackingExecutor = binPacking match {
     case binPacking: BinPackingLocalSearch[_] =>
-      new BinPackingLocalSearchExecutor(binPacking, runId, dumper, timeLimit)
+      new BinPackingLocalSearchExecutor(binPacking, runId, dumpers, timeLimit)
     case binPacking: BinPackingGreedy[_] =>
-      new BinPackingGreedyExecutor(binPacking, runId, dumper)
+      new BinPackingGreedyExecutor(binPacking, runId, dumpers)
   }
 }

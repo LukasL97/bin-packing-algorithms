@@ -72,7 +72,7 @@ class BinPackingLocalSearchExecutorSpec
               }
           }
 
-        val executor = new BinPackingLocalSearchExecutor(binPacking, runId, dumper, None)
+        val executor = new BinPackingLocalSearchExecutor(binPacking, runId, Seq(dumper), None)
         executor.execute()
 
         probe.expectMsg(
