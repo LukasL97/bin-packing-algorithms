@@ -8,8 +8,12 @@ import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.Rectangle
 import models.problem.binpacking.solution.SimpleBinPackingSolution
 import models.problem.binpacking.solution.TopLeftFirstBinPackingSolution
+import models.problem.binpacking.solution.update.RectanglesChanged
+import models.problem.binpacking.solution.update.StartSolution
+import models.problem.binpacking.solution.update.Update
 import org.mongodb.scala.bson.BsonArray
 import org.mongodb.scala.bson.BsonDocument
+import org.mongodb.scala.bson.BsonInt32
 
 import scala.collection.SortedSet
 
@@ -29,10 +33,20 @@ object BsonSerializationUtil {
     case solution: TopLeftFirstBinPackingSolution => topLeftFirstSolutionToDocument(solution)
   }
 
+  private def updateToDocument(update: Update): BsonDocument = update match {
+    case StartSolution() => BsonDocument("jsonClass" -> "StartSolution")
+    case RectanglesChanged(rectangleIds) =>
+      BsonDocument(
+        "jsonClass" -> "RectanglesChanged",
+        "rectangleIds" -> BsonArray.fromIterable(rectangleIds.map(BsonInt32(_)))
+      )
+  }
+
   private def simpleSolutionToDocument(solution: SimpleBinPackingSolution): BsonDocument = {
     BsonDocument(
       "jsonClass" -> "SimpleBinPackingSolution",
-      "placement" -> placementToDocument(solution.placement)
+      "placement" -> placementToDocument(solution.placement),
+      "update" -> updateToDocument(solution.update)
     )
   }
 
@@ -41,7 +55,8 @@ object BsonSerializationUtil {
       "jsonClass" -> "TopLeftFirstBinPackingSolution",
       "placement" -> placementToDocument(solution.placement),
       "topLeftCandidates" -> topLeftCandidatesToDocument(solution.topLeftCandidates),
-      "boxLength" -> solution.boxLength
+      "boxLength" -> solution.boxLength,
+      "update" -> updateToDocument(solution.update)
     )
   }
 
