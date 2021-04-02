@@ -38,7 +38,7 @@ const AlgorithmProgressChart = (props) => {
       <h3>Algorithm Progress</h3>
       <Chart options={options} series={series} type="bar"/>
       <div className="progress-chart-finished-indicators">
-        {progress.finished ? <p>Computation complete</p> : null}
+        {progress.finished ? <p>Fetching complete</p> : null}
         {(progress.finished && progress.visualized === progress.fetched) ? <p>Visualization complete</p> : null}
       </div>
     </div>

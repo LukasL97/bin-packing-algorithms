@@ -28,11 +28,11 @@ class App extends Component {
   getRectanglesLastUpdate = () => this.state.rectanglesLastUpdate
 
   getProgress = () => {
-    const fetched = last(this.state.solutionSteps)?.step
+    const fetched = this.state.solutionSteps.length - 1
     const visualized = this.state.currentStepIndex
     const finished = last(this.state.solutionSteps)?.finished
     return {
-      fetched: fetched !== undefined ? fetched : 0,
+      fetched: fetched < 0 ? 0 : fetched,
       visualized: visualized !== undefined ? visualized : 0,
       finished: finished !== undefined ? finished : false
     }
@@ -110,7 +110,6 @@ class App extends Component {
   toggleCombineSteps(active) {
     this.setState(oldState => ({
       ...oldState,
-      solutionSteps: this.state.solutionSteps.length === 0 ? [] : this.state.solutionSteps[0],
       combineSteps: active
     }))
   }
