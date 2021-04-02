@@ -8,6 +8,7 @@ class App extends Component {
 
   fetchSolutionStepsPeriod = 100
   fetchSolutionStepsCount = 100
+  fetchCombinedSolutionStepsCount = 10000
   visualizationIterationPeriodDefault = 100
 
   backendClient = new BackendClient()
@@ -19,7 +20,8 @@ class App extends Component {
     rectanglesLastUpdate: {},
     solutionSteps: [],
     currentStepIndex: 0,
-    automaticVisualization: true
+    automaticVisualization: true,
+    combineSteps: false
   }
 
   getCurrentSolutionStep = () => this.state.solutionSteps[this.state.currentStepIndex]
@@ -89,9 +91,9 @@ class App extends Component {
     this.backendClient.fetchSolutionSteps(
       this.state.runId,
       lastLoadedStep + 1,
-      lastLoadedStep + this.fetchSolutionStepsCount
+      lastLoadedStep + (this.state.combineSteps ? this.fetchCombinedSolutionStepsCount : this.fetchSolutionStepsCount),
+      this.state.combineSteps
     )(solutionSteps => {
-      console.log(solutionSteps)
       const finished = solutionSteps.data.length > 0 && last(solutionSteps.data).finished
       this.setState(oldState => ({
         ...oldState,
@@ -103,6 +105,14 @@ class App extends Component {
         ]
       }))
     })
+  }
+
+  toggleCombineSteps(active) {
+    this.setState(oldState => ({
+      ...oldState,
+      solutionSteps: this.state.solutionSteps.length === 0 ? [] : this.state.solutionSteps[0],
+      combineSteps: active
+    }))
   }
 
   getUpdatedRectangleIdsInNewStep = (oldSolutionStep, newSolutionStep) => {
@@ -198,6 +208,7 @@ class App extends Component {
           getRectanglesLastUpdate={this.getRectanglesLastUpdate}
           start={this.start}
           startFromInstance={this.startFromInstance}
+          toggleCombineSteps={this.toggleCombineSteps.bind(this)}
           visualizationIterationPeriodDefault={this.visualizationIterationPeriodDefault}
           updateVisualizationIterationPeriod={this.updateMoveCurrentStepIndexInterval.bind(this)}
           toggleAutomaticVisualization={this.toggleAutomaticVisualization.bind(this)}

@@ -48,7 +48,7 @@ class BackendClient {
     }
   }
 
-  fetchSolutionSteps(runId, minStep, maxStep) {
+  fetchSolutionSteps(runId, minStep, maxStep, combined) {
     return (callback) => {
       console.trace('Fetching steps ' + minStep + ' - ' + maxStep + ' for runId ' + runId)
       axios.get(
@@ -57,7 +57,8 @@ class BackendClient {
           params: {
             runId: runId,
             minStep: minStep,
-            maxStep: maxStep
+            maxStep: maxStep,
+            combined: combined
           }
         }
       ).then(solutionSteps => callback(solutionSteps))

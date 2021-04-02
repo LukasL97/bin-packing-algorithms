@@ -24,11 +24,21 @@ class VisualizationConfigForm extends Component {
     this.props.toggleAutomaticVisualization(event.target.checked)
   }
 
+  handleCombineStepsChange(event) {
+    this.props.toggleCombineSteps(event.target.checked)
+  }
+
   render() {
     return (
       <div className="input-container-element visualization-config-form">
         <h3>Visualization Config</h3>
         <form>
+          <ToggleFormRow
+            label={'Combine Steps'}
+            name={'combine-steps'}
+            value={false}
+            onToggle={this.handleCombineStepsChange.bind(this)}
+          />
           <ToggleFormRow
             label={'Auto Mode'}
             name={'auto-mode'}

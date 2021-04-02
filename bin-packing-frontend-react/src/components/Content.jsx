@@ -13,6 +13,7 @@ class Content extends Component {
       getRectanglesLastUpdate,
       start,
       startFromInstance,
+      toggleCombineSteps,
       visualizationIterationPeriodDefault,
       updateVisualizationIterationPeriod,
       toggleAutomaticVisualization,
@@ -27,6 +28,7 @@ class Content extends Component {
         <div className="input-container">
           <AlgorithmInputForm start={start} startFromInstance={startFromInstance}/>
           <VisualizationConfigForm
+            toggleCombineSteps={toggleCombineSteps}
             visualizationIterationPeriodDefault={visualizationIterationPeriodDefault}
             updateVisualizationIterationPeriod={updateVisualizationIterationPeriod}
             toggleAutomaticVisualization={toggleAutomaticVisualization}
