@@ -38,12 +38,9 @@ class BackendClient {
       console.trace('Starting algorithm from instance with id ' + instanceId)
       axios.put(
         '/binPacking/startFromInstance',
-        null,
         {
-          params: {
-            strategy: strategy,
-            instanceId: instanceId
-          }
+          strategy: strategy,
+          instanceId: instanceId
         }
       ).then(startSolutionStep => callback(startSolutionStep))
     }

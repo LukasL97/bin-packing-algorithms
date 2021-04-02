@@ -4,7 +4,7 @@
 # ~~~~
 
 PUT     /binPacking/start               controllers.BinPackingController.start()
-PUT     /binPacking/startFromInstance   controllers.BinPackingController.startFromInstance(strategy, instanceId)
+PUT     /binPacking/startFromInstance   controllers.BinPackingController.startFromInstance()
 GET     /binPacking/steps               controllers.BinPackingController.getSteps(runId, minStep, maxStep)
 GET     /binPacking/rawSteps            controllers.BinPackingController.getRawSteps(runId, minStep, maxStep)
 

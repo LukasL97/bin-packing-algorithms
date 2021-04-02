@@ -37,6 +37,7 @@ import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
 class BinPackingController @Inject()(
@@ -71,17 +72,19 @@ class BinPackingController @Inject()(
     }
   }
 
-  def startFromInstance(strategy: String, instanceId: String): Action[AnyContent] = Action.async {
-    implicit request: Request[AnyContent] =>
-      instanceDao.getInstance(instanceId).map { instance =>
+  def startFromInstance(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+    request.body.asJson.map { json =>
+      val startInfo = SerializationUtil.fromJson[StartFromInstanceRequestBody](json)
+      instanceDao.getInstance(startInfo.instanceId).map { instance =>
         try {
-          val startSolution = actorStarter(strategy, instance)
+          val startSolution = actorStarter(startInfo.strategy, instance)
           val response: JsValue = SerializationUtil.toJson(startSolution)
           Ok(response)
         } catch {
           case e: UnknownStrategyException => BadRequest(e.getMessage)
         }
       }
+    }.getOrElse(Future.successful(BadRequest))
   }
 
   def getSteps(runId: String, minStep: String, maxStep: String): Action[AnyContent] = Action.async {
@@ -155,4 +158,9 @@ case class StartRequestBody(
 case class Range(
   min: Int,
   max: Int
+)
+
+case class StartFromInstanceRequestBody(
+  strategy: String,
+  instanceId: String
 )
