@@ -2,6 +2,8 @@ package models.problem.binpacking.solution
 
 import models.problem.binpacking.solution.initialization.EmptySolutionInitializer
 import models.problem.binpacking.solution.transformation.TopLeftFirstPlacingSupport
+import models.problem.binpacking.solution.update.StartSolution
+import models.problem.binpacking.solution.update.Update
 
 import scala.collection.SortedSet
 
@@ -14,7 +16,8 @@ object BoxClosingTopLeftFirstBinPackingSolution
       Map.empty[Int, SortedSet[Coordinates]],
       Seq.empty[Int],
       Seq.empty[Rectangle],
-      boxLength
+      boxLength,
+      StartSolution()
     )
   }
 
@@ -30,7 +33,8 @@ case class BoxClosingTopLeftFirstBinPackingSolution(
   override val topLeftCandidates: Map[Int, SortedSet[Coordinates]],
   override val closedBoxes: Seq[Int],
   rectangles: Seq[Rectangle],
-  override val boxLength: Int
+  override val boxLength: Int,
+  override val update: Update
 ) extends AbstractTopLeftFirstBinPackingSolution with ClosedBoxes
     with TopLeftFirstPlacingSupport[BoxClosingTopLeftFirstBinPackingSolution] {
 

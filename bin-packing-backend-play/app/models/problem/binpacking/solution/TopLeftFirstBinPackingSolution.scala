@@ -5,6 +5,8 @@ import models.problem.binpacking.solution.initialization.OneRectanglePerBoxSolut
 import models.problem.binpacking.solution.transformation.BoxReorderingSupport
 import models.problem.binpacking.solution.transformation.SquashingSupport
 import models.problem.binpacking.solution.transformation.TopLeftFirstPlacingSupport
+import models.problem.binpacking.solution.update.StartSolution
+import models.problem.binpacking.solution.update.Update
 
 import scala.collection.SortedSet
 
@@ -15,7 +17,8 @@ object TopLeftFirstBinPackingSolution
   override def apply(boxLength: Int): TopLeftFirstBinPackingSolution = new TopLeftFirstBinPackingSolution(
     Map.empty[Rectangle, Placing],
     Map.empty[Int, SortedSet[Coordinates]],
-    boxLength
+    boxLength,
+    StartSolution()
   )
 
   override def apply(rectangles: Seq[Rectangle], boxLength: Int): TopLeftFirstBinPackingSolution = {
@@ -34,7 +37,8 @@ object TopLeftFirstBinPackingSolution
 case class TopLeftFirstBinPackingSolution(
   override val placement: Map[Rectangle, Placing],
   override val topLeftCandidates: Map[Int, SortedSet[Coordinates]],
-  override val boxLength: Int
+  override val boxLength: Int,
+  override val update: Update
 ) extends AbstractTopLeftFirstBinPackingSolution with TopLeftFirstPlacingSupport[TopLeftFirstBinPackingSolution]
     with BoxReorderingSupport[TopLeftFirstBinPackingSolution] with SquashingSupport[TopLeftFirstBinPackingSolution] {
 
@@ -73,10 +77,10 @@ case class TopLeftFirstBinPackingSolution(
     val (placedRectangle, placing) = findRectanglePlacing(rectangle, Option(topLeftCandidates))
     val updatedPlacement = placement.updated(placedRectangle, placing)
     val updatedCandidates = updateCandidates(placedRectangle, placing)
-    TopLeftFirstBinPackingSolution(
-      updatedPlacement,
-      updatedCandidates,
-      boxLength
+    copy(
+      placement = updatedPlacement,
+      topLeftCandidates = updatedCandidates,
+      boxLength = boxLength
     )
   }
 
@@ -91,10 +95,10 @@ case class TopLeftFirstBinPackingSolution(
         val placing = Placing(Box(boxId, boxLength), coordinates)
         val updatedPlacement = placement.updated(placedRectangle, placing)
         val updatedCandidates = updateCandidates(placedRectangle, placing)
-        TopLeftFirstBinPackingSolution(
-          updatedPlacement,
-          updatedCandidates,
-          boxLength
+        copy(
+          placement = updatedPlacement,
+          topLeftCandidates = updatedCandidates,
+          boxLength = boxLength
         )
     }
   }

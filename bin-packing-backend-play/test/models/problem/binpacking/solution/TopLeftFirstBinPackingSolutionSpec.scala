@@ -2,6 +2,7 @@ package models.problem.binpacking.solution
 
 import models.problem.binpacking.BinPackingSolutionValidator
 import models.problem.binpacking.BinPackingTopLeftFirstPlacing
+import models.problem.binpacking.solution.update.StartSolution
 import models.problem.binpacking.utils.RectanglesGenerator
 import models.problem.binpacking.utils.TopLeftFirstCoordinateOrdering
 import org.scalatest.MustMatchers
@@ -105,7 +106,8 @@ class TopLeftFirstBinPackingSolutionSpec
               Coordinates(0, 4)
             )
           ),
-          boxLength
+          boxLength,
+          StartSolution()
         )
       }
       "placing it into a solution with some existing rectangles" in {
@@ -120,7 +122,7 @@ class TopLeftFirstBinPackingSolutionSpec
             Coordinates(0, 7)
           )
         )
-        val solution = TopLeftFirstBinPackingSolution(placement, candidates, boxLength)
+        val solution = TopLeftFirstBinPackingSolution(placement, candidates, boxLength, StartSolution())
         val rectangle = Rectangle(3, 5, 1)
         solution.placeTopLeftFirst(rectangle) mustEqual TopLeftFirstBinPackingSolution(
           placement.updated(rectangle, Placing(Box(1, boxLength), Coordinates(3, 2))),
@@ -134,7 +136,8 @@ class TopLeftFirstBinPackingSolutionSpec
               Coordinates(8, 2)
             )
           ),
-          boxLength
+          boxLength,
+          StartSolution()
         )
       }
       "placing it into a solution so that a new candidate appears at its bottom edge" in {
@@ -149,7 +152,7 @@ class TopLeftFirstBinPackingSolutionSpec
             Coordinates(0, 2)
           )
         )
-        val solution = TopLeftFirstBinPackingSolution(placement, candidates, boxLength)
+        val solution = TopLeftFirstBinPackingSolution(placement, candidates, boxLength, StartSolution())
         val rectangle = Rectangle(3, 2, 1)
         solution.placeTopLeftFirst(rectangle) mustEqual TopLeftFirstBinPackingSolution(
           placement.updated(rectangle, Placing(Box(1, boxLength), Coordinates(1, 0))),
@@ -160,7 +163,8 @@ class TopLeftFirstBinPackingSolutionSpec
               Coordinates(2, 1)
             )
           ),
-          boxLength
+          boxLength,
+          StartSolution()
         )
       }
     }
@@ -179,7 +183,7 @@ class TopLeftFirstBinPackingSolutionSpec
             Coordinates(0, 7)
           )
         )
-        val solution = TopLeftFirstBinPackingSolution(placement, candidates, boxLength)
+        val solution = TopLeftFirstBinPackingSolution(placement, candidates, boxLength, StartSolution())
         val rectangle = Rectangle(3, 5, 1)
         solution.placeTopLeftFirstInSpecificBox(rectangle, boxId) mustEqual Option(
           TopLeftFirstBinPackingSolution(
@@ -194,7 +198,8 @@ class TopLeftFirstBinPackingSolutionSpec
                 Coordinates(8, 2)
               )
             ),
-            boxLength
+            boxLength,
+            StartSolution()
           )
         )
       }
@@ -205,7 +210,8 @@ class TopLeftFirstBinPackingSolutionSpec
             Rectangle(1, boxLength, boxLength) -> Placing(Box(boxId, boxLength), Coordinates(0, 0))
           ),
           Map(boxId -> SortedSet.empty),
-          boxLength
+          boxLength,
+          StartSolution()
         )
         val rectangle = Rectangle(2, 1, 1)
         solution.placeTopLeftFirstInSpecificBox(rectangle, boxId) must be(None)
@@ -217,7 +223,8 @@ class TopLeftFirstBinPackingSolutionSpec
             Rectangle(1, boxLength, boxLength) -> Placing(Box(1, boxLength), Coordinates(0, 0))
           ),
           Map(1 -> SortedSet.empty),
-          boxLength
+          boxLength,
+          StartSolution()
         )
         val rectangle = Rectangle(2, 1, 1)
         solution.placeTopLeftFirstInSpecificBox(rectangle, boxId) mustEqual Option(
@@ -230,7 +237,8 @@ class TopLeftFirstBinPackingSolutionSpec
               1 -> SortedSet.empty,
               boxId -> SortedSet(Coordinates(0, 1), Coordinates(1, 0))
             ),
-            boxLength
+            boxLength,
+            StartSolution()
           )
         )
       }
@@ -294,7 +302,8 @@ class TopLeftFirstBinPackingSolutionSpec
           Map(
             1 -> SortedSet(Coordinates(3, 0), Coordinates(2, 1), Coordinates(1, 2), Coordinates(0, 3))
           ),
-          boxLength
+          boxLength,
+          StartSolution()
         )
         solution.removeRectangleFromBox(2, 1) mustEqual TopLeftFirstBinPackingSolution(
           Map(
@@ -304,7 +313,8 @@ class TopLeftFirstBinPackingSolutionSpec
           Map(
             1 -> SortedSet(Coordinates(3, 0), Coordinates(1, 1), Coordinates(1, 0), Coordinates(0, 3))
           ),
-          boxLength
+          boxLength,
+          StartSolution()
         )
       }
     }

@@ -5,6 +5,8 @@ import models.problem.binpacking.solution.initialization.EmptySolutionInitialize
 import models.problem.binpacking.solution.transformation.BoxReorderingSupport
 import models.problem.binpacking.solution.transformation.SquashingSupport
 import models.problem.binpacking.solution.transformation.TopLeftFirstPlacingSupport
+import models.problem.binpacking.solution.update.StartSolution
+import models.problem.binpacking.solution.update.Update
 
 import scala.collection.SortedSet
 
@@ -16,7 +18,8 @@ object OverlappingTopLeftFirstBinPackingSolution
       Map.empty[Rectangle, Placing],
       Map.empty[Int, SortedSet[Coordinates]],
       Map.empty[Int, Set[Overlapping]],
-      boxLength
+      boxLength,
+      StartSolution()
     )
 
   def apply(
@@ -35,7 +38,8 @@ case class OverlappingTopLeftFirstBinPackingSolution(
   override val placement: Map[Rectangle, Placing],
   override val topLeftCandidates: Map[Int, SortedSet[Coordinates]],
   override val overlappings: Map[Int, Set[Overlapping]],
-  boxLength: Int
+  boxLength: Int,
+  override val update: Update
 ) extends AbstractTopLeftFirstBinPackingSolution with Overlappings with BinPackingSolutionValidator
     with TopLeftFirstPlacingSupport[OverlappingTopLeftFirstBinPackingSolution]
     with SquashingSupport[OverlappingTopLeftFirstBinPackingSolution]

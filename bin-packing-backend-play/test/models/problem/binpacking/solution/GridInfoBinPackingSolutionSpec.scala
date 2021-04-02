@@ -1,5 +1,6 @@
 package models.problem.binpacking.solution
 
+import models.problem.binpacking.solution.update.StartSolution
 import org.scalatest.MustMatchers
 import org.scalatest.WordSpec
 
@@ -16,7 +17,8 @@ class GridInfoBinPackingSolutionSpec extends WordSpec with MustMatchers {
           Map.empty,
           Map.empty,
           boxLength,
-          tileLength
+          tileLength,
+          StartSolution()
         )
         val rectangle = Rectangle(1, boxLength, 3)
         val boxId = 1
@@ -35,7 +37,8 @@ class GridInfoBinPackingSolutionSpec extends WordSpec with MustMatchers {
             )
           ),
           boxLength,
-          tileLength
+          tileLength,
+          StartSolution()
         )
       }
 
@@ -57,7 +60,8 @@ class GridInfoBinPackingSolutionSpec extends WordSpec with MustMatchers {
             )
           ),
           boxLength,
-          tileLength
+          tileLength,
+          StartSolution()
         )
         val newPlacing = oldPlacing.copy(coordinates = Coordinates(0, 0))
         solution.updated(rectangle, newPlacing) mustEqual GridInfoBinPackingSolution(
@@ -74,7 +78,8 @@ class GridInfoBinPackingSolutionSpec extends WordSpec with MustMatchers {
             )
           ),
           boxLength,
-          tileLength
+          tileLength,
+          StartSolution()
         )
       }
     }

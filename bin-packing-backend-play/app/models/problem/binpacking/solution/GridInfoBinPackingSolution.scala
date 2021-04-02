@@ -1,12 +1,14 @@
 package models.problem.binpacking.solution
 
 import models.problem.binpacking.solution.transformation.RectanglePlacingUpdateSupport
+import models.problem.binpacking.solution.update.Update
 
 case class GridInfoBinPackingSolution(
   override val placement: Map[Rectangle, Placing],
   override val grids: Map[Int, Grid],
   override val boxLength: Int,
-  override val tileLength: Int
+  override val tileLength: Int,
+  override val update: Update
 ) extends BinPackingSolution with GridInfo with RectanglePlacingUpdateSupport[GridInfoBinPackingSolution] {
 
   override def asSimpleSolution: SimpleBinPackingSolution = SimpleBinPackingSolution(placement)
@@ -27,7 +29,12 @@ case class GridInfoBinPackingSolution(
       case (rectangleToOverride, placingToOverride) =>
         replaceRectangleInGrids(rectangleToOverride, placingToOverride, rectangle, placing)
     }.getOrElse(placeRectangleInGrids(rectangle, placing))
-    GridInfoBinPackingSolution(updatedPlacement, updatedGrids, boxLength, tileLength)
+    copy(
+      placement = updatedPlacement,
+      grids = updatedGrids,
+      boxLength = boxLength,
+      tileLength = tileLength
+    )
   }
 }
 

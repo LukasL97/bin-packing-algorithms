@@ -1,5 +1,6 @@
 package models.problem.binpacking.solution
 
+import models.problem.binpacking.solution.update.StartSolution
 import models.problem.binpacking.utils.TopLeftFirstCoordinateOrdering
 import org.scalatest.MustMatchers
 import org.scalatest.WordSpec
@@ -23,7 +24,8 @@ class OverlappingTopLeftFirstBinPackingSolutionSpec
           ),
           Map(1 -> SortedSet(Coordinates(1, 0), Coordinates(2, 0), Coordinates(0, 2))),
           Map(1 -> Set.empty[Overlapping]),
-          boxLength
+          boxLength,
+          StartSolution()
         )
         val rectangle = Rectangle(3, 2, 2)
         solution.placeTopLeftFirst(rectangle, Option(0)) mustEqual OverlappingTopLeftFirstBinPackingSolution(
@@ -42,7 +44,8 @@ class OverlappingTopLeftFirstBinPackingSolutionSpec
             )
           ),
           Map(1 -> Set.empty[Overlapping]),
-          boxLength
+          boxLength,
+          StartSolution()
         )
       }
 
@@ -54,7 +57,8 @@ class OverlappingTopLeftFirstBinPackingSolutionSpec
           ),
           Map(1 -> SortedSet(Coordinates(1, 0), Coordinates(2, 0), Coordinates(0, 2))),
           Map(1 -> Set.empty[Overlapping]),
-          boxLength
+          boxLength,
+          StartSolution()
         )
         val rectangle = Rectangle(3, 2, 2)
         solution.placeTopLeftFirst(rectangle, Option(0.3)) mustEqual OverlappingTopLeftFirstBinPackingSolution(
@@ -65,7 +69,8 @@ class OverlappingTopLeftFirstBinPackingSolutionSpec
           ),
           Map(1 -> SortedSet(Coordinates(0, 2), Coordinates(1, 2), Coordinates(2, 2), Coordinates(3, 0))),
           Map(1 -> Set(Overlapping(rectangle, Coordinates(1, 0), Rectangle(2, 2, 1), Coordinates(0, 1), 0.25))),
-          boxLength
+          boxLength,
+          StartSolution()
         )
       }
     }
@@ -81,7 +86,8 @@ class OverlappingTopLeftFirstBinPackingSolutionSpec
           Map(
             1 -> Set.empty[Overlapping]
           ),
-          boxLength
+          boxLength,
+          StartSolution()
         )
         val rectangle = Rectangle(2, 5, 5)
         solution.placeTopLeftFirstInSpecificBox(rectangle, 1, Option(0.3)) mustEqual Option(
@@ -94,7 +100,8 @@ class OverlappingTopLeftFirstBinPackingSolutionSpec
             Map(
               1 -> Set(Overlapping(rectangle, Coordinates(0, 0), Rectangle(1, 8, 10), Coordinates(2, 0), 15.0 / 80.0))
             ),
-            boxLength
+            boxLength,
+            StartSolution()
           )
         )
       }
@@ -108,7 +115,8 @@ class OverlappingTopLeftFirstBinPackingSolutionSpec
           Map(
             1 -> Set.empty[Overlapping]
           ),
-          boxLength
+          boxLength,
+          StartSolution()
         )
         val rectangle = Rectangle(2, 5, 5)
         solution.placeTopLeftFirstInSpecificBox(rectangle, 1, Option(0.1)) must be(None)
@@ -127,7 +135,8 @@ class OverlappingTopLeftFirstBinPackingSolutionSpec
           Map(
             1 -> Set(Overlapping(Rectangle(3, 2, 2), Coordinates(1, 0), Rectangle(2, 2, 1), Coordinates(0, 1), 0.25))
           ),
-          boxLength
+          boxLength,
+          StartSolution()
         )
         solution.removeRectangleFromBox(3, 1) mustEqual OverlappingTopLeftFirstBinPackingSolution(
           Map(
@@ -136,7 +145,8 @@ class OverlappingTopLeftFirstBinPackingSolutionSpec
           ),
           Map(1 -> SortedSet(Coordinates(1, 0), Coordinates(2, 0), Coordinates(0, 2))),
           Map(1 -> Set.empty[Overlapping]),
-          boxLength
+          boxLength,
+          StartSolution()
         )
       }
     }
