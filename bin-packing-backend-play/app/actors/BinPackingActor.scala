@@ -1,5 +1,6 @@
 package actors
 
+import actors.executors.BinPackingExecutor
 import actors.executors.BinPackingGreedyExecutor
 import actors.executors.BinPackingLocalSearchExecutor
 import akka.actor.Actor
@@ -7,17 +8,9 @@ import akka.actor.ActorRef
 import akka.actor.ActorSystem
 import akka.actor.Props
 import com.google.inject.Inject
-import models.problem.binpacking.greedy.BoxClosingBinPackingGreedy
-import models.problem.binpacking.greedy.basic.BasicBinPackingGreedy
-import models.problem.binpacking.greedy.candidatesupported.CandidateSupportedBinPackingGreedy
+import models.problem.binpacking.BinPacking
+import models.problem.binpacking.greedy.BinPackingGreedy
 import models.problem.binpacking.localsearch.BinPackingLocalSearch
-import models.problem.binpacking.localsearch.RectanglePermutationBinPacking
-import models.problem.binpacking.localsearch.TopLeftFirstBoxMergingBinPacking
-import models.problem.binpacking.localsearch.TopLeftFirstOverlappingBinPacking
-import models.problem.binpacking.solution.BoxClosingTopLeftFirstBinPackingSolution
-import models.problem.binpacking.solution.OverlappingTopLeftFirstBinPackingSolution
-import models.problem.binpacking.solution.SimpleBinPackingSolution
-import models.problem.binpacking.solution.TopLeftFirstBinPackingSolution
 
 object BinPackingActor {
   trait Factory {
@@ -31,34 +24,10 @@ class BinPackingActor @Inject()(
 ) extends Actor {
 
   override def receive: Receive = {
-    case (runId: String, binPacking: TopLeftFirstBoxMergingBinPacking, timeLimit: Option[Int]) =>
+    case (runId: String, binPacking: BinPacking, timeLimit: Option[Int]) =>
       val dumper = createSolutionStepDumper(runId)
-      val executor = new BinPackingLocalSearchExecutor[TopLeftFirstBinPackingSolution](dumper, timeLimit)
-      executor.execute(runId, binPacking)
-    case (runId: String, binPacking: TopLeftFirstOverlappingBinPacking, timeLimit: Option[Int]) =>
-      val dumper = createSolutionStepDumper(runId)
-      val executor = new BinPackingLocalSearchExecutor[OverlappingTopLeftFirstBinPackingSolution](dumper, timeLimit)
-      executor.execute(runId, binPacking)
-    case (runId: String, binPacking: RectanglePermutationBinPacking, timeLimit: Option[Int]) =>
-      val dumper = createSolutionStepDumper(runId)
-      val executor = new BinPackingLocalSearchExecutor[BoxClosingTopLeftFirstBinPackingSolution](dumper, timeLimit)
-      executor.execute(runId, binPacking)
-    case (runId: String, binPacking: BinPackingLocalSearch[SimpleBinPackingSolution], timeLimit: Option[Int]) =>
-      val dumper = createSolutionStepDumper(runId)
-      val executor = new BinPackingLocalSearchExecutor[SimpleBinPackingSolution](dumper, timeLimit)
-      executor.execute(runId, binPacking)
-    case (runId: String, binPacking: BasicBinPackingGreedy, timeLimit: Option[Int]) =>
-      val dumper = createSolutionStepDumper(runId)
-      val executor = new BinPackingGreedyExecutor[SimpleBinPackingSolution](dumper)
-      executor.execute(runId, binPacking)
-    case (runId: String, binPacking: CandidateSupportedBinPackingGreedy, timeLimit: Option[Int]) =>
-      val dumper = createSolutionStepDumper(runId)
-      val executor = new BinPackingGreedyExecutor[TopLeftFirstBinPackingSolution](dumper)
-      executor.execute(runId, binPacking)
-    case (runId: String, binPacking: BoxClosingBinPackingGreedy, timeLimit: Option[Int]) =>
-      val dumper = createSolutionStepDumper(runId)
-      val executor = new BinPackingGreedyExecutor[BoxClosingTopLeftFirstBinPackingSolution](dumper)
-      executor.execute(runId, binPacking)
+      val executor = BinPackingExecutorProvider.get(binPacking, runId, dumper, timeLimit)
+      executor.execute()
   }
 
   private def createSolutionStepDumper(runId: String): ActorRef = {
@@ -66,5 +35,19 @@ class BinPackingActor @Inject()(
       Props(dumperFactory.apply()),
       s"solution-step-dumper-$runId"
     )
+  }
+}
+
+private object BinPackingExecutorProvider {
+  def get(
+    binPacking: BinPacking,
+    runId: String,
+    dumper: ActorRef,
+    timeLimit: Option[Int]
+  ): BinPackingExecutor = binPacking match {
+    case binPacking: BinPackingLocalSearch[_] =>
+      new BinPackingLocalSearchExecutor(binPacking, runId, dumper, timeLimit)
+    case binPacking: BinPackingGreedy[_] =>
+      new BinPackingGreedyExecutor(binPacking, runId, dumper)
   }
 }

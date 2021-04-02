@@ -27,8 +27,6 @@ class BinPackingLocalSearchExecutorSpec
   private val probe = TestProbe()
   private val dumper = probe.ref
 
-  private val executor = new BinPackingLocalSearchExecutor[SimpleBinPackingSolution](dumper, None)
-
   override def afterAll(): Unit = {
     TestKit.shutdownActorSystem(system)
   }
@@ -74,7 +72,8 @@ class BinPackingLocalSearchExecutorSpec
               }
           }
 
-        executor.execute(runId, binPacking)
+        val executor = new BinPackingLocalSearchExecutor(binPacking, runId, dumper, None)
+        executor.execute()
 
         probe.expectMsg(
           BinPackingSolutionStep(

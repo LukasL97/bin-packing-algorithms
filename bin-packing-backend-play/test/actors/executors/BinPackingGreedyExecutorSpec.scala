@@ -41,8 +41,6 @@ class BinPackingGreedyExecutorSpec
   private val probe = TestProbe()
   private val dumper = probe.ref
 
-  private val executor = new BinPackingGreedyExecutor[SimpleBinPackingSolution](dumper)
-
   override def afterAll(): Unit = {
     TestKit.shutdownActorSystem(system)
   }
@@ -50,7 +48,6 @@ class BinPackingGreedyExecutorSpec
   "BinPackingGreedyExecutor" should {
     "dump intermediate solution steps correctly" when {
       "receiving a binPacking with three rectangles to place" in {
-        val runId = "runId"
 
         val boxLength = 6
         val numRectangles = 3
@@ -68,11 +65,13 @@ class BinPackingGreedyExecutorSpec
           maxHeight
         )
 
-        val box = Box(1, boxLength)
-
+        val runId = "runId"
         val binPacking = new BinPackingGreedyImpl(instance)
 
-        executor.execute(runId, binPacking)
+        val executor = new BinPackingGreedyExecutor(binPacking, runId, dumper)
+        executor.execute()
+
+        val box = Box(1, boxLength)
 
         probe.expectMsg(
           BinPackingSolutionStep(

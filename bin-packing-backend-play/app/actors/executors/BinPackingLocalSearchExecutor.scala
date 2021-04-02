@@ -8,15 +8,17 @@ import models.problem.binpacking.localsearch.BinPackingLocalSearch
 import models.problem.binpacking.solution.BinPackingSolution
 import play.api.Logging
 
-class BinPackingLocalSearchExecutor[A <: BinPackingSolution](
+class BinPackingLocalSearchExecutor(
+  val binPacking: BinPackingLocalSearch[_ <: BinPackingSolution],
+  val runId: String,
   val dumper: ActorRef,
   val timeLimit: Option[Int]
-) extends BinPackingExecutor[BinPackingLocalSearch[A]] with Logging with Metrics {
+) extends BinPackingExecutor with Logging with Metrics {
 
   // TODO: proper configuration
   val maxIterations = 10000
 
-  override def execute(runId: String, binPacking: BinPackingLocalSearch[A]): Unit = {
+  override def execute(): Unit = {
     withContext("runId" -> runId) {
       withTimer("local-search-run") {
         logger.info(s"Starting ${getClass.getSimpleName} for runId $runId")
