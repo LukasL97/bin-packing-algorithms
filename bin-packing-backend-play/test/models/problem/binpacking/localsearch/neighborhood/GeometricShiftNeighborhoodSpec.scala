@@ -5,6 +5,7 @@ import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.Rectangle
 import models.problem.binpacking.solution.SimpleBinPackingSolution
+import models.problem.binpacking.solution.update.RectanglesChanged
 import org.scalatest.MustMatchers
 import org.scalatest.WordSpec
 
@@ -37,7 +38,8 @@ class GeometricShiftNeighborhoodSpec extends WordSpec with MustMatchers {
           SimpleBinPackingSolution(
             Map(
               Rectangle(1, 1, 1) -> Placing(Box(1, boxLength), Coordinates(2, 0))
-            )
+            ),
+            RectanglesChanged(Set(1))
           )
         )
       }
@@ -54,7 +56,8 @@ class GeometricShiftNeighborhoodSpec extends WordSpec with MustMatchers {
             Map(
               Rectangle(1, 5, 1) -> Placing(Box(1, boxLength), Coordinates(0, 0)),
               Rectangle(2, 5, 1) -> Placing(Box(1, boxLength), Coordinates(0, 1))
-            )
+            ),
+            RectanglesChanged(Set(2))
           )
         )
       }
@@ -85,7 +88,8 @@ class GeometricShiftNeighborhoodSpec extends WordSpec with MustMatchers {
               Rectangle(1, 1, 1) -> Placing(Box(1, boxLength), Coordinates(2, 0)),
               Rectangle(2, 2, 1) -> Placing(Box(1, boxLength), Coordinates(3, 0)),
               Rectangle(3, 1, 1) -> Placing(Box(1, boxLength), Coordinates(4, 1))
-            )
+            ),
+            RectanglesChanged(Set(1, 2, 3))
           )
         )
       }
@@ -102,13 +106,15 @@ class GeometricShiftNeighborhoodSpec extends WordSpec with MustMatchers {
             Map(
               Rectangle(1, 2, 2) -> Placing(Box(1, boxLength), Coordinates(3, 0)),
               Rectangle(2, 1, 1) -> Placing(Box(2, boxLength), Coordinates(0, 2))
-            )
+            ),
+            RectanglesChanged(Set(2))
           ),
           SimpleBinPackingSolution(
             Map(
               Rectangle(1, 2, 2) -> Placing(Box(1, boxLength), Coordinates(0, 0)),
               Rectangle(2, 1, 1) -> Placing(Box(2, boxLength), Coordinates(2, 2))
-            )
+            ),
+            RectanglesChanged(Set(1))
           )
         )
       }
@@ -127,7 +133,8 @@ class GeometricShiftNeighborhoodSpec extends WordSpec with MustMatchers {
               Rectangle(1, 2, 3) -> Placing(Box(1, boxLength), Coordinates(0, 0)),
               Rectangle(2, 2, 2) -> Placing(Box(1, boxLength), Coordinates(0, 3)),
               Rectangle(3, 1, 1) -> Placing(Box(1, boxLength), Coordinates(3, 0))
-            )
+            ),
+            RectanglesChanged(Set(1, 2, 3))
           )
         )
       }

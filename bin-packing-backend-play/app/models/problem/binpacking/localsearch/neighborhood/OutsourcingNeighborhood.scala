@@ -4,10 +4,12 @@ import models.problem.binpacking.solution.Box
 import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.transformation.RectanglePlacingUpdateSupport
+import models.problem.binpacking.solution.update.RectanglesChanged
+import models.problem.binpacking.solution.update.UpdateStoringSupport
 
 import scala.collection.View
 
-class OutsourcingNeighborhood[A <: RectanglePlacingUpdateSupport[A]](
+class OutsourcingNeighborhood[A <: RectanglePlacingUpdateSupport[A] with UpdateStoringSupport[A]](
   val boxLength: Int
 ) {
 
@@ -24,7 +26,9 @@ class OutsourcingNeighborhood[A <: RectanglePlacingUpdateSupport[A]](
       .toSeq
     solution.placement.view.collect {
       case (rectangle, Placing(box, _)) if !boxIdsWithOnlyOneRectangle.contains(box.id) =>
-        solution.updated(rectangle, Placing(Box(boxIds.max + 1, boxLength), Coordinates(0, 0)))
+        solution
+          .updated(rectangle, Placing(Box(boxIds.max + 1, boxLength), Coordinates(0, 0)))
+          .setUpdate(RectanglesChanged(Set(rectangle.id)))
     }
   }
 

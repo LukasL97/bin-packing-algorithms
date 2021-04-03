@@ -5,6 +5,7 @@ import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.Rectangle
 import models.problem.binpacking.solution.SimpleBinPackingSolution
+import models.problem.binpacking.solution.update.BoxOrderChanged
 import org.scalatest.MustMatchers
 import org.scalatest.WordSpec
 
@@ -29,7 +30,8 @@ class BoxReorderingNeighborhoodSpec extends WordSpec with MustMatchers {
             Rectangle(2, 6, 3) -> Placing(Box(1, 10), Coordinates(1, 0)),
             Rectangle(3, 1, 3) -> Placing(Box(2, 10), Coordinates(0, 0)),
             Rectangle(4, 1, 3) -> Placing(Box(2, 10), Coordinates(5, 0)),
-          )
+          ),
+          BoxOrderChanged()
         )
       }
     }

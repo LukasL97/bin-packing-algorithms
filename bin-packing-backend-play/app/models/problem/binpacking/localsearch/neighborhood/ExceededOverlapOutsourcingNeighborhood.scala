@@ -4,6 +4,7 @@ import metrics.Metrics
 import models.problem.binpacking.solution.Overlapping
 import models.problem.binpacking.solution.OverlappingTopLeftFirstBinPackingSolution
 import models.problem.binpacking.solution.Rectangle
+import models.problem.binpacking.solution.update.RectanglesChanged
 
 import scala.collection.View
 
@@ -50,7 +51,9 @@ class ExceededOverlapOutsourcingNeighborhood(
       boxLength,
       maxOverlap
     )
-    solutionWithOutsourcedRectanglesRemoved.appended(outsourcedRectanglesSolutionSuffix)
+    solutionWithOutsourcedRectanglesRemoved
+      .appended(outsourcedRectanglesSolutionSuffix)
+      .setUpdate(RectanglesChanged(rectanglesToOutsource.values.flatten.map(_.id).toSet))
   }
 
   private def collectRectanglesToOutsource(

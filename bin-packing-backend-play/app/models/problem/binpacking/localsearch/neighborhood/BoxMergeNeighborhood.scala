@@ -7,11 +7,13 @@ import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.Rectangle
 import models.problem.binpacking.solution.transformation.RectanglePlacingUpdateSupport
 import models.problem.binpacking.solution.transformation.SquashingSupport
+import models.problem.binpacking.solution.update.RectanglesChanged
+import models.problem.binpacking.solution.update.UpdateStoringSupport
 
 import scala.annotation.tailrec
 import scala.collection.View
 
-class BoxMergeNeighborhood[A <: RectanglePlacingUpdateSupport[A] with SquashingSupport[A]](
+class BoxMergeNeighborhood[A <: RectanglePlacingUpdateSupport[A] with SquashingSupport[A] with UpdateStoringSupport[A]](
   val rectangles: Set[Rectangle],
   val boxLength: Int
 ) extends Metrics {
@@ -43,7 +45,10 @@ class BoxMergeNeighborhood[A <: RectanglePlacingUpdateSupport[A] with SquashingS
             case (rectangle, coordinates) => rectangle -> Placing(Box(mergedBoxId, boxLength), coordinates)
           }
           .toMap
-        val mergedBoxSolution = solution.updated(mergedBoxPlacement).squashed
+        val mergedBoxSolution = solution
+          .updated(mergedBoxPlacement)
+          .squashed
+          .setUpdate(RectanglesChanged(mergedBoxRectangles.map(_.id).toSet))
         Seq(mergedBoxSolution).view
       }
     }

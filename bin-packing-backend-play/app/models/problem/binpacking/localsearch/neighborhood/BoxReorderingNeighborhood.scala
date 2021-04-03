@@ -4,10 +4,12 @@ import metrics.Metrics
 import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Rectangle
 import models.problem.binpacking.solution.transformation.BoxReorderingSupport
+import models.problem.binpacking.solution.update.BoxOrderChanged
+import models.problem.binpacking.solution.update.UpdateStoringSupport
 
 import scala.collection.View
 
-class BoxReorderingNeighborhood[A <: BoxReorderingSupport[A]] extends Metrics {
+class BoxReorderingNeighborhood[A <: BoxReorderingSupport[A] with UpdateStoringSupport[A]] extends Metrics {
 
   def reorderBoxesByFillGrade(solution: A): View[A] = {
     withTimer("reorder-boxes-by-fill-grade-neighborhood") {
@@ -17,7 +19,7 @@ class BoxReorderingNeighborhood[A <: BoxReorderingSupport[A]] extends Metrics {
       if (reorderedBoxIds == (1 to reorderedBoxIds.size)) {
         View.empty[A]
       } else {
-        Seq(solution.reorderBoxes(reorderedBoxIds)).view
+        Seq(solution.reorderBoxes(reorderedBoxIds).setUpdate(BoxOrderChanged())).view
       }
     }
   }

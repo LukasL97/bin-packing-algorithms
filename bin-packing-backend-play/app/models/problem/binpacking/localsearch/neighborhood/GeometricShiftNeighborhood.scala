@@ -8,10 +8,12 @@ import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.Rectangle
 import models.problem.binpacking.solution.transformation.RectanglePlacingUpdateSupport
+import models.problem.binpacking.solution.update.RectanglesChanged
+import models.problem.binpacking.solution.update.UpdateStoringSupport
 
 import scala.collection.View
 
-class GeometricShiftNeighborhood[A <: RectanglePlacingUpdateSupport[A]](
+class GeometricShiftNeighborhood[A <: RectanglePlacingUpdateSupport[A] with UpdateStoringSupport[A]](
   val boxLength: Int
 ) extends BinPackingSolutionValidator with Metrics {
 
@@ -24,6 +26,7 @@ class GeometricShiftNeighborhood[A <: RectanglePlacingUpdateSupport[A]](
     solution.placement.view.flatMap {
       case (rectangle, placing) =>
         shiftRectangleInSolution(solution, rectangle, placing, direction, stepSize, allowOverlap)
+          .map(_.setUpdate(RectanglesChanged(Set(rectangle.id))))
     }
   }
 
@@ -34,6 +37,7 @@ class GeometricShiftNeighborhood[A <: RectanglePlacingUpdateSupport[A]](
     solution.placement.view.flatMap {
       case (rectangle, placing) =>
         shiftRectangleInSolutionUntilHittingBarrier(solution, rectangle, placing, direction)
+          .map(_.setUpdate(RectanglesChanged(Set(rectangle.id))))
     }
   }
 
@@ -48,6 +52,7 @@ class GeometricShiftNeighborhood[A <: RectanglePlacingUpdateSupport[A]](
             case (rectangle, coordinates) => rectangle -> Placing(Box(boxId, boxLength), coordinates)
           }
           shiftAllRectanglesInBoxUntilHittingBarrier(solution, placementWithBox, direction)
+            .map(_.setUpdate(RectanglesChanged(placementWithBox.keys.map(_.id).toSet)))
         }
     }
   }

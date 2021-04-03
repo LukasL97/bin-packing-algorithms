@@ -5,11 +5,13 @@ import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Rectangle
 import models.problem.binpacking.solution.transformation.SquashingSupport
 import models.problem.binpacking.solution.transformation.TopLeftFirstPlacingSupport
+import models.problem.binpacking.solution.update.RectanglesChanged
+import models.problem.binpacking.solution.update.UpdateStoringSupport
 import models.problem.binpacking.utils.TopLeftFirstCoordinateOrdering
 
 import scala.collection.View
 
-class TopLeftFirstBoxMergeNeighborhood[A <: TopLeftFirstPlacingSupport[A] with SquashingSupport[A]](
+class TopLeftFirstBoxMergeNeighborhood[A <: TopLeftFirstPlacingSupport[A] with SquashingSupport[A] with UpdateStoringSupport[A]](
   val boxLength: Int
 ) extends TopLeftFirstCoordinateOrdering with Metrics {
 
@@ -72,6 +74,7 @@ class TopLeftFirstBoxMergeNeighborhood[A <: TopLeftFirstPlacingSupport[A] with S
         case (None, _) => None
       }
       .map(_.squashed)
+      .map(_.setUpdate(RectanglesChanged(pulledBoxes.flatMap(_._2).map(_._1).map(_.id).toSet)))
   }
 
   private def pullUpAllRectanglesFromBox(

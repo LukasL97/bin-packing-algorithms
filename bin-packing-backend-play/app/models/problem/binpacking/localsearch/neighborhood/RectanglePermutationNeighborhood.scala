@@ -3,6 +3,7 @@ package models.problem.binpacking.localsearch.neighborhood
 import models.problem.binpacking.solution.BoxClosingTopLeftFirstBinPackingSolution
 import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Rectangle
+import models.problem.binpacking.solution.update.RectanglesChanged
 
 import scala.collection.View
 
@@ -55,6 +56,7 @@ class RectanglePermutationNeighborhood(
           case None => (updatedSolution, usedIndexes)
         }
     }
+    val changedRectangleIds = usedIndexes.map(remainingPermutation(_)).map(_.id).toSet
     if (usedIndexes.isEmpty) {
       Option.empty[BoxClosingTopLeftFirstBinPackingSolution]
     } else {
@@ -65,7 +67,7 @@ class RectanglePermutationNeighborhood(
         remainingPermutationWithoutPulledUpCandidates.foldLeft(solutionWithBoxFilled) {
           case (updatedSolution, rectangle) => updatedSolution.placeTopLeftFirst(rectangle)
         }
-      Option(solutionWithRemainingPermutationPlaced)
+      Option(solutionWithRemainingPermutationPlaced.setUpdate(RectanglesChanged(changedRectangleIds)))
     }
   }
 

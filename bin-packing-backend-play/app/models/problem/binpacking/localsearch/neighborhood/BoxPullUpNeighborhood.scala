@@ -6,10 +6,12 @@ import models.problem.binpacking.solution.Box
 import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.transformation.RectanglePlacingUpdateSupport
 import models.problem.binpacking.solution.transformation.SquashingSupport
+import models.problem.binpacking.solution.update.RectanglesChanged
+import models.problem.binpacking.solution.update.UpdateStoringSupport
 
 import scala.collection.View
 
-class BoxPullUpNeighborhood[A <: RectanglePlacingUpdateSupport[A] with SquashingSupport[A]](
+class BoxPullUpNeighborhood[A <: RectanglePlacingUpdateSupport[A] with SquashingSupport[A] with UpdateStoringSupport[A]](
   override val boxLength: Int
 ) extends BinPackingTopLeftFirstPlacing with Metrics {
 
@@ -23,7 +25,10 @@ class BoxPullUpNeighborhood[A <: RectanglePlacingUpdateSupport[A] with Squashing
             considerRotation = true
           ).map {
             case (rectangle, coordinates) =>
-              solution.updated(rectangle, Placing(Box(id - 1, length), coordinates)).squashed
+              solution
+                .updated(rectangle, Placing(Box(id - 1, length), coordinates))
+                .squashed
+                .setUpdate(RectanglesChanged(Set(rectangle.id)))
           }
         }
     }.flatten

@@ -9,10 +9,12 @@ import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.Rectangle
 import models.problem.binpacking.solution.transformation.RectanglePlacingUpdateSupport
 import models.problem.binpacking.solution.transformation.SquashingSupport
+import models.problem.binpacking.solution.update.RectanglesChanged
+import models.problem.binpacking.solution.update.UpdateStoringSupport
 
 import scala.collection.View
 
-class CoarseMultipleBoxPullUpNeighborhood[A <: RectanglePlacingUpdateSupport[A] with SquashingSupport[A]](
+class CoarseMultipleBoxPullUpNeighborhood[A <: RectanglePlacingUpdateSupport[A] with SquashingSupport[A] with UpdateStoringSupport[A]](
   override val boxLength: Int
 ) extends BinPackingTopLeftFirstPlacing with Metrics {
 
@@ -37,7 +39,7 @@ class CoarseMultipleBoxPullUpNeighborhood[A <: RectanglePlacingUpdateSupport[A] 
           ).map {
             case (rectangle, coordinates) => rectangle -> Placing(Box(boxId - 1, boxLength), coordinates)
           }.toMap
-          solution.updated(updatedPlacings).squashed
+          solution.updated(updatedPlacings).squashed.setUpdate(RectanglesChanged(updatedPlacings.keys.map(_.id).toSet))
         }
     }
   }
