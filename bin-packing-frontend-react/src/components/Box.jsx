@@ -1,6 +1,5 @@
 import React, {Component} from 'react'
-import {Group, Layer, Rect, Stage} from "react-konva";
-import interpolate from 'color-interpolate'
+import {Group, Layer, Rect, Stage} from 'react-konva'
 
 class Box extends Component {
 
@@ -8,34 +7,35 @@ class Box extends Component {
   boxBorderColor = 'black'
 
   rectangleFillColorBase = '#D6E9FE'
-  rectangleFillColorLatestUpdate = '#5995DA'
+  rectangleFillColorUpdated = '#5995DA'
   rectangleBorderColor = 'black'
   rectangleOpacity = 0.7
 
-  rectangleHighlightDuration = 10
-  rectangleFillColormap = interpolate([this.rectangleFillColorBase, this.rectangleFillColorLatestUpdate])
+  getRectangleColor(rectangleId, update) {
+    if (update.jsonClass === 'RectanglesChanged' && update.rectangleIds.includes(rectangleId)) {
+      return this.rectangleFillColorUpdated
+    } else {
+      return this.rectangleFillColorBase
+    }
+  }
 
   render() {
     const self = this
 
-    const {id, unitLength, pixelLength, getRectangles, currentStep} = this.props
+    const {id, unitLength, pixelLength, getRectangles, update} = this.props
 
     function unitToPixel(unit) {
       return unit / unitLength * pixelLength
     }
 
     function getRectShape(rectangle) {
-      const colorProportion = Math.max(
-        0.0,
-        (rectangle.lastUpdate - currentStep + self.rectangleHighlightDuration) / self.rectangleHighlightDuration
-      )
       return (
         <Rect
           x={unitToPixel(rectangle.x)}
           y={unitToPixel(rectangle.y)}
           width={unitToPixel(rectangle.width)}
           height={unitToPixel(rectangle.height)}
-          fill={self.rectangleFillColormap(colorProportion)}
+          fill={self.getRectangleColor(rectangle.id, update)}
           stroke={self.rectangleBorderColor}
           opacity={self.rectangleOpacity}
         />

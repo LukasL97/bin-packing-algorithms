@@ -10,7 +10,6 @@ class Content extends Component {
   render() {
     const {
       getCurrentSolutionStep,
-      getRectanglesLastUpdate,
       start,
       startFromInstance,
       toggleCombineSteps,
@@ -40,7 +39,6 @@ class Content extends Component {
         </div>
         <AlgorithmDisplay
           getCurrentSolutionStep={getCurrentSolutionStep}
-          getRectanglesLastUpdate={getRectanglesLastUpdate}
         />
       </div>
     )

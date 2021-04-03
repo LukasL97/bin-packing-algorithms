@@ -2,7 +2,6 @@ import React, {Component} from 'react'
 import Header from './Header'
 import Content from './Content'
 import BackendClient from '../client/BackendClient'
-import SolutionStepUtil from '../utils/SolutionStepUtil'
 
 class App extends Component {
 
@@ -17,7 +16,6 @@ class App extends Component {
     running: false,
     runId: '',
     fetchBlocked: false,
-    rectanglesLastUpdate: {},
     solutionSteps: [],
     currentStepIndex: 0,
     automaticVisualization: true,
@@ -25,7 +23,6 @@ class App extends Component {
   }
 
   getCurrentSolutionStep = () => this.state.solutionSteps[this.state.currentStepIndex]
-  getRectanglesLastUpdate = () => this.state.rectanglesLastUpdate
 
   getProgress = () => {
     const fetched = this.state.solutionSteps.length - 1
@@ -72,7 +69,6 @@ class App extends Component {
       ...oldState,
       running: true,
       runId: startSolutionStep.data.runId,
-      rectanglesLastUpdate: {},
       solutionSteps: [startSolutionStep.data],
       currentStepIndex: 0
     }))
@@ -114,22 +110,6 @@ class App extends Component {
     }))
   }
 
-  getUpdatedRectangleIdsInNewStep = (oldSolutionStep, newSolutionStep) => {
-    const zippedPlacements = SolutionStepUtil.zipPlacementsByRectangleId(
-      oldSolutionStep.solution.placement,
-      newSolutionStep.solution.placement
-    )
-    return zippedPlacements.map(p => {
-      if (p.left === null) {
-        return p.right.rectangle.id
-      } else if (p.right === null || p.left.coordinates.x !== p.right.coordinates.x || p.left.coordinates.y !== p.right.coordinates.y) {
-        return p.left.rectangle.id
-      } else {
-        return null
-      }
-    }).filter(id => id !== null)
-  }
-
   moveCurrentStepIndex = (index) => {
     if (this.state.solutionSteps.length === 0) {
       return
@@ -141,14 +121,9 @@ class App extends Component {
     if (index >= this.state.solutionSteps.length) {
       actualIndex = this.state.solutionSteps.length - 1
     }
-    const oldSolutionStep = this.state.solutionSteps[this.state.currentStepIndex]
-    const newSolutionStep = this.state.solutionSteps[actualIndex]
-    const newRectanglesLastUpdate = {...this.state.rectanglesLastUpdate}
-    this.getUpdatedRectangleIdsInNewStep(oldSolutionStep, newSolutionStep).forEach(id => newRectanglesLastUpdate[id] = newSolutionStep.step)
     this.setState(oldState => ({
       ...oldState,
       currentStepIndex: actualIndex,
-      rectanglesLastUpdate: newRectanglesLastUpdate
     }))
   }
 
@@ -204,7 +179,6 @@ class App extends Component {
         <Header/>
         <Content
           getCurrentSolutionStep={this.getCurrentSolutionStep}
-          getRectanglesLastUpdate={this.getRectanglesLastUpdate}
           start={this.start}
           startFromInstance={this.startFromInstance}
           toggleCombineSteps={this.toggleCombineSteps.bind(this)}

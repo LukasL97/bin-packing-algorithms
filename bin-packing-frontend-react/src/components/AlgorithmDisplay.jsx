@@ -4,18 +4,13 @@ import Box from "./Box"
 class AlgorithmDisplay extends Component {
 
   getCurrentSolutionStep = this.props.getCurrentSolutionStep
-  getRectanglesLastUpdate = this.props.getRectanglesLastUpdate
 
   state = {
-    placement: []
+    placement: [],
+    update: {jsonClass: "UnchangedSolution"}
   }
 
   boxPixelLength = 300
-
-  getRectanglesLastUpdateWithZeroDefault(rectangleId) {
-    const lastUpdate = this.getRectanglesLastUpdate()[rectangleId]
-    return lastUpdate !== undefined ? lastUpdate : 0
-  }
 
   getRectangles(boxId) {
     return () => this.state.placement
@@ -26,7 +21,7 @@ class AlgorithmDisplay extends Component {
           y: placing.coordinates.y,
           width: placing.rectangle.width,
           height: placing.rectangle.height,
-          lastUpdate: this.getRectanglesLastUpdateWithZeroDefault(placing.rectangle.id)
+          id: placing.rectangle.id
         }
       })
   }
@@ -40,9 +35,10 @@ class AlgorithmDisplay extends Component {
     const newSolutionStep = this.getCurrentSolutionStep()
 
     if (newSolutionStep !== undefined && newSolutionStep.solution.placement !== this.state.placement) {
-      this.setState({
-        placement: newSolutionStep.solution.placement
-      })
+      this.setState(oldState => ({
+        placement: newSolutionStep.solution.placement,
+        update: newSolutionStep.solution.update
+      }))
       console.log("Visualize solution step " + newSolutionStep.step + " for run with id " + newSolutionStep.runId)
     }
 
@@ -54,7 +50,7 @@ class AlgorithmDisplay extends Component {
           unitLength={box.length}
           pixelLength={this.boxPixelLength}
           getRectangles={this.getRectangles(box.id)}
-          currentStep={newSolutionStep.step}
+          update={this.state.update}
         />
       ))
 
