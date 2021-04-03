@@ -4,6 +4,7 @@ import models.problem.binpacking.solution.initialization.EmptySolutionInitialize
 import models.problem.binpacking.solution.transformation.TopLeftFirstPlacingSupport
 import models.problem.binpacking.solution.update.StartSolution
 import models.problem.binpacking.solution.update.Update
+import models.problem.binpacking.solution.update.UpdateStoringSupport
 
 import scala.collection.SortedSet
 
@@ -36,7 +37,8 @@ case class BoxClosingTopLeftFirstBinPackingSolution(
   override val boxLength: Int,
   override val update: Update
 ) extends AbstractTopLeftFirstBinPackingSolution with ClosedBoxes
-    with TopLeftFirstPlacingSupport[BoxClosingTopLeftFirstBinPackingSolution] {
+    with TopLeftFirstPlacingSupport[BoxClosingTopLeftFirstBinPackingSolution]
+    with UpdateStoringSupport[BoxClosingTopLeftFirstBinPackingSolution] {
 
   override def placeTopLeftFirst(
     rectangle: Rectangle,
@@ -99,6 +101,10 @@ case class BoxClosingTopLeftFirstBinPackingSolution(
       rectangles = rectangles.filter(placement(_).box.id <= lastBoxId)
     )
   }
+
+  override def setUpdate(update: Update): BoxClosingTopLeftFirstBinPackingSolution = copy(update = update)
+
+  override def asSimpleSolution: SimpleBinPackingSolution = new SimpleBinPackingSolution(placement, update)
 }
 
 trait ClosedBoxes {

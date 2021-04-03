@@ -7,6 +7,7 @@ import models.problem.binpacking.solution.transformation.SquashingSupport
 import models.problem.binpacking.solution.transformation.TopLeftFirstPlacingSupport
 import models.problem.binpacking.solution.update.StartSolution
 import models.problem.binpacking.solution.update.Update
+import models.problem.binpacking.solution.update.UpdateStoringSupport
 
 import scala.collection.SortedSet
 
@@ -43,9 +44,10 @@ case class OverlappingTopLeftFirstBinPackingSolution(
 ) extends AbstractTopLeftFirstBinPackingSolution with Overlappings with BinPackingSolutionValidator
     with TopLeftFirstPlacingSupport[OverlappingTopLeftFirstBinPackingSolution]
     with SquashingSupport[OverlappingTopLeftFirstBinPackingSolution]
-    with BoxReorderingSupport[OverlappingTopLeftFirstBinPackingSolution] {
+    with BoxReorderingSupport[OverlappingTopLeftFirstBinPackingSolution]
+    with UpdateStoringSupport[OverlappingTopLeftFirstBinPackingSolution] {
 
-  override def asSimpleSolution: SimpleBinPackingSolution = SimpleBinPackingSolution(placement)
+  override def asSimpleSolution: SimpleBinPackingSolution = SimpleBinPackingSolution(placement, update)
 
   def appended(solution: OverlappingTopLeftFirstBinPackingSolution): OverlappingTopLeftFirstBinPackingSolution = {
     val currentMaxBoxId = placement.values.map(_.box.id).maxOption.getOrElse(0)
@@ -394,6 +396,8 @@ case class OverlappingTopLeftFirstBinPackingSolution(
       overlappings = newOverlappings
     )
   }
+
+  override def setUpdate(update: Update): OverlappingTopLeftFirstBinPackingSolution = copy(update = update)
 }
 
 trait Overlappings {

@@ -1,11 +1,7 @@
 package models.problem.binpacking.solution
 
-import models.problem.binpacking.solution.update.Update
-
 trait BinPackingSolution {
   val placement: Map[Rectangle, Placing]
-
-  val update: Update
 
   def asSimpleSolution: SimpleBinPackingSolution
 

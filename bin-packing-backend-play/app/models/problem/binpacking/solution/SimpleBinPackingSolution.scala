@@ -9,6 +9,7 @@ import models.problem.binpacking.solution.transformation.RectanglePlacingUpdateS
 import models.problem.binpacking.solution.transformation.SquashingSupport
 import models.problem.binpacking.solution.update.StartSolution
 import models.problem.binpacking.solution.update.Update
+import models.problem.binpacking.solution.update.UpdateStoringSupport
 
 object SimpleBinPackingSolution
     extends FullPlacementSolutionInitializer[SimpleBinPackingSolution]
@@ -35,7 +36,7 @@ case class SimpleBinPackingSolution(
   override val update: Update
 ) extends BinPackingSolution with BoxReorderingSupport[SimpleBinPackingSolution]
     with PlacementResetSupport[SimpleBinPackingSolution] with RectanglePlacingUpdateSupport[SimpleBinPackingSolution]
-    with SquashingSupport[SimpleBinPackingSolution] {
+    with SquashingSupport[SimpleBinPackingSolution] with UpdateStoringSupport[SimpleBinPackingSolution] {
 
   override def asSimpleSolution: SimpleBinPackingSolution = this
 
@@ -61,4 +62,6 @@ case class SimpleBinPackingSolution(
       squashPlacement(boxIdSquashMapping)
     )
   }
+
+  override def setUpdate(update: Update): SimpleBinPackingSolution = copy(update = update)
 }

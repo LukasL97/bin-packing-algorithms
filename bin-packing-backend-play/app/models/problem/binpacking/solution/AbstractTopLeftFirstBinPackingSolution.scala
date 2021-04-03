@@ -1,6 +1,7 @@
 package models.problem.binpacking.solution
 
 import models.problem.binpacking.BinPackingTopLeftFirstPlacing
+import models.problem.binpacking.solution.update.UpdateStoringSupport
 
 import scala.collection.SortedSet
 
@@ -8,8 +9,6 @@ abstract class AbstractTopLeftFirstBinPackingSolution
     extends BinPackingSolution with TopLeftCandidates with BinPackingTopLeftFirstPlacing {
 
   val boxLength: Int
-
-  override def asSimpleSolution: SimpleBinPackingSolution = SimpleBinPackingSolution(placement)
 
   protected def updateCandidatesOnRectangleRemoval(
     rectangle: Rectangle,

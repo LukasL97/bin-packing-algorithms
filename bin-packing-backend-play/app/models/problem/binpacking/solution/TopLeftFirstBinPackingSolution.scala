@@ -7,6 +7,7 @@ import models.problem.binpacking.solution.transformation.SquashingSupport
 import models.problem.binpacking.solution.transformation.TopLeftFirstPlacingSupport
 import models.problem.binpacking.solution.update.StartSolution
 import models.problem.binpacking.solution.update.Update
+import models.problem.binpacking.solution.update.UpdateStoringSupport
 
 import scala.collection.SortedSet
 
@@ -40,9 +41,10 @@ case class TopLeftFirstBinPackingSolution(
   override val boxLength: Int,
   override val update: Update
 ) extends AbstractTopLeftFirstBinPackingSolution with TopLeftFirstPlacingSupport[TopLeftFirstBinPackingSolution]
-    with BoxReorderingSupport[TopLeftFirstBinPackingSolution] with SquashingSupport[TopLeftFirstBinPackingSolution] {
+    with BoxReorderingSupport[TopLeftFirstBinPackingSolution] with SquashingSupport[TopLeftFirstBinPackingSolution]
+    with UpdateStoringSupport[TopLeftFirstBinPackingSolution] {
 
-  override def asSimpleSolution: SimpleBinPackingSolution = SimpleBinPackingSolution(placement)
+  override def asSimpleSolution: SimpleBinPackingSolution = SimpleBinPackingSolution(placement, update)
 
   override def removeRectangleFromBox(rectangleId: Int, boxId: Int): TopLeftFirstBinPackingSolution = {
     val (rectangle, coordinates) = getPlacementInSingleBox(boxId).find {
@@ -126,4 +128,6 @@ case class TopLeftFirstBinPackingSolution(
       topLeftCandidates = updatedCandidates
     )
   }
+
+  override def setUpdate(update: Update): TopLeftFirstBinPackingSolution = copy(update = update)
 }
