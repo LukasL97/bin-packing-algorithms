@@ -4,6 +4,7 @@ import models.problem.binpacking.greedy.BinPackingGreedy
 import models.problem.binpacking.greedy.BinPackingSelectionHandler
 import models.problem.binpacking.solution.Rectangle
 import models.problem.binpacking.solution.TopLeftFirstBinPackingSolution
+import models.problem.binpacking.solution.update.RectanglesChanged
 
 trait CandidateSupportedBinPackingGreedy extends BinPackingGreedy[TopLeftFirstBinPackingSolution] {
   val selectionHandler: CandidateSupportedBinPackingSelectionHandler
@@ -21,7 +22,7 @@ trait CandidateSupportedBinPackingSelectionHandler extends BinPackingSelectionHa
     candidate: Rectangle,
     solution: TopLeftFirstBinPackingSolution
   ): TopLeftFirstBinPackingSolution = {
-    solution.placeTopLeftFirst(candidate)
+    solution.placeTopLeftFirst(candidate).setUpdate(RectanglesChanged(Set(candidate.id)))
   }
 
 }

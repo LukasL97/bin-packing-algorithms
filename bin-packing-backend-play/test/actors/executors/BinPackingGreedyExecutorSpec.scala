@@ -12,6 +12,7 @@ import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.Rectangle
 import models.problem.binpacking.solution.SimpleBinPackingSolution
+import models.problem.binpacking.solution.update.RectanglesChanged
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.WordSpecLike
@@ -86,10 +87,11 @@ class BinPackingGreedyExecutorSpec
           BinPackingSolutionStep(
             runId,
             1,
-            SimpleBinPackingSolution.apply(
+            new SimpleBinPackingSolution(
               Map(
                 instance.rectangles.toSeq.head -> Placing(box, Coordinates(0, 0))
-              )
+              ),
+              RectanglesChanged(Set(1))
             )
           )
         )
@@ -97,11 +99,12 @@ class BinPackingGreedyExecutorSpec
           BinPackingSolutionStep(
             runId,
             2,
-            SimpleBinPackingSolution.apply(
+            new SimpleBinPackingSolution(
               Map(
                 instance.rectangles.toSeq.head -> Placing(box, Coordinates(0, 0)),
                 instance.rectangles.toSeq(1) -> Placing(box, Coordinates(0, 2))
-              )
+              ),
+              RectanglesChanged(Set(2))
             )
           )
         )
@@ -109,12 +112,13 @@ class BinPackingGreedyExecutorSpec
           BinPackingSolutionStep(
             runId,
             3,
-            SimpleBinPackingSolution.apply(
+            new SimpleBinPackingSolution(
               Map(
                 instance.rectangles.toSeq.head -> Placing(box, Coordinates(0, 0)),
                 instance.rectangles.toSeq(1) -> Placing(box, Coordinates(0, 2)),
                 instance.rectangles.toSeq(2) -> Placing(box, Coordinates(3, 0))
-              )
+              ),
+              RectanglesChanged(Set(3))
             )
           )
         )
@@ -122,12 +126,13 @@ class BinPackingGreedyExecutorSpec
           BinPackingSolutionStep(
             runId,
             4,
-            SimpleBinPackingSolution.apply(
+           new  SimpleBinPackingSolution(
               Map(
                 instance.rectangles.toSeq.head -> Placing(box, Coordinates(0, 0)),
                 instance.rectangles.toSeq(1) -> Placing(box, Coordinates(0, 2)),
                 instance.rectangles.toSeq(2) -> Placing(box, Coordinates(3, 0))
-              )
+              ),
+              RectanglesChanged(Set(3))
             ),
             finished = true
           )

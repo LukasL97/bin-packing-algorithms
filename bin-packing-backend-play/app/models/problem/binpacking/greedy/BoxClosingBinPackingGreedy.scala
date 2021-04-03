@@ -3,6 +3,7 @@ package models.problem.binpacking.greedy
 import models.problem.binpacking.BinPackingInstance
 import models.problem.binpacking.solution.BoxClosingTopLeftFirstBinPackingSolution
 import models.problem.binpacking.solution.Rectangle
+import models.problem.binpacking.solution.update.RectanglesChanged
 import models.problem.binpacking.utils.RectangleSizeOrdering
 
 class BoxClosingBinPackingGreedy(
@@ -55,6 +56,6 @@ class BoxClosingBinPackingSelectionHandler(
     candidate: Rectangle,
     solution: BoxClosingTopLeftFirstBinPackingSolution
   ): BoxClosingTopLeftFirstBinPackingSolution = {
-    solution.placeTopLeftFirst(candidate)
+    solution.placeTopLeftFirst(candidate).setUpdate(RectanglesChanged(Set(candidate.id)))
   }
 }
