@@ -9,11 +9,11 @@ import models.algorithm.Score
 import models.problem.binpacking.BinPackingInstance
 import models.problem.binpacking.localsearch.BinPackingLocalSearch
 import models.problem.binpacking.localsearch.BinPackingSolutionHandler
-import models.problem.binpacking.solution.BinPackingSolution
 import models.problem.binpacking.solution.Box
 import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.SimpleBinPackingSolution
+import models.problem.binpacking.solution.update.UnchangedSolution
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.WordSpecLike
@@ -106,8 +106,9 @@ class BinPackingLocalSearchExecutorSpec
           BinPackingSolutionStep(
             runId,
             3,
-            solution = SimpleBinPackingSolution.apply(
-              Map(binPacking.instance.rectangles.head -> Placing(box, Coordinates(2, 2)))
+            solution = new SimpleBinPackingSolution(
+              Map(binPacking.instance.rectangles.head -> Placing(box, Coordinates(2, 2))),
+              UnchangedSolution()
             ),
             finished = true
           )

@@ -46,10 +46,11 @@ class LocalSearch[Solution](solutionHandler: SolutionHandler[Solution]) extends 
   }
 
   private def stagnation(solution: Solution): StepResult = {
-    if (solutionHandler.stopOnStagnation(solution)) {
-      Finished(solution)
+    val taggedSolution = solutionHandler.tagAsUnchanged(solution)
+    if (solutionHandler.stopOnStagnation(taggedSolution)) {
+      Finished(taggedSolution)
     } else {
-      Ongoing(solution)
+      Ongoing(taggedSolution)
     }
   }
 
@@ -68,6 +69,8 @@ trait SolutionHandler[Solution] {
   def evaluate(solution: Solution, step: Int): Score
 
   def stopOnStagnation(solution: Solution): Boolean = true
+
+  def tagAsUnchanged(solution: Solution): Solution
 }
 
 trait Score extends Ordered[Score]
