@@ -8,8 +8,10 @@ import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.Rectangle
 import models.problem.binpacking.solution.SimpleBinPackingSolution
 import models.problem.binpacking.solution.TopLeftFirstBinPackingSolution
+import models.problem.binpacking.solution.update.BoxOrderChanged
 import models.problem.binpacking.solution.update.RectanglesChanged
 import models.problem.binpacking.solution.update.StartSolution
+import models.problem.binpacking.solution.update.UnchangedSolution
 import models.problem.binpacking.solution.update.Update
 import org.mongodb.scala.bson.BsonArray
 import org.mongodb.scala.bson.BsonDocument
@@ -40,6 +42,8 @@ object BsonSerializationUtil {
         "jsonClass" -> "RectanglesChanged",
         "rectangleIds" -> BsonArray.fromIterable(rectangleIds.map(BsonInt32(_)))
       )
+    case BoxOrderChanged() => BsonDocument("jsonClass" -> "BoxOrderChanged")
+    case UnchangedSolution() => BsonDocument("jsonClass" -> "UnchangedSolution")
   }
 
   private def simpleSolutionToDocument(solution: SimpleBinPackingSolution): BsonDocument = {

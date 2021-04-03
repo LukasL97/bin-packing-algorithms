@@ -1,14 +1,15 @@
 package utils
 
-import models.problem.binpacking.solution.BinPackingSolution
 import models.problem.binpacking.solution.Box
 import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.Rectangle
 import models.problem.binpacking.solution.SimpleBinPackingSolution
 import models.problem.binpacking.solution.TopLeftFirstBinPackingSolution
+import models.problem.binpacking.solution.update.BoxOrderChanged
 import models.problem.binpacking.solution.update.RectanglesChanged
 import models.problem.binpacking.solution.update.StartSolution
+import models.problem.binpacking.solution.update.UnchangedSolution
 import models.problem.binpacking.solution.update.Update
 import models.problem.binpacking.utils.TopLeftFirstCoordinateOrdering
 import org.json4s
@@ -29,30 +30,36 @@ object BinPackingSolutionSerializationUtil extends TopLeftFirstCoordinateOrderin
         classOf[SimpleBinPackingSolution],
         classOf[TopLeftFirstBinPackingSolution],
         classOf[StartSolution],
-        classOf[RectanglesChanged]
+        classOf[RectanglesChanged],
+        classOf[BoxOrderChanged],
+        classOf[UnchangedSolution]
       )
     ) {
 
       override def serialize: PartialFunction[Any, json4s.JObject] = {
         case solution: SimpleBinPackingSolution => simpleSolutionToJObject(solution)
         case solution: TopLeftFirstBinPackingSolution => topLeftFirstSolutionToJObject(solution)
-        case update: StartSolution => JObject()
+        case _: StartSolution => JObject()
         case update: RectanglesChanged => JObject("rectangleIds" -> SerializationUtil.toJson(update.rectangleIds))
+        case _: BoxOrderChanged => JObject()
+        case _: UnchangedSolution => JObject()
       }
 
       override def deserialize: PartialFunction[(String, json4s.JObject), Any] = {
         case ("SimpleBinPackingSolution", jObject) => jObjectToSimpleSolution(jObject)
         case ("TopLeftFirstBinPackingSolution", jObject) => jObjectToTopLeftFirstSolution(jObject)
-        case ("StartSolution", jObject) => StartSolution()
+        case ("StartSolution", _) => StartSolution()
         case ("RectanglesChanged", jObject) =>
           RectanglesChanged(
             getFieldValue(jObject, "rectangleIds").asInstanceOf[JArray].arr.map(_.asInstanceOf[JInt].num.toInt).toSet
           )
+        case ("BoxOrderChanged", _) => BoxOrderChanged()
+        case ("UnchangedSolution", _) => UnchangedSolution()
       }
     }
   )
 
-  private def simpleSolutionToJObject(solution: BinPackingSolution): JObject = {
+  private def simpleSolutionToJObject(solution: SimpleBinPackingSolution): JObject = {
     JObject(
       "placement" -> placementToJObject(solution.placement),
       "update" -> SerializationUtil.toJson(solution.update)
