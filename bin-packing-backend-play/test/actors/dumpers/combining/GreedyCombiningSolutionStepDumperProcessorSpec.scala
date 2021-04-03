@@ -15,7 +15,8 @@ class GreedyCombiningSolutionStepDumperProcessorSpec
   private val numRectangles = 500
 
   private val instance = BinPackingInstance(10, numRectangles, 1, 4, 1, 4)
-  private val dumper = new GreedyCombiningSolutionStepDumperProcessor(mock[CombinedBinPackingSolutionStepDAO], instance)
+  private val dao = mock[CombinedBinPackingSolutionStepDAO]
+  private val dumper = new GreedyCombiningSolutionStepDumperProcessor(dao, instance)
 
   private def createSolutionStep(step: Int, finished: Boolean = false) = BinPackingSolutionStep(
     "runId",
@@ -31,25 +32,8 @@ class GreedyCombiningSolutionStepDumperProcessorSpec
   "GreedyCombiningSolutionStepDumperProcessor" should {
 
     "pop steps from queue" when {
-
       "enough steps in queue to pop" in {
         val solutionSteps = (1 to 5).map(createSolutionStep(_))
-        dumper.queue.appendAll(solutionSteps)
-        val poppedSteps = dumper.popStepsFromQueue()
-        poppedSteps mustEqual solutionSteps
-        dumper.queue must be(empty)
-      }
-
-      "last step in queue is start step" in {
-        val startStep = createSolutionStep(0)
-        dumper.queue.append(startStep)
-        val poppedSteps = dumper.popStepsFromQueue()
-        poppedSteps mustEqual Seq(startStep)
-        dumper.queue must be(empty)
-      }
-
-      "last step in queue is finished" in {
-        val solutionSteps = (1 to 3).map(createSolutionStep(_)).appended(createSolutionStep(4, finished = true))
         dumper.queue.appendAll(solutionSteps)
         val poppedSteps = dumper.popStepsFromQueue()
         poppedSteps mustEqual solutionSteps
@@ -64,6 +48,21 @@ class GreedyCombiningSolutionStepDumperProcessorSpec
         val poppedSteps = dumper.popStepsFromQueue()
         poppedSteps must be(empty)
         dumper.queue.toSeq mustEqual solutionSteps
+      }
+    }
+
+    "dump solution step immediately" when {
+      "given a start step" in {
+        val solutionStep = createSolutionStep(0)
+        (dao.dumpSolutionStep _).expects(solutionStep)
+        dumper.process(solutionStep)
+        dumper.queue must be(empty)
+      }
+      "given a finished step" in {
+        val solutionStep = createSolutionStep(42, finished = true)
+        (dao.dumpSolutionStep _).expects(solutionStep)
+        dumper.process(solutionStep)
+        dumper.queue must be(empty)
       }
     }
   }

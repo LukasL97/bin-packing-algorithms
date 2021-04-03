@@ -1,29 +1,29 @@
 package actors.dumpers.combining
 
 import actors.BinPackingSolutionStep
-import akka.actor.Actor
 import dao.CombinedBinPackingSolutionStepDAO
 import models.problem.binpacking.BinPackingInstance
 
-object GreedyCombiningSolutionStepDumperProcessor {
-  trait Factory {
-    def apply(): Actor
-  }
-}
-
 class GreedyCombiningSolutionStepDumperProcessor(
   override val dao: CombinedBinPackingSolutionStepDAO,
-  override val instance: BinPackingInstance
+  val instance: BinPackingInstance
 ) extends CombiningSolutionStepDumperProcessor {
 
   private val targetStepCount = 100
   private val combiningInterval = Math.max(Math.round(instance.numRectangles.toDouble / targetStepCount), 1).toInt
 
-  override def popStepsFromQueue(): Seq[BinPackingSolutionStep] = {
-    queue.lastOption match {
-      case Some(solutionStep) if solutionStep.step == 0 || solutionStep.finished => popNStepsFromQueue(queue.size)
-      case Some(_) if queue.size >= combiningInterval => popNStepsFromQueue(combiningInterval)
-      case _ => Seq.empty[BinPackingSolutionStep]
+  override protected def processQueue(): Unit = {
+    val steps = popStepsFromQueue()
+    if (steps.nonEmpty) {
+      dao.dumpSolutionStep(combine(steps))
+    }
+  }
+
+  private[combining] def popStepsFromQueue(): Seq[BinPackingSolutionStep] = {
+    if (queue.size >= combiningInterval) {
+      popNStepsFromQueue(combiningInterval)
+    } else {
+      Seq.empty[BinPackingSolutionStep]
     }
   }
 
