@@ -17,7 +17,12 @@ case class BinPackingInstance(
   minHeight: Int,
   maxHeight: Int,
   rectangles: Seq[Rectangle]
-)
+) {
+
+  def toTupleString: String = {
+    s"($boxLength, $numRectangles, $minWidth, $maxHeight, $minHeight, $maxHeight)"
+  }
+}
 
 object BinPackingInstance {
 

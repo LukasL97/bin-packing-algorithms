@@ -11,7 +11,11 @@ class LocalSearch[Solution](solutionHandler: SolutionHandler[Solution]) extends 
   case class Ongoing(solution: Solution) extends StepResult
   case class Finished(solution: Solution) extends StepResult
 
-  def run(maxSteps: Int, timeLimit: Option[Int], afterStep: (Solution, Int, Boolean) => Unit): Solution = {
+  def run(
+    maxSteps: Int,
+    timeLimit: Option[Int] = None,
+    afterStep: (Solution, Int, Boolean) => Unit = (_, _, _) => {}
+  ): Solution = {
     val startTime = System.currentTimeMillis()
 
     @tailrec
