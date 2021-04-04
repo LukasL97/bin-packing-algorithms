@@ -19,7 +19,8 @@ import java.io.File
 object DemoCli extends App {
 
   private val parser: OptionParser[DemoCliConfig] = new OptionParser[DemoCliConfig]("demo-cli") {
-    opt[String]("path").action((v, c) => c.copy(demoConfigPath = v)).required().text("Path to demo config csv")
+    opt[String]("configPath").action((v, c) => c.copy(demoConfigPath = v)).required().text("Path to demo config csv")
+    opt[String]("outPath").action((v, c) => c.copy(outPath = v)).required().text("Path to output csv file")
     opt[Int]("timeLimit")
       .action((v, c) => c.copy(timeLimitMillis = Option(v)))
       .optional()
@@ -44,13 +45,13 @@ object DemoCli extends App {
     }
     val timeUsed = (System.currentTimeMillis() - startTime).toDouble / 1000
     val boxesUsed = solution.getPlacementsPerBox.keys.max
-    DemoRunResult(boxesUsed, timeUsed)
+    DemoRunResult(binPacking.getClass.getSimpleName, binPacking.instance, boxesUsed, timeUsed)
   }
 
   private implicit val demoConfigRowDecoder: RowDecoder[DemoConfigRow] =
     RowDecoder.decoder(0, 1, 2, 3, 4, 5, 6)(DemoConfigRow.apply)
 
-  parser.parse(args, DemoCliConfig("", None, 10000)).foreach { config =>
+  parser.parse(args, DemoCliConfig("", "", None, 10000)).foreach { config =>
     val file = new File(config.demoConfigPath)
     val reader = file.asCsvReader[DemoConfigRow](rfc.withHeader)
 
@@ -62,7 +63,7 @@ object DemoCli extends App {
         )
     }.toSeq.flatten
 
-    instances.zipWithIndex.foreach {
+    val demoRunResults = instances.zipWithIndex.map {
       case (instance, index) =>
         println(
           s"\nExecute algorithms on instance ${index + 1}/${instances.size} ${instance.toTupleString} with lower bound ${getTheoreticalBoxesLowerBound(instance)} boxes"
@@ -74,17 +75,49 @@ object DemoCli extends App {
           new RectanglePermutationBinPacking(instance),
           new TopLeftFirstOverlappingBinPacking(instance)
         )
-        algorithms.foreach { algorithm =>
+        algorithms.map { algorithm =>
           val result = run(algorithm, config.localSearchMaxSteps, config.timeLimitMillis)
           println(s"${algorithm.getClass.getSimpleName}: ${result.boxesUsed} boxes - ${result.timeUsed} seconds")
+          result
         }
     }
+
+    val algorithmNames = demoRunResults.head.map(_.algorithm)
+    val header = Seq(
+      "boxLength",
+      "numRectangles",
+      "minWidth",
+      "maxWidth",
+      "minHeight",
+      "maxHeight",
+      "theoretical lower bound"
+    ) ++ algorithmNames.flatMap(name => Seq(s"$name (boxes)", s"$name (time)"))
+
+    val out = new File("/home/lukas/Documents/bin-packing-algorithms/bin-packing-backend-play/resources/out.csv")
+    val writer = out.asCsvWriter[Seq[Double]](rfc.withHeader(header: _*))
+    demoRunResults.foreach { results =>
+      val instance = results.head.instance
+      val instanceRow = Seq(
+        instance.boxLength,
+        instance.numRectangles,
+        instance.minWidth,
+        instance.maxWidth,
+        instance.minHeight,
+        instance.maxHeight,
+        getTheoreticalBoxesLowerBound(instance)
+      ).map(_.toDouble)
+      val algorithmsRow = results.flatMap(result => Seq(result.boxesUsed, result.timeUsed))
+      writer.write(instanceRow ++ algorithmsRow)
+    }
+    writer.close()
+
   }
 
 }
 
 case class DemoCliConfig(
   demoConfigPath: String,
+  outPath: String,
   timeLimitMillis: Option[Int],
   localSearchMaxSteps: Int
 )
@@ -100,6 +133,8 @@ case class DemoConfigRow(
 )
 
 case class DemoRunResult(
+  algorithm: String,
+  instance: BinPackingInstance,
   boxesUsed: Int,
   timeUsed: Double
 )
