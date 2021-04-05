@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Group, Layer, Rect, Stage} from 'react-konva'
+import {Group, Layer, Rect, Stage, Text} from 'react-konva'
 
 class Box extends Component {
 
@@ -30,15 +30,25 @@ class Box extends Component {
 
     function getRectShape(rectangle) {
       return (
-        <Rect
+        <Group
           x={unitToPixel(rectangle.x)}
           y={unitToPixel(rectangle.y)}
           width={unitToPixel(rectangle.width)}
           height={unitToPixel(rectangle.height)}
-          fill={self.getRectangleColor(rectangle.id, update)}
-          stroke={self.rectangleBorderColor}
-          opacity={self.rectangleOpacity}
-        />
+        >
+          <Rect
+            width={unitToPixel(rectangle.width)}
+            height={unitToPixel(rectangle.height)}
+            fill={self.getRectangleColor(rectangle.id, update)}
+            stroke={self.rectangleBorderColor}
+            opacity={self.rectangleOpacity}
+          />
+          <Text
+            text={rectangle.id}
+            fontSize={10}
+            padding={3}
+          />
+        </Group>
       )
     }
 
