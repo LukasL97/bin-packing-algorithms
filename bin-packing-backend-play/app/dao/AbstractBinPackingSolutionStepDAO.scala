@@ -15,7 +15,7 @@ import utils.SerializationUtil
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
-import utils.BinPackingSolutionSerializationUtil.formats
+import utils.BinPackingSolutionRepresentationSerializationUtil.formats
 
 trait AbstractBinPackingSolutionStepDAO extends Metrics {
 

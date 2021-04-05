@@ -6,7 +6,7 @@ import models.problem.binpacking.solution.Box
 import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.Rectangle
-import models.problem.binpacking.solution.SimpleBinPackingSolution
+import models.problem.binpacking.solution.SimpleBinPackingSolutionRepresentation
 import models.problem.binpacking.solution.update.RectanglesChanged
 import models.problem.binpacking.solution.update.UnchangedSolution
 import org.scalamock.scalatest.MockFactory
@@ -21,7 +21,7 @@ class LocalSearchCombiningSolutionStepDumperProcessorSpec extends WordSpec with 
   private def createUnchangedSolutionStep(step: Int, finished: Boolean = false) = BinPackingSolutionStep(
     "runId",
     step,
-    new SimpleBinPackingSolution(
+    SimpleBinPackingSolutionRepresentation(
       Map.empty,
       UnchangedSolution()
     ),
@@ -31,7 +31,7 @@ class LocalSearchCombiningSolutionStepDumperProcessorSpec extends WordSpec with 
   private def createMinimalRectangleChangedSolutionStep(step: Int, finished: Boolean = false) = BinPackingSolutionStep(
     "runId",
     step,
-    new SimpleBinPackingSolution(
+    SimpleBinPackingSolutionRepresentation(
       Map.empty,
       RectanglesChanged(Set(step))
     ),
@@ -64,7 +64,7 @@ class LocalSearchCombiningSolutionStepDumperProcessorSpec extends WordSpec with 
         (dao.dumpSolutionStep _).expects(BinPackingSolutionStep(
           "runId",
           dumper.minimalChangesCombiningThreshold,
-          new SimpleBinPackingSolution(
+          SimpleBinPackingSolutionRepresentation(
             Map.empty,
             RectanglesChanged((8 until dumper.minimalChangesCombiningThreshold).toSet)
           )
@@ -80,7 +80,7 @@ class LocalSearchCombiningSolutionStepDumperProcessorSpec extends WordSpec with 
         val newStep = BinPackingSolutionStep(
           "runId",
           8,
-          new SimpleBinPackingSolution(
+          SimpleBinPackingSolutionRepresentation(
             Map(
               Rectangle(1, 1, 1) -> Placing(Box(1, 10), Coordinates(0, 0)),
               Rectangle(2, 1, 1) -> Placing(Box(1, 10), Coordinates(1, 0))

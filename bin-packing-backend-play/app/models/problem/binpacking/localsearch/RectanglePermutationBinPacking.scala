@@ -4,8 +4,11 @@ import models.algorithm.Score
 import models.problem.binpacking.BinPackingInstance
 import models.problem.binpacking.localsearch.evaluation.BoxWeightedTopLeftFirstEvaluation
 import models.problem.binpacking.localsearch.neighborhood.RectanglePermutationNeighborhood
+import models.problem.binpacking.solution.BinPackingSolution
+import models.problem.binpacking.solution.BinPackingSolutionRepresentation
 import models.problem.binpacking.solution.BoxClosingTopLeftFirstBinPackingSolution
 import models.problem.binpacking.solution.Rectangle
+import models.problem.binpacking.solution.RectanglePermutationBinPackingSolutionRepresentation
 
 import scala.collection.View
 
@@ -15,6 +18,15 @@ class RectanglePermutationBinPacking(
 
   override val solutionHandler: BinPackingSolutionHandler[BoxClosingTopLeftFirstBinPackingSolution] =
     new RectanglePermutationBinPackingSolutionHandler(instance.rectangles, instance.boxLength)
+
+  override def transformToStoredRepresentation(solution: BinPackingSolution): BinPackingSolutionRepresentation = {
+    val rectanglePermutationSolution = solution.asInstanceOf[BoxClosingTopLeftFirstBinPackingSolution]
+    RectanglePermutationBinPackingSolutionRepresentation(
+      rectanglePermutationSolution.placement,
+      rectanglePermutationSolution.update,
+      rectanglePermutationSolution.rectangles.map(_.id)
+    )
+  }
 }
 
 class RectanglePermutationBinPackingSolutionHandler(

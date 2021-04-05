@@ -26,7 +26,7 @@ class BinPackingLocalSearchExecutor(
           _.tell(
             BinPackingSolutionStep.startStep(
               runId,
-              binPacking.solutionHandler.startSolution.asSimpleSolution
+              binPacking.transformToStoredRepresentation(binPacking.startSolution)
             ),
             noSender
           )
@@ -45,7 +45,7 @@ class BinPackingLocalSearchExecutor(
         BinPackingSolutionStep(
           runId,
           step,
-          solution.asSimpleSolution,
+          binPacking.transformToStoredRepresentation(solution),
           finished
         ),
         noSender

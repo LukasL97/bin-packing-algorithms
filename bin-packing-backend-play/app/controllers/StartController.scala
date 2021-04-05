@@ -24,7 +24,7 @@ import models.problem.binpacking.localsearch.TopLeftFirstOverlappingBinPacking
 import play.api.libs.json.JsValue
 import play.api.mvc.Action
 import play.api.mvc._
-import utils.BinPackingSolutionSerializationUtil.formats
+import utils.BinPackingSolutionRepresentationSerializationUtil.formats
 import utils.JsonConversions._
 import utils.SerializationUtil
 
@@ -94,7 +94,7 @@ class BinPackingActorStarter @Inject()(
     val runId = generateRunId()
     val actor = createActor(runId)
     val binPacking = BinPackingProvider.get(strategy, instance)
-    val startSolution = binPacking.startSolution.asSimpleSolution
+    val startSolution = binPacking.transformToStoredRepresentation(binPacking.startSolution)
     actor.tell((runId, binPacking, timeLimit), noSender)
     BinPackingSolutionStep.startStep(runId, startSolution)
   }

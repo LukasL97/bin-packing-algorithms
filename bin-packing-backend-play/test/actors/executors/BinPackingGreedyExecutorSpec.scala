@@ -12,7 +12,9 @@ import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.Rectangle
 import models.problem.binpacking.solution.SimpleBinPackingSolution
+import models.problem.binpacking.solution.SimpleBinPackingSolutionRepresentation
 import models.problem.binpacking.solution.update.RectanglesChanged
+import models.problem.binpacking.solution.update.StartSolution
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.WordSpecLike
@@ -78,8 +80,9 @@ class BinPackingGreedyExecutorSpec
           BinPackingSolutionStep(
             runId,
             0,
-            SimpleBinPackingSolution.apply(
-              boxLength
+            SimpleBinPackingSolutionRepresentation(
+              Map.empty,
+              StartSolution()
             )
           )
         )
@@ -87,7 +90,7 @@ class BinPackingGreedyExecutorSpec
           BinPackingSolutionStep(
             runId,
             1,
-            new SimpleBinPackingSolution(
+            SimpleBinPackingSolutionRepresentation(
               Map(
                 instance.rectangles.toSeq.head -> Placing(box, Coordinates(0, 0))
               ),
@@ -99,7 +102,7 @@ class BinPackingGreedyExecutorSpec
           BinPackingSolutionStep(
             runId,
             2,
-            new SimpleBinPackingSolution(
+            SimpleBinPackingSolutionRepresentation(
               Map(
                 instance.rectangles.toSeq.head -> Placing(box, Coordinates(0, 0)),
                 instance.rectangles.toSeq(1) -> Placing(box, Coordinates(0, 2))
@@ -112,7 +115,7 @@ class BinPackingGreedyExecutorSpec
           BinPackingSolutionStep(
             runId,
             3,
-            new SimpleBinPackingSolution(
+            SimpleBinPackingSolutionRepresentation(
               Map(
                 instance.rectangles.toSeq.head -> Placing(box, Coordinates(0, 0)),
                 instance.rectangles.toSeq(1) -> Placing(box, Coordinates(0, 2)),
@@ -126,7 +129,7 @@ class BinPackingGreedyExecutorSpec
           BinPackingSolutionStep(
             runId,
             4,
-           new  SimpleBinPackingSolution(
+            SimpleBinPackingSolutionRepresentation(
               Map(
                 instance.rectangles.toSeq.head -> Placing(box, Coordinates(0, 0)),
                 instance.rectangles.toSeq(1) -> Placing(box, Coordinates(0, 2)),

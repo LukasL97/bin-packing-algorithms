@@ -2,7 +2,6 @@ package actors.dumpers.combining
 
 import actors.BinPackingSolutionStep
 import dao.CombinedBinPackingSolutionStepDAO
-import models.problem.binpacking.solution.SimpleBinPackingSolution
 import models.problem.binpacking.solution.update.RectanglesChanged
 import models.problem.binpacking.solution.update.UnchangedSolution
 
@@ -30,8 +29,9 @@ class LocalSearchCombiningSolutionStepDumperProcessor(
   }
 
   private def onlyMinimalChangesInQueue(): Boolean = queue.forall {
-    case BinPackingSolutionStep(_, _, SimpleBinPackingSolution(_, RectanglesChanged(ids)), _) => ids.size == 1
-    case BinPackingSolutionStep(_, _, SimpleBinPackingSolution(_, UnchangedSolution()), _) => true
+    case BinPackingSolutionStep(_, _, solution, _) if solution.update.isInstanceOf[RectanglesChanged] =>
+      solution.update.asInstanceOf[RectanglesChanged].rectangleIds.size == 1
+    case BinPackingSolutionStep(_, _, solution, _) if solution.update.isInstanceOf[UnchangedSolution] => true
     case _ => false
   }
 }

@@ -22,7 +22,7 @@ class BinPackingGreedyExecutor(
           _.tell(
             BinPackingSolutionStep.startStep(
               runId,
-              binPacking.selectionHandler.startSolution.asSimpleSolution
+              binPacking.transformToStoredRepresentation(binPacking.startSolution)
             ),
             noSender
           )
@@ -41,7 +41,7 @@ class BinPackingGreedyExecutor(
         BinPackingSolutionStep(
           runId,
           step,
-          solution.asSimpleSolution,
+          binPacking.transformToStoredRepresentation(solution),
           finished
         ),
         noSender

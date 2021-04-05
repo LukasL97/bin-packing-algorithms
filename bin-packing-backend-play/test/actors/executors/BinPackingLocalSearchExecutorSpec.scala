@@ -13,6 +13,8 @@ import models.problem.binpacking.solution.Box
 import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.SimpleBinPackingSolution
+import models.problem.binpacking.solution.SimpleBinPackingSolutionRepresentation
+import models.problem.binpacking.solution.update.StartSolution
 import models.problem.binpacking.solution.update.UnchangedSolution
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.BeforeAndAfterAll
@@ -79,8 +81,9 @@ class BinPackingLocalSearchExecutorSpec
           BinPackingSolutionStep(
             runId,
             0,
-            solution = SimpleBinPackingSolution.apply(
-              Map(binPacking.instance.rectangles.head -> Placing(box, Coordinates(0, 0)))
+            solution = SimpleBinPackingSolutionRepresentation(
+              Map(binPacking.instance.rectangles.head -> Placing(box, Coordinates(0, 0))),
+              StartSolution()
             )
           )
         )
@@ -88,8 +91,9 @@ class BinPackingLocalSearchExecutorSpec
           BinPackingSolutionStep(
             runId,
             1,
-            solution = SimpleBinPackingSolution.apply(
-              Map(binPacking.instance.rectangles.head -> Placing(box, Coordinates(1, 1)))
+            solution = SimpleBinPackingSolutionRepresentation(
+              Map(binPacking.instance.rectangles.head -> Placing(box, Coordinates(1, 1))),
+              StartSolution()
             )
           )
         )
@@ -97,8 +101,9 @@ class BinPackingLocalSearchExecutorSpec
           BinPackingSolutionStep(
             runId,
             2,
-            solution = SimpleBinPackingSolution.apply(
-              Map(binPacking.instance.rectangles.head -> Placing(box, Coordinates(2, 2)))
+            solution = SimpleBinPackingSolutionRepresentation(
+              Map(binPacking.instance.rectangles.head -> Placing(box, Coordinates(2, 2))),
+              StartSolution()
             )
           )
         )
@@ -106,7 +111,7 @@ class BinPackingLocalSearchExecutorSpec
           BinPackingSolutionStep(
             runId,
             3,
-            solution = new SimpleBinPackingSolution(
+            solution = SimpleBinPackingSolutionRepresentation(
               Map(binPacking.instance.rectangles.head -> Placing(box, Coordinates(2, 2))),
               UnchangedSolution()
             ),

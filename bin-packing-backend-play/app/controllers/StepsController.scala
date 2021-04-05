@@ -10,7 +10,7 @@ import play.api.mvc.ControllerComponents
 import play.api.mvc.Request
 import utils.JsonConversions.toPlayJson
 import utils.SerializationUtil
-import utils.BinPackingSolutionSerializationUtil.formats
+import utils.BinPackingSolutionRepresentationSerializationUtil.formats
 
 import java.lang.Integer.parseInt
 import javax.inject.Inject

@@ -3,7 +3,8 @@ package actors.dumpers.combining
 import actors.BinPackingSolutionStep
 import dao.CombinedBinPackingSolutionStepDAO
 import models.problem.binpacking.BinPackingInstance
-import models.problem.binpacking.solution.SimpleBinPackingSolution
+import models.problem.binpacking.solution.SimpleBinPackingSolutionRepresentation
+import models.problem.binpacking.solution.update.StartSolution
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.MustMatchers
@@ -21,7 +22,7 @@ class GreedyCombiningSolutionStepDumperProcessorSpec
   private def createSolutionStep(step: Int, finished: Boolean = false) = BinPackingSolutionStep(
     "runId",
     step,
-    SimpleBinPackingSolution.apply(10),
+    SimpleBinPackingSolutionRepresentation(Map.empty, StartSolution()),
     finished
   )
 

@@ -1,16 +1,16 @@
 package actors
 
-import models.problem.binpacking.solution.SimpleBinPackingSolution
+import models.problem.binpacking.solution.BinPackingSolutionRepresentation
 
 case class BinPackingSolutionStep(
   runId: String,
   step: Int,
-  solution: SimpleBinPackingSolution,
+  solution: BinPackingSolutionRepresentation,
   finished: Boolean = false
 )
 
 object BinPackingSolutionStep {
-  def startStep(runId: String, solution: SimpleBinPackingSolution): BinPackingSolutionStep = {
+  def startStep(runId: String, solution: BinPackingSolutionRepresentation): BinPackingSolutionStep = {
     BinPackingSolutionStep(
       runId,
       0,

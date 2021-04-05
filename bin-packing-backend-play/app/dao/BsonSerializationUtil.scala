@@ -1,13 +1,13 @@
 package dao
 
 import actors.BinPackingSolutionStep
-import models.problem.binpacking.solution.BinPackingSolution
+import models.problem.binpacking.solution.BinPackingSolutionRepresentation
 import models.problem.binpacking.solution.Box
 import models.problem.binpacking.solution.Coordinates
 import models.problem.binpacking.solution.Placing
 import models.problem.binpacking.solution.Rectangle
-import models.problem.binpacking.solution.SimpleBinPackingSolution
-import models.problem.binpacking.solution.TopLeftFirstBinPackingSolution
+import models.problem.binpacking.solution.RectanglePermutationBinPackingSolutionRepresentation
+import models.problem.binpacking.solution.SimpleBinPackingSolutionRepresentation
 import models.problem.binpacking.solution.update.BoxOrderChanged
 import models.problem.binpacking.solution.update.RectanglesChanged
 import models.problem.binpacking.solution.update.StartSolution
@@ -16,8 +16,6 @@ import models.problem.binpacking.solution.update.Update
 import org.mongodb.scala.bson.BsonArray
 import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.bson.BsonInt32
-
-import scala.collection.SortedSet
 
 object BsonSerializationUtil {
 
@@ -30,9 +28,9 @@ object BsonSerializationUtil {
     )
   }
 
-  private def solutionToDocument(solution: BinPackingSolution): BsonDocument = solution match {
-    case solution: SimpleBinPackingSolution => simpleSolutionToDocument(solution)
-    case solution: TopLeftFirstBinPackingSolution => topLeftFirstSolutionToDocument(solution)
+  private def solutionToDocument(solution: BinPackingSolutionRepresentation): BsonDocument = solution match {
+    case solution: SimpleBinPackingSolutionRepresentation => simpleSolutionToDocument(solution)
+    case solution: RectanglePermutationBinPackingSolutionRepresentation => rectanglePermutationSolutionToDocument(solution)
   }
 
   private def updateToDocument(update: Update): BsonDocument = update match {
@@ -46,21 +44,20 @@ object BsonSerializationUtil {
     case UnchangedSolution() => BsonDocument("jsonClass" -> "UnchangedSolution")
   }
 
-  private def simpleSolutionToDocument(solution: SimpleBinPackingSolution): BsonDocument = {
+  private def simpleSolutionToDocument(solution: SimpleBinPackingSolutionRepresentation): BsonDocument = {
     BsonDocument(
-      "jsonClass" -> "SimpleBinPackingSolution",
+      "jsonClass" -> "SimpleBinPackingSolutionRepresentation",
       "placement" -> placementToDocument(solution.placement),
       "update" -> updateToDocument(solution.update)
     )
   }
 
-  private def topLeftFirstSolutionToDocument(solution: TopLeftFirstBinPackingSolution): BsonDocument = {
+  private def rectanglePermutationSolutionToDocument(solution: RectanglePermutationBinPackingSolutionRepresentation): BsonDocument = {
     BsonDocument(
-      "jsonClass" -> "TopLeftFirstBinPackingSolution",
+      "jsonClass" -> "RectanglePermutationBinPackingSolutionRepresentation",
       "placement" -> placementToDocument(solution.placement),
-      "topLeftCandidates" -> topLeftCandidatesToDocument(solution.topLeftCandidates),
-      "boxLength" -> solution.boxLength,
-      "update" -> updateToDocument(solution.update)
+      "update" -> updateToDocument(solution.update),
+      "permutation" -> BsonArray.fromIterable(solution.permutation.map(BsonInt32(_)))
     )
   }
 
@@ -72,20 +69,6 @@ object BsonSerializationUtil {
             "rectangle" -> rectangleToDocument(rectangle),
             "box" -> boxToDocument(box),
             "coordinates" -> coordinatesToDocument(coordinates)
-          )
-      }
-    )
-  }
-
-  def topLeftCandidatesToDocument(topLeftCandidates: Map[Int, SortedSet[Coordinates]]): BsonArray = {
-    BsonArray.fromIterable(
-      topLeftCandidates.toSeq.map {
-        case (boxId, candidates) =>
-          BsonDocument(
-            "boxId" -> boxId,
-            "candidates" -> BsonArray.fromIterable(
-              candidates.toSeq.map(coordinatesToDocument)
-            )
           )
       }
     )
