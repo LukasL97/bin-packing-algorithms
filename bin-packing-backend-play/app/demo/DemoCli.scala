@@ -93,7 +93,7 @@ object DemoCli extends App {
       "theoretical lower bound"
     ) ++ algorithmNames.flatMap(name => Seq(s"$name (boxes)", s"$name (time)"))
 
-    val out = new File("/home/lukas/Documents/bin-packing-algorithms/bin-packing-backend-play/resources/out.csv")
+    val out = new File(config.outPath)
     val writer = out.asCsvWriter[Seq[Double]](rfc.withHeader(header: _*))
     demoRunResults.foreach { results =>
       val instance = results.head.instance
