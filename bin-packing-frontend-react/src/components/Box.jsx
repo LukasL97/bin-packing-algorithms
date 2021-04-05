@@ -11,8 +11,8 @@ class Box extends Component {
   rectangleBorderColor = 'black'
   rectangleOpacity = 0.7
 
-  getRectangleColor(rectangleId, update) {
-    if (update.jsonClass === 'RectanglesChanged' && update.rectangleIds.includes(rectangleId)) {
+  getRectangleColor(rectangleId, changedRectangleIds) {
+    if (changedRectangleIds.includes(rectangleId)) {
       return this.rectangleFillColorUpdated
     } else {
       return this.rectangleFillColorBase
@@ -20,9 +20,7 @@ class Box extends Component {
   }
 
   render() {
-    const self = this
-
-    const {id, unitLength, pixelLength, getRectangles, update, getShowRectangleIds} = this.props
+    const {id, unitLength, pixelLength, getRectangles, changedRectangleIds, getShowRectangleIds} = this.props
 
     function unitToPixel(unit) {
       return unit / unitLength * pixelLength
@@ -39,9 +37,9 @@ class Box extends Component {
           <Rect
             width={unitToPixel(rectangle.width)}
             height={unitToPixel(rectangle.height)}
-            fill={self.getRectangleColor(rectangle.id, update)}
-            stroke={self.rectangleBorderColor}
-            opacity={self.rectangleOpacity}
+            fill={this.getRectangleColor(rectangle.id, changedRectangleIds)}
+            stroke={this.rectangleBorderColor}
+            opacity={this.rectangleOpacity}
           />
           {getShowRectangleIds() ? <Text
             text={rectangle.id}
@@ -52,7 +50,7 @@ class Box extends Component {
       )
     }
 
-    const rectangles = getRectangles().map(getRectShape)
+    const rectangles = getRectangles().map(getRectShape.bind(this))
 
     return (
       <div className="box" id={id}>
