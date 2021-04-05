@@ -19,7 +19,8 @@ class App extends Component {
     solutionSteps: [],
     currentStepIndex: 0,
     automaticVisualization: true,
-    combineSteps: false
+    combineSteps: false,
+    showRectangleIds: false
   }
 
   getCurrentSolutionStep = () => this.state.solutionSteps[this.state.currentStepIndex]
@@ -146,8 +147,16 @@ class App extends Component {
     }))
   }
 
+  toggleShowRectangleIds(active) {
+    this.setState(oldState => ({
+      ...oldState,
+      showRectangleIds: active
+    }))
+  }
+
   getAutomaticVisualization = () => this.state.automaticVisualization
   getCurrentStepIndex = () => this.state.currentStepIndex
+  getShowRectangleIds = () => this.state.showRectangleIds
 
   componentDidMount() {
     this.fetchSolutionStepsInterval = setInterval(
@@ -182,6 +191,8 @@ class App extends Component {
           start={this.start}
           startFromInstance={this.startFromInstance}
           toggleCombineSteps={this.toggleCombineSteps.bind(this)}
+          toggleShowRectangleIds={this.toggleShowRectangleIds.bind(this)}
+          getShowRectangleIds={this.getShowRectangleIds.bind(this)}
           visualizationIterationPeriodDefault={this.visualizationIterationPeriodDefault}
           updateVisualizationIterationPeriod={this.updateMoveCurrentStepIndexInterval.bind(this)}
           toggleAutomaticVisualization={this.toggleAutomaticVisualization.bind(this)}

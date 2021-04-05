@@ -4,6 +4,7 @@ import Box from "./Box"
 class AlgorithmDisplay extends Component {
 
   getCurrentSolutionStep = this.props.getCurrentSolutionStep
+  getShowRectangleIds = this.props.getShowRectangleIds
 
   state = {
     placement: [],
@@ -51,6 +52,7 @@ class AlgorithmDisplay extends Component {
           pixelLength={this.boxPixelLength}
           getRectangles={this.getRectangles(box.id)}
           update={this.state.update}
+          getShowRectangleIds={this.getShowRectangleIds}
         />
       ))
 

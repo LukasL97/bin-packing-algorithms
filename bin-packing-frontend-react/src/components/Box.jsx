@@ -22,7 +22,7 @@ class Box extends Component {
   render() {
     const self = this
 
-    const {id, unitLength, pixelLength, getRectangles, update} = this.props
+    const {id, unitLength, pixelLength, getRectangles, update, getShowRectangleIds} = this.props
 
     function unitToPixel(unit) {
       return unit / unitLength * pixelLength
@@ -43,11 +43,11 @@ class Box extends Component {
             stroke={self.rectangleBorderColor}
             opacity={self.rectangleOpacity}
           />
-          <Text
+          {getShowRectangleIds() ? <Text
             text={rectangle.id}
             fontSize={10}
             padding={3}
-          />
+          /> : null}
         </Group>
       )
     }

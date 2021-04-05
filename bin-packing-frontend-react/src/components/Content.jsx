@@ -13,6 +13,8 @@ class Content extends Component {
       start,
       startFromInstance,
       toggleCombineSteps,
+      toggleShowRectangleIds,
+      getShowRectangleIds,
       visualizationIterationPeriodDefault,
       updateVisualizationIterationPeriod,
       toggleAutomaticVisualization,
@@ -28,6 +30,7 @@ class Content extends Component {
           <AlgorithmInputForm start={start} startFromInstance={startFromInstance}/>
           <VisualizationConfigForm
             toggleCombineSteps={toggleCombineSteps}
+            toggleShowRectangleIds={toggleShowRectangleIds}
             visualizationIterationPeriodDefault={visualizationIterationPeriodDefault}
             updateVisualizationIterationPeriod={updateVisualizationIterationPeriod}
             toggleAutomaticVisualization={toggleAutomaticVisualization}
@@ -39,6 +42,7 @@ class Content extends Component {
         </div>
         <AlgorithmDisplay
           getCurrentSolutionStep={getCurrentSolutionStep}
+          getShowRectangleIds={getShowRectangleIds}
         />
       </div>
     )

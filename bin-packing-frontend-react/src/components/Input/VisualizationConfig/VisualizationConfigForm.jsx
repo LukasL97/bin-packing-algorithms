@@ -28,6 +28,10 @@ class VisualizationConfigForm extends Component {
     this.props.toggleCombineSteps(event.target.checked)
   }
 
+  handleShowRectangleIdsChange(event) {
+    this.props.toggleShowRectangleIds(event.target.checked)
+  }
+
   render() {
     return (
       <div className="input-container-element visualization-config-form">
@@ -38,6 +42,12 @@ class VisualizationConfigForm extends Component {
             name={'combine-steps'}
             value={false}
             onToggle={this.handleCombineStepsChange.bind(this)}
+          />
+          <ToggleFormRow
+            label={'Show Rectangle IDs'}
+            name={'show-rectangle-ids'}
+            value={false}
+            onToggle={this.handleShowRectangleIdsChange.bind(this)}
           />
           <ToggleFormRow
             label={'Auto Mode'}
