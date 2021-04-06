@@ -9,6 +9,7 @@ class AlgorithmDisplay extends Component {
 
   state = {
     placement: [],
+    step: 0,
     update: {jsonClass: 'UnchangedSolution'},
     permutation: null,
     showAllBoxes: false
@@ -59,6 +60,7 @@ class AlgorithmDisplay extends Component {
       this.setState(oldState => ({
         ...oldState,
         placement: newSolutionStep.solution.placement,
+        step: newSolutionStep.step,
         update: newSolutionStep.solution.update,
         permutation: (newSolutionStep.solution.permutation ? newSolutionStep.solution.permutation : null)
       }))
@@ -97,7 +99,7 @@ class AlgorithmDisplay extends Component {
 
     return (
       <div className="algorithm-display">
-        <div>
+        <div className="show-all-boxes-container">
           {numBoxes > this.maxShownBoxes ?
             <ToggleFormRow
               label={'Show all ' + numBoxes + ' boxes'}
@@ -107,6 +109,11 @@ class AlgorithmDisplay extends Component {
             /> :
             null
           }
+        </div>
+        <div className="step-container">
+          <p>
+            Step: {this.state.step}
+          </p>
         </div>
         <div className="permutation-container">
           <p>
