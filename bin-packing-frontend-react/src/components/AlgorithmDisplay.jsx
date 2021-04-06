@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import Box from './Box'
+import ToggleFormRow from './Input/ToggleFormRow'
 
 class AlgorithmDisplay extends Component {
 
@@ -9,8 +10,11 @@ class AlgorithmDisplay extends Component {
   state = {
     placement: [],
     update: {jsonClass: 'UnchangedSolution'},
-    permutation: null
+    permutation: null,
+    showAllBoxes: false
   }
+
+  maxShownBoxes = 50
 
   boxPixelLength = 300
 
@@ -40,6 +44,13 @@ class AlgorithmDisplay extends Component {
     }
   }
 
+  handleShowAllBoxesChange(event) {
+    this.setState(oldState => ({
+      ...oldState,
+      showAllBoxes: event.target.checked
+    }))
+  }
+
   render() {
 
     const newSolutionStep = this.getCurrentSolutionStep()
@@ -56,7 +67,10 @@ class AlgorithmDisplay extends Component {
 
     const changedRectangleIds = this.getChangedRectangleIds(this.state.update)
 
+    const numBoxes = this.state.placement.length > 0 ? Math.max(...this.state.placement.map(placing => placing.box.id)) : 0
+
     const boxes = this.getUnique(this.state.placement.map(placing => placing.box))
+      .filter(box => this.state.showAllBoxes || box.id <= this.maxShownBoxes)
       .sort((box1, box2) => box1.id - box2.id)
       .map(box => (
         <Box
@@ -83,6 +97,17 @@ class AlgorithmDisplay extends Component {
 
     return (
       <div className="algorithm-display">
+        <div>
+          {numBoxes > this.maxShownBoxes ?
+            <ToggleFormRow
+              label={'Show all ' + numBoxes + ' boxes'}
+              name={'show-all-boxes'}
+              value={false}
+              onToggle={this.handleShowAllBoxesChange.bind(this)}
+            /> :
+            null
+          }
+        </div>
         <div className="permutation-container">
           <p>
             {permutation}
