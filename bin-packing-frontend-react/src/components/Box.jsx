@@ -6,8 +6,8 @@ class Box extends Component {
   boxFillColor = 'white'
   boxBorderColor = 'black'
 
-  rectangleFillColorBase = '#D6E9FE'
-  rectangleFillColorUpdated = '#5995DA'
+  rectangleFillColorBase = 'grey'
+  rectangleFillColorUpdated = 'red'
   rectangleBorderColor = 'black'
   rectangleOpacity = 0.7
 
